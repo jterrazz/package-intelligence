@@ -1,72 +1,214 @@
-# Package Logger
+# Package Intelligence
 
-A TypeScript-based logging utility designed with clean architecture principles, providing flexible and extensible logging capabilities for Node.js and React Native applications.
+A TypeScript-based AI agent framework built with clean architecture principles, providing composable prompt libraries, structured chat agents, and tool integration for intelligent automation.
 
 ## Features
 
-- 📝 Type-safe logging interface
-- 🔌 Pluggable logging adapters
-- 💪 100% TypeScript
-- 🚀 Production-ready with no-op adapter
-- 📱 React Native compatible
+- 🤖 **Structured Chat Agents** - LangChain-powered agents with optional responses
+- 📚 **Composable Prompt Library** - Modular prompt parts for consistent AI behavior
+- 🛠️ **Safe Tool Integration** - Error-handled tool execution with logging
+- 🎯 **Type-Safe Responses** - Zod-validated AI response parsing
+- 💪 **100% TypeScript** - Full type safety throughout
+- 🏗️ **Clean Architecture** - Ports and adapters pattern for extensibility
 
 ## Installation
 
 ```bash
-npm install @jterrazz/logger
+npm install package-intelligence
 ```
 
-## Usage
+## Quick Start
 
-### Basic Usage
+### Basic Chat Agent
 
 ```typescript
-import { Logger } from '@jterrazz/logger';
-import { PinoLoggerAdapter } from '@jterrazz/logger/adapters/pino';
-import { NoopLoggerAdapter } from '@jterrazz/logger/adapters/noop';
+import { ChatAgentAdapter } from 'package-intelligence/agents';
+import { OpenRouterAdapter } from 'package-intelligence/models';
+import { PROMPTS } from 'package-intelligence/prompts';
 
-// Development environment with Pino
-const devLogger = new Logger({
-  adapter: new PinoLoggerAdapter({
-    prettyPrint: true,
-    level: 'debug',
-  }),
+// Create a model
+const model = new OpenRouterAdapter({
+  apiKey: process.env.OPENROUTER_API_KEY!,
+  modelName: 'anthropic/claude-3.5-sonnet',
 });
 
-// Production environment with No-op
-const prodLogger = new Logger({
-  adapter: new NoopLoggerAdapter(),
+// Create an agent with a preset
+const agent = new ChatAgentAdapter('discord-bot', PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR, {
+  model,
+  tools: [],
 });
 
-// Log messages
-logger.info('Application started');
-logger.error('An error occurred', { error: new Error('Something went wrong') });
+// Run the agent
+const response = await agent.run();
+console.log(response);
 ```
 
-### Available Adapters
+### Custom Prompt Composition
 
-- **PinoLoggerAdapter**: Full-featured logging with Pino (recommended for development)
+```typescript
+import { SystemPromptAdapter, UserPromptAdapter } from 'package-intelligence/prompts';
+import { PROMPTS } from 'package-intelligence/prompts';
 
-  ```typescript
-  new PinoLoggerAdapter({
-    prettyPrint: true, // Enable pretty printing
-    level: 'debug', // Set minimum log level
-  });
-  ```
+// Create custom system prompt
+const systemPrompt = new SystemPromptAdapter([
+  PROMPTS.DIRECTIVES.BE_SAFE,
+  PROMPTS.PERSONA.EXPERT_ADVISOR,
+  PROMPTS.DOMAIN.SOFTWARE_ENGINEERING,
+  PROMPTS.TONE.PROFESSIONAL,
+  PROMPTS.LANGUAGE.ENGLISH_NATIVE,
+]);
 
-- **NoopLoggerAdapter**: Zero-overhead logging (recommended for client side production)
-  ```typescript
-  new NoopLoggerAdapter();
-  ```
+// Create user prompt
+const userPrompt = new UserPromptAdapter(['Please review this TypeScript code for best practices']);
+
+const agent = new ChatAgentAdapter('code-reviewer', systemPrompt.generate(), { model, tools: [] });
+
+const response = await agent.run(userPrompt);
+```
+
+### Tool Integration
+
+```typescript
+import { SafeToolAdapter } from 'package-intelligence/tools';
+import { z } from 'zod/v4';
+
+// Create a tool with schema validation
+const weatherTool = new SafeToolAdapter(
+  {
+    name: 'get_weather',
+    description: 'Get current weather for a location',
+    execute: async (args) => {
+      const response = await fetch(`/api/weather?city=${args.city}`);
+      return response.json();
+    },
+  },
+  {
+    schema: z.object({
+      city: z.string().describe('City name'),
+    }),
+  },
+);
+
+// Use tool with agent
+const agent = new ChatAgentAdapter('weather-bot', PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT, {
+  model,
+  tools: [weatherTool.getDynamicTool()],
+});
+```
+
+## Prompt Library
+
+The composable prompt library provides building blocks for consistent AI behavior:
+
+### Categories
+
+- **`DIRECTIVES`** - Core safety and ethical rules
+- **`PERSONA`** - Agent character (Expert Advisor, Creative Partner, etc.)
+- **`DOMAIN`** - Area of expertise (Software Engineering, Business Strategy, etc.)
+- **`TONE`** - Communication style (Professional, Empathetic, Humorous, etc.)
+- **`LANGUAGE`** - Natural language and proficiency level
+- **`VERBOSITY`** - Level of detail (Concise, Normal, Detailed)
+- **`FORMAT`** - Output structure (Markdown, JSON, Step-by-step, etc.)
+- **`AGENT_LOGIC`** - Response behavior (Always Respond, Tool First, etc.)
+- **`AGENT_SKILLS`** - Primary capabilities (Problem Solving, Creative Ideation, etc.)
+
+### Presets
+
+Ready-to-use combinations for common scenarios:
+
+```typescript
+// Available presets
+PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR; // Fun community engagement
+PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT; // User support
+PROMPTS.PRESETS.CREATIVE_BRAINSTORMER; // Ideation and creativity
+```
 
 ## Architecture
 
-This package follows the hexagonal (ports and adapters) architecture:
+This package follows hexagonal architecture principles:
 
-- `src/ports/`: Contains the core interfaces and types
-- `src/adapters/`: Implements various logging adapters
-  - `pino.adapter.ts`: Pino-based logging
-  - `noop.adapter.ts`: No-operation logging
+```
+src/
+├── ports/                 # Core interfaces
+│   ├── agent.port.ts     # Agent interface
+│   ├── model.port.ts     # Model provider interface
+│   ├── tool.port.ts      # Tool interface
+│   └── prompt.port.ts    # Prompt interface
+├── adapters/
+│   ├── agents/           # Agent implementations
+│   ├── models/           # Model provider implementations
+│   ├── tools/            # Tool implementations
+│   ├── prompts/          # Prompt implementations
+│   │   └── library/      # Composable prompt parts
+│   └── utils/            # Utilities (parsers, etc.)
+└── index.ts              # Main exports
+```
+
+## Core Components
+
+### ChatAgentAdapter
+
+Structured chat agent with optional responses:
+
+```typescript
+const agent = new ChatAgentAdapter(
+    name: string,                    // Agent identifier
+    systemPrompts: readonly string[], // System prompt parts
+    options: ChatAgentOptions        // Model, tools, logger
+);
+```
+
+### AIResponseParser
+
+Type-safe response parsing with Zod schemas:
+
+```typescript
+const parser = new AIResponseParser(schema);
+const result = parser.parse(aiResponse);
+```
+
+### SafeToolAdapter
+
+Error-handled tool execution:
+
+```typescript
+const tool = new SafeToolAdapter(config, options);
+const dynamicTool = tool.getDynamicTool();
+```
+
+## Examples
+
+### Discord Community Bot
+
+```typescript
+const discordBot = new ChatAgentAdapter(
+  'discord-community-bot',
+  PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR,
+  { model, tools: [] },
+);
+
+// Bot will engage with fun, community-focused responses
+const response = await discordBot.run(
+  new UserPromptAdapter(["What's happening in the tech world today?"]),
+);
+```
+
+### Code Review Assistant
+
+```typescript
+const codeReviewer = new ChatAgentAdapter(
+  'code-reviewer',
+  [
+    PROMPTS.DIRECTIVES.BE_FACTUAL,
+    PROMPTS.PERSONA.EXPERT_ADVISOR,
+    PROMPTS.DOMAIN.SOFTWARE_ENGINEERING,
+    PROMPTS.TONE.PROFESSIONAL,
+    PROMPTS.VERBOSITY.DETAILED,
+    PROMPTS.FORMAT.MARKDOWN,
+  ],
+  { model, tools: [codeAnalysisTool] },
+);
+```
 
 ## Contributing
 

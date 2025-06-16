@@ -9,8 +9,9 @@ export interface SafeToolOptions<T> {
     schema?: z.ZodSchema<T>;
 }
 
-export type ToolConfig = {
+export type ToolConfig<T = void> = {
     description: string;
+    execute: ToolFunction<T>;
     name: string;
 };
 
@@ -25,8 +26,7 @@ export class SafeToolAdapter<T = void> implements Tool {
     private readonly dynamicTool: DynamicStructuredTool<z.ZodSchema<T>> | DynamicTool;
 
     constructor(
-        private readonly config: ToolConfig,
-        private readonly toolFunction: ToolFunction<T>,
+        private readonly config: ToolConfig<T>,
         private readonly options: SafeToolOptions<T> = {},
     ) {
         const { logger, schema } = options;
@@ -37,7 +37,7 @@ export class SafeToolAdapter<T = void> implements Tool {
                 description: config.description,
                 func: async (args: T) => {
                     try {
-                        return await (toolFunction as ToolFunction<T>)(args);
+                        return await (config.execute as ToolFunction<T>)(args);
                     } catch (error) {
                         const errorMessage = error instanceof Error ? error.message : String(error);
 
@@ -59,7 +59,7 @@ export class SafeToolAdapter<T = void> implements Tool {
                 description: config.description,
                 func: async () => {
                     try {
-                        return await (toolFunction as ToolFunction<void>)();
+                        return await (config.execute as ToolFunction<void>)();
                     } catch (error) {
                         const errorMessage = error instanceof Error ? error.message : String(error);
 
