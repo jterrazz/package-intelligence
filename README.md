@@ -133,20 +133,20 @@ const model = new OpenRouterModelAdapter({
   modelName: 'anthropic/claude-3.5-sonnet',
 });
 
-// 1. Compose the system prompt from multiple parts
-const systemPrompt = new SystemPromptAdapter([
+// 1. Compose the system prompt from multiple parts (using rest arguments)
+const systemPrompt = new SystemPromptAdapter(
   PROMPTS.PERSONA.EXPERT_ADVISOR,
   PROMPTS.DOMAIN.SOFTWARE_ENGINEERING,
   PROMPTS.TONE.PROFESSIONAL,
   PROMPTS.VERBOSITY.DETAILED,
   PROMPTS.FORMAT.MARKDOWN,
   PROMPTS.DIRECTIVES.BE_FACTUAL,
-]);
+);
 
-// 2. Create the user request
+// 2. Create the user request (using a single array)
 const userPrompt = new UserPromptAdapter([
-  'Please review this TypeScript code for best practices:',
-  'const x = (s) => s.trim();',
+    'Please review this TypeScript code for best practices:',
+    'const x = (s) => s.trim();',
 ]);
 
 // 3. Configure and run the agent

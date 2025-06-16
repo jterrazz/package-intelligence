@@ -6,8 +6,9 @@ import type { Prompt } from '../../ports/prompt.port.js';
 export class SystemPromptAdapter implements Prompt {
     private readonly finalPrompt: string;
 
-    constructor(prompts: readonly string[]) {
-        this.finalPrompt = prompts.join('\n\n');
+    constructor(...prompts: readonly (readonly string[] | string)[]) {
+        const flattenedPrompts = prompts.flat();
+        this.finalPrompt = flattenedPrompts.join('\n\n');
     }
 
     generate(): string {
