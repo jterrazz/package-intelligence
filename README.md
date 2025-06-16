@@ -1,15 +1,20 @@
-# Package Intelligence
+# @jterrazz/intelligence
 
-A TypeScript-based AI agent framework built with clean architecture principles, providing composable prompt libraries, structured chat agents, and tool integration for intelligent automation.
+**A composable, type-safe, and framework-agnostic AI agent library for TypeScript.**
 
-## Features
+[![NPM Version](https://img.shields.io/npm/v/@jterrazz/intelligence.svg)](https://www.npmjs.com/package/@jterrazz/intelligence)
+[![License](https://img.shields.io/npm/l/@jterrazz/intelligence.svg)](./LICENSE)
 
-- 🤖 **Structured Chat Agents** - LangChain-powered agents with optional responses
-- 📚 **Composable Prompt Library** - Modular prompt parts for consistent AI behavior
-- 🛠️ **Safe Tool Integration** - Error-handled tool execution with logging
-- 🎯 **Type-Safe Responses** - Zod-validated AI response parsing
-- 💪 **100% TypeScript** - Full type safety throughout
-- 🏗️ **Clean Architecture** - Ports and adapters pattern for extensibility
+`@jterrazz/intelligence` provides a clean, structured, and extensible foundation for building sophisticated AI agents. By combining a composable prompt system, safe tool integration, and a ports-and-adapters architecture, it empowers developers to create reliable and maintainable AI-powered applications.
+
+---
+
+## Why Use This Library?
+
+- **🤖 Build Predictable Agents**: Use the composable prompt library to ensure your agents have a consistent personality, tone, and behavior.
+- **🛠️ Integrate Tools Safely**: `SafeToolAdapter` provides built-in error handling, logging, and Zod-based schema validation for all your tools.
+- **🏗️ Stay Flexible**: The ports-and-adapters architecture makes it easy to swap out underlying models or frameworks (like LangChain) without rewriting your core logic.
+- **🎯 Get Type-Safe Responses**: Move beyond string parsing with `AIResponseParser`, which validates and types your model's output against a Zod schema.
 
 ## Installation
 
@@ -17,203 +22,198 @@ A TypeScript-based AI agent framework built with clean architecture principles, 
 npm install @jterrazz/intelligence
 ```
 
+---
+
 ## Quick Start
 
-### Basic Chat Agent
+Get your first agent running in under a minute. This example uses a preset to create a helpful Discord community animator.
 
 ```typescript
 import { ChatAgentAdapter, OpenRouterModelAdapter, PROMPTS } from '@jterrazz/intelligence';
 
-// Create a model
+// 1. Set up the model provider
 const model = new OpenRouterModelAdapter({
-  apiKey: process.env.OPENROUTER_API_KEY!,
+  apiKey: process.env.OPENROUTER_API_KEY!, // Make sure to set this environment variable
   modelName: 'anthropic/claude-3.5-sonnet',
 });
 
-// Create an agent with a preset
+// 2. Create an agent using a preset prompt
 const agent = new ChatAgentAdapter('discord-bot', PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR, {
   model,
-  tools: [],
 });
 
-// Run the agent
+// 3. Run the agent
 const response = await agent.run();
+
 console.log(response);
+// Output might be: "Hello, community! I'm here to help with any questions and keep the good vibes flowing. What's on your mind today?"
 ```
 
-### Custom Prompt Composition
+---
 
-```typescript
-import { SystemPromptAdapter, UserPromptAdapter, PROMPTS } from '@jterrazz/intelligence';
+## Core Concepts
 
-// Create custom system prompt
-const systemPrompt = new SystemPromptAdapter([
-  PROMPTS.DIRECTIVES.BE_SAFE,
-  PROMPTS.PERSONA.EXPERT_ADVISOR,
-  PROMPTS.DOMAIN.SOFTWARE_ENGINEERING,
-  PROMPTS.TONE.PROFESSIONAL,
-  PROMPTS.LANGUAGE.ENGLISH_NATIVE,
-]);
+### 1. Composable Prompts
 
-// Create user prompt
-const userPrompt = new UserPromptAdapter(['Please review this TypeScript code for best practices']);
+Instead of writing monolithic prompts, the library provides a collection of composable string constants. Mix and match them to build a precise, fine-grained system prompt that defines your agent's behavior.
 
-const agent = new ChatAgentAdapter('code-reviewer', systemPrompt.generate(), { model, tools: [] });
+- **`PERSONA`**: Who the agent is (e.g., `EXPERT_ADVISOR`).
+- **`TONE`**: How the agent communicates (e.g., `PROFESSIONAL`, `EMPATHETIC`).
+- **`FORMAT`** How the agent structures its response (e.g., `MARKDOWN`, `JSON`).
+- **`DIRECTIVES`**: Core rules the agent must follow (e.g., `BE_SAFE`, `BE_FACTUAL`).
 
-const response = await agent.run(userPrompt);
-```
+This approach makes agent behavior more predictable and easier to modify.
 
-### Tool Integration
+### 2. Safe Tool Integration
+
+The `SafeToolAdapter` is a wrapper for your functions that ensures they are executed safely.
 
 ```typescript
 import { SafeToolAdapter } from '@jterrazz/intelligence';
 import { z } from 'zod/v4';
 
-// Create a tool with schema validation
 const weatherTool = new SafeToolAdapter(
   {
     name: 'get_weather',
-    description: 'Get current weather for a location',
-    execute: async (args) => {
-      const response = await fetch(`/api/weather?city=${args.city}`);
-      return response.json();
-    },
+    description: 'Get the current weather for a specific city.',
+    execute: async ({ city }) => `The weather in ${city} is currently sunny.`,
   },
   {
+    // Zod schema for automatic validation and type-safety
     schema: z.object({
-      city: z.string().describe('City name'),
+      city: z.string().describe('The city name'),
     }),
   },
 );
-
-// Use tool with agent
-const agent = new ChatAgentAdapter('weather-bot', PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT, {
-  model,
-  tools: [weatherTool.getDynamicTool()],
-});
 ```
 
-## Prompt Library
+The adapter handles errors gracefully and integrates seamlessly with the agent, which will automatically provide the Zod schema to the underlying model.
 
-The composable prompt library provides building blocks for consistent AI behavior:
+### 3. Ports and Adapters Architecture
 
-### Categories
+The library is built on a hexagonal architecture.
 
-- **`DIRECTIVES`** - Core safety and ethical rules
-- **`PERSONA`** - Agent character (Expert Advisor, Creative Partner, etc.)
-- **`DOMAIN`** - Area of expertise (Software Engineering, Business Strategy, etc.)
-- **`TONE`** - Communication style (Professional, Empathetic, Humorous, etc.)
-- **`LANGUAGE`** - Natural language and proficiency level
-- **`VERBOSITY`** - Level of detail (Concise, Normal, Detailed)
-- **`FORMAT`** - Output structure (Markdown, JSON, Step-by-step, etc.)
-- **`AGENT_LOGIC`** - Response behavior (Always Respond, Tool First, etc.)
-- **`AGENT_SKILLS`** - Primary capabilities (Problem Solving, Creative Ideation, etc.)
+- **Ports (`/ports`)**: Define the contracts (interfaces) for core components like `Agent`, `Model`, and `Tool`.
+- **Adapters (`/adapters`)**: Provide concrete implementations. For example, `ChatAgentAdapter` is an adapter that uses LangChain, and `OpenRouterModelAdapter` is an adapter for the OpenRouter API.
 
-### Presets
-
-Ready-to-use combinations for common scenarios:
-
-```typescript
-// Available presets
-PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR; // Fun community engagement
-PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT; // User support
-PROMPTS.PRESETS.CREATIVE_BRAINSTORMER; // Ideation and creativity
-```
-
-## Architecture
-
-This package follows hexagonal architecture principles:
+This separation of concerns means you can easily create your own adapters to support different models or services without changing the application's core logic.
 
 ```
 src/
-├── ports/                 # Core interfaces
-│   ├── agent.port.ts     # Agent interface
-│   ├── model.port.ts     # Model provider interface
-│   ├── tool.port.ts      # Tool interface
-│   └── prompt.port.ts    # Prompt interface
-├── adapters/
-│   ├── agents/           # Agent implementations
-│   ├── models/           # Model provider implementations
-│   ├── tools/            # Tool implementations
-│   ├── prompts/          # Prompt implementations
-│   │   └── library/      # Composable prompt parts
-│   └── utils/            # Utilities (parsers, etc.)
-└── index.ts              # Main exports
+├── ports/      # Abstract interfaces (the "what")
+└── adapters/   # Concrete implementations (the "how")
 ```
 
-## Core Components
+---
 
-### ChatAgentAdapter
+## Recipes
 
-Structured chat agent with optional responses:
+### Recipe: Code Review Assistant
+
+This recipe creates an agent that acts as an expert software engineer, providing detailed feedback on code.
 
 ```typescript
+import {
+  ChatAgentAdapter,
+  OpenRouterModelAdapter,
+  SystemPromptAdapter,
+  UserPromptAdapter,
+  PROMPTS,
+} from '@jterrazz/intelligence';
+
+const model = new OpenRouterModelAdapter({
+  apiKey: process.env.OPENROUTER_API_KEY!,
+  modelName: 'anthropic/claude-3.5-sonnet',
+});
+
+// 1. Compose the system prompt from multiple parts
+const systemPrompt = new SystemPromptAdapter([
+  PROMPTS.PERSONA.EXPERT_ADVISOR,
+  PROMPTS.DOMAIN.SOFTWARE_ENGINEERING,
+  PROMPTS.TONE.PROFESSIONAL,
+  PROMPTS.VERBOSITY.DETAILED,
+  PROMPTS.FORMAT.MARKDOWN,
+  PROMPTS.DIRECTIVES.BE_FACTUAL,
+]);
+
+// 2. Create the user request
+const userPrompt = new UserPromptAdapter([
+  'Please review this TypeScript code for best practices:',
+  'const x = (s) => s.trim();',
+]);
+
+// 3. Configure and run the agent
+const agent = new ChatAgentAdapter('code-reviewer', systemPrompt.generate(), { model });
+
+const response = await agent.run(userPrompt);
+
+console.log(response);
+```
+
+### Recipe: Weather Bot with Tools
+
+This example shows how to give an agent a tool and have it respond to a user query.
+
+```typescript
+import {
+  ChatAgentAdapter,
+  OpenRouterModelAdapter,
+  SafeToolAdapter,
+  PROMPTS,
+} from '@jterrazz/intelligence';
+import { z } from 'zod/v4';
+
+// Assume 'model' is already configured
+
+// 1. Define the tool
+const weatherTool = new SafeToolAdapter(
+  {
+    name: 'get_weather',
+    description: 'Get the current weather for a location.',
+    execute: async ({ city }) => {
+      // In a real app, you would fetch from a weather API here
+      return `The weather in ${city} is 75°F and sunny.`;
+    },
+  },
+  { schema: z.object({ city: z.string().describe('City name') }) },
+);
+
+// 2. Create an agent that knows how to use tools
 const agent = new ChatAgentAdapter(
-    name: string,                    // Agent identifier
-    systemPrompts: readonly string[], // System prompt parts
-    options: ChatAgentOptions        // Model, tools, logger
-);
-```
-
-### AIResponseParser
-
-Type-safe response parsing with Zod schemas:
-
-```typescript
-const parser = new AIResponseParser(schema);
-const result = parser.parse(aiResponse);
-```
-
-### SafeToolAdapter
-
-Error-handled tool execution:
-
-```typescript
-const tool = new SafeToolAdapter(config, options);
-const dynamicTool = tool.getDynamicTool();
-```
-
-## Examples
-
-### Discord Community Bot
-
-```typescript
-const discordBot = new ChatAgentAdapter(
-  'discord-community-bot',
-  PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR,
-  { model, tools: [] },
+  'weather-bot',
+  PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT, // A good general-purpose preset
+  {
+    model,
+    tools: [weatherTool], // Pass the tool instance directly
+  },
 );
 
-// Bot will engage with fun, community-focused responses
-const response = await discordBot.run(
-  new UserPromptAdapter(["What's happening in the tech world today?"]),
-);
+// 3. Run the agent with a user query that requires the tool
+const response = await agent.run({ generate: () => "What's the weather like in Boston?" });
+
+console.log(response);
+// Expected output: "The weather in Boston is 75°F and sunny."
 ```
 
-### Code Review Assistant
+---
 
-```typescript
-const codeReviewer = new ChatAgentAdapter(
-  'code-reviewer',
-  [
-    PROMPTS.DIRECTIVES.BE_FACTUAL,
-    PROMPTS.PERSONA.EXPERT_ADVISOR,
-    PROMPTS.DOMAIN.SOFTWARE_ENGINEERING,
-    PROMPTS.TONE.PROFESSIONAL,
-    PROMPTS.VERBOSITY.DETAILED,
-    PROMPTS.FORMAT.MARKDOWN,
-  ],
-  { model, tools: [codeAnalysisTool] },
-);
-```
+## API Reference
+
+### Core Components
+
+| Class                    | Description                                                                |
+| ------------------------ | -------------------------------------------------------------------------- |
+| `ChatAgentAdapter`       | The main agent implementation. Runs prompts and coordinates tools.         |
+| `OpenRouterModelAdapter` | An adapter for connecting to any model on the OpenRouter platform.         |
+| `SafeToolAdapter`        | A type-safe wrapper for creating tools with validation and error handling. |
+| `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from an array.         |
+| `UserPromptAdapter`      | A simple adapter to generate a user prompt string from an array.           |
+| `AIResponseParser`       | A utility to parse a model's string output into a typed object using Zod.  |
+| `PROMPTS`                | A frozen object containing the entire composable prompt library.           |
 
 ## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is open source and available under the [MIT License](LICENSE).
 
 ## Author
 

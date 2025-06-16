@@ -5,12 +5,12 @@ import {
     SystemMessagePromptTemplate,
 } from '@langchain/core/prompts';
 import { AgentExecutor, createStructuredChatAgent } from 'langchain/agents';
-import type { DynamicTool } from 'langchain/tools';
 import { z } from 'zod/v4';
 
 import type { Agent } from '../../ports/agent.port.js';
 import type { Model } from '../../ports/model.port.js';
 import type { Prompt } from '../../ports/prompt.port.js';
+import type { Tool } from '../../ports/tool.port.js';
 
 import { AIResponseParser } from '../utils/ai-response-parser.js';
 
@@ -19,7 +19,7 @@ export type AgentResponse = z.infer<typeof AgentResponseSchema>;
 export interface ChatAgentOptions {
     logger?: LoggerPort;
     model: Model;
-    tools: DynamicTool[];
+    tools: Tool[];
 }
 
 // Schema for agent responses
@@ -106,6 +106,9 @@ export class ChatAgentAdapter implements Agent {
         options: ChatAgentOptions,
     ): Promise<AgentExecutor> {
         const model = options.model.getModel();
+        
+        // Convert Tool instances to DynamicTool instances
+        const dynamicTools = options.tools.map(tool => tool.getDynamicTool());
 
         // Combine LangChain framework rules with user-provided system prompts
         const systemPromptText = `${LANGCHAIN_FRAMEWORK_RULES}\n\n${systemPrompts.join('\n\n')}`;
@@ -117,12 +120,12 @@ export class ChatAgentAdapter implements Agent {
         const agent = await createStructuredChatAgent({
             llm: model,
             prompt,
-            tools: options.tools,
+            tools: dynamicTools,
         });
 
         return AgentExecutor.fromAgentAndTools({
             agent,
-            tools: options.tools,
+            tools: dynamicTools,
         });
     }
 
