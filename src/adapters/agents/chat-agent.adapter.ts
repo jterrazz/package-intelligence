@@ -14,6 +14,8 @@ import type { Tool } from '../../ports/tool.port.js';
 
 import { AIResponseParser } from '../utils/ai-response-parser.js';
 
+import type { SystemPromptAdapter } from '../prompts/system-prompt.adapter.js';
+
 export type AgentResponse = z.infer<typeof AgentResponseSchema>;
 
 export interface ChatAgentOptions {
@@ -65,11 +67,11 @@ export class ChatAgentAdapter implements Agent {
     private readonly name: string;
     private readonly responseParser: AIResponseParser<AgentResponse>;
 
-    constructor(name: string, systemPrompts: readonly string[], options: ChatAgentOptions) {
+    constructor(name: string, systemPrompt: SystemPromptAdapter, options: ChatAgentOptions) {
         this.name = name;
         this.logger = options.logger;
         this.responseParser = new AIResponseParser(AgentResponseSchema);
-        this.executorPromise = this.createExecutor(systemPrompts, options);
+        this.executorPromise = this.createExecutor(systemPrompt, options);
     }
 
     async run(userPrompt?: Prompt): Promise<null | string> {
@@ -102,16 +104,16 @@ export class ChatAgentAdapter implements Agent {
     }
 
     private async createExecutor(
-        systemPrompts: readonly string[],
+        systemPrompt: SystemPromptAdapter,
         options: ChatAgentOptions,
     ): Promise<AgentExecutor> {
         const model = options.model.getModel();
-        
+
         // Convert Tool instances to DynamicTool instances
-        const dynamicTools = options.tools.map(tool => tool.getDynamicTool());
+        const dynamicTools = options.tools.map((tool) => tool.getDynamicTool());
 
         // Combine LangChain framework rules with user-provided system prompts
-        const systemPromptText = `${LANGCHAIN_FRAMEWORK_RULES}\n\n${systemPrompts.join('\n\n')}`;
+        const systemPromptText = `${LANGCHAIN_FRAMEWORK_RULES}\n\n${systemPrompt.generate()}`;
         const systemTemplate = SystemMessagePromptTemplate.fromTemplate(systemPromptText);
         const humanTemplate = HumanMessagePromptTemplate.fromTemplate('{input}');
 
