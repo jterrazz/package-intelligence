@@ -25,7 +25,7 @@ export interface OpenRouterConfig {
 /**
  * OpenRouter adapter that provides access to various models through OpenRouter's API
  */
-export class OpenRouterAdapter implements Model {
+export class OpenRouterModelAdapter implements Model {
     private readonly model: BaseLanguageModel;
 
     constructor(config: OpenRouterConfig) {

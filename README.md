@@ -14,7 +14,7 @@ A TypeScript-based AI agent framework built with clean architecture principles, 
 ## Installation
 
 ```bash
-npm install package-intelligence
+npm install @jterrazz/intelligence
 ```
 
 ## Quick Start
@@ -22,12 +22,10 @@ npm install package-intelligence
 ### Basic Chat Agent
 
 ```typescript
-import { ChatAgentAdapter } from 'package-intelligence/agents';
-import { OpenRouterAdapter } from 'package-intelligence/models';
-import { PROMPTS } from 'package-intelligence/prompts';
+import { ChatAgentAdapter, OpenRouterModelAdapter, PROMPTS } from '@jterrazz/intelligence';
 
 // Create a model
-const model = new OpenRouterAdapter({
+const model = new OpenRouterModelAdapter({
   apiKey: process.env.OPENROUTER_API_KEY!,
   modelName: 'anthropic/claude-3.5-sonnet',
 });
@@ -46,8 +44,7 @@ console.log(response);
 ### Custom Prompt Composition
 
 ```typescript
-import { SystemPromptAdapter, UserPromptAdapter } from 'package-intelligence/prompts';
-import { PROMPTS } from 'package-intelligence/prompts';
+import { SystemPromptAdapter, UserPromptAdapter, PROMPTS } from '@jterrazz/intelligence';
 
 // Create custom system prompt
 const systemPrompt = new SystemPromptAdapter([
@@ -69,7 +66,7 @@ const response = await agent.run(userPrompt);
 ### Tool Integration
 
 ```typescript
-import { SafeToolAdapter } from 'package-intelligence/tools';
+import { SafeToolAdapter } from '@jterrazz/intelligence';
 import { z } from 'zod/v4';
 
 // Create a tool with schema validation
