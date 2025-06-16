@@ -1,26 +1,25 @@
-import { ChatPromptTemplate } from '@langchain/core/prompts';
+import { type LoggerPort } from '@jterrazz/logger';
+import {
+    ChatPromptTemplate,
+    HumanMessagePromptTemplate,
+    SystemMessagePromptTemplate,
+} from '@langchain/core/prompts';
 import { AgentExecutor, createStructuredChatAgent } from 'langchain/agents';
 import type { DynamicTool } from 'langchain/tools';
 import { z } from 'zod/v4';
 
 import type { Agent } from '../../ports/agent.port.js';
 import type { Model } from '../../ports/model.port.js';
+import type { Prompt } from '../../ports/prompt.port.js';
 
 import { AIResponseParser } from '../utils/ai-response-parser.js';
 
 export type AgentResponse = z.infer<typeof AgentResponseSchema>;
 
-export interface ChatAgentConfig {
-    logger?: Logger;
+export interface ChatAgentOptions {
+    logger?: LoggerPort;
     model: Model;
-    prompts?: string[];
     tools: DynamicTool[];
-}
-
-export interface Logger {
-    debug(message: string, context?: Record<string, unknown>): void;
-    error(message: string, context?: Record<string, unknown>): void;
-    info(message: string, context?: Record<string, unknown>): void;
 }
 
 // Schema for agent responses
@@ -30,8 +29,9 @@ const AgentResponseSchema = z.object({
     shouldRespond: z.boolean(),
 });
 
-const AGENT_RULES = `
-<AGENT_RULES>
+// LangChain-specific framework rules (internal to this adapter)
+const LANGCHAIN_FRAMEWORK_RULES = `
+<AGENT_FRAMEWORK>
 You are a chat agent piloted by the LangChain framework.
 
 You have access to the following tools: {tools}
@@ -50,45 +50,38 @@ OR
 {{"action": "Final Answer", "action_input": {{"shouldRespond": true, "message": "<your response message>"}}}}
 \`\`\`
 
+"shouldRespond" set to true means the message will be sent to the user.
+"shouldRespond" set to false means the message will not be sent to the user.
+
 ALWAYS use this exact format with markdown code blocks and the action/action_input structure.
-USE tools to get accurate, up-to-date information
-ONLY respond when you have something valuable to contribute
-</AGENT_RULES>
-`;
+</AGENT_FRAMEWORK>`;
 
 /**
  * Chat agent adapter that provides structured chat capabilities with optional responses
  */
 export class ChatAgentAdapter implements Agent {
-    private executor: AgentExecutor | null = null;
-    private readonly logger?: Logger;
-    private readonly model: Model;
+    private readonly executorPromise: Promise<AgentExecutor>;
+    private readonly logger?: LoggerPort;
+    private readonly name: string;
     private readonly responseParser: AIResponseParser<AgentResponse>;
-    private readonly systemPrompt: string;
-    private readonly tools: DynamicTool[];
 
-    constructor(config: ChatAgentConfig) {
-        this.model = config.model;
-        this.tools = config.tools;
-        this.logger = config.logger;
-        this.systemPrompt = this.buildSystemPrompt(config.prompts || []);
+    constructor(name: string, systemPrompts: readonly string[], options: ChatAgentOptions) {
+        this.name = name;
+        this.logger = options.logger;
         this.responseParser = new AIResponseParser(AgentResponseSchema);
+        this.executorPromise = this.createExecutor(systemPrompts, options);
     }
 
-    async run(userQuery?: string): Promise<null | string> {
+    async run(userPrompt?: Prompt): Promise<null | string> {
         try {
-            if (!this.executor) {
-                await this.initializeExecutor();
-            }
-
-            // Use default input when no user query is provided
-            const input =
-                userQuery || 'Please analyze the current situation and respond if appropriate.';
-            const result = await this.executor!.invoke({ input });
+            const executor = await this.executorPromise;
+            const input = this.resolveUserInput(userPrompt);
+            const result = await executor.invoke({ input });
 
             this.logger?.debug('Agent execution result', {
+                agentName: this.name,
                 hasOutput: 'output' in result,
-                hasUserQuery: !!userQuery,
+                hasUserPrompt: !!userPrompt,
                 outputType: typeof result.output,
             });
 
@@ -100,15 +93,37 @@ export class ChatAgentAdapter implements Agent {
             return this.handleResponse(response);
         } catch (error) {
             this.logger?.error('Error running chat agent', {
+                agentName: this.name,
                 error: error instanceof Error ? error.message : 'Unknown error',
-                userQuery: userQuery || 'none',
+                userPrompt: userPrompt ? 'Prompt object' : 'none',
             });
             return null;
         }
     }
 
-    private buildSystemPrompt(customPrompts: string[]): string {
-        return [AGENT_RULES, ...customPrompts].join('\n');
+    private async createExecutor(
+        systemPrompts: readonly string[],
+        options: ChatAgentOptions,
+    ): Promise<AgentExecutor> {
+        const model = options.model.getModel();
+
+        // Combine LangChain framework rules with user-provided system prompts
+        const systemPromptText = `${LANGCHAIN_FRAMEWORK_RULES}\n\n${systemPrompts.join('\n\n')}`;
+        const systemTemplate = SystemMessagePromptTemplate.fromTemplate(systemPromptText);
+        const humanTemplate = HumanMessagePromptTemplate.fromTemplate('{input}');
+
+        const prompt = ChatPromptTemplate.fromMessages([systemTemplate, humanTemplate]);
+
+        const agent = await createStructuredChatAgent({
+            llm: model,
+            prompt,
+            tools: options.tools,
+        });
+
+        return AgentExecutor.fromAgentAndTools({
+            agent,
+            tools: options.tools,
+        });
     }
 
     private extractActionInput(output: unknown): string {
@@ -148,47 +163,42 @@ export class ChatAgentAdapter implements Agent {
 
     private handleResponse(response: AgentResponse): null | string {
         if (response.shouldRespond && response.message) {
-            this.logger?.info('Agent responding with message');
+            this.logger?.info('Agent responding with message', { agentName: this.name });
             return response.message;
         }
 
         if (!response.shouldRespond) {
             this.logger?.info('Agent chose not to respond', {
+                agentName: this.name,
                 reason: response.reason,
             });
             return null;
         }
 
-        this.logger?.error('Invalid agent response state', { response });
+        this.logger?.error('Invalid agent response state', { agentName: this.name, response });
         return null;
-    }
-
-    private async initializeExecutor(): Promise<void> {
-        const model = this.model.getModel();
-        const prompt = ChatPromptTemplate.fromMessages([['human', `${this.systemPrompt} {input}`]]);
-
-        const agent = await createStructuredChatAgent({
-            llm: model,
-            prompt,
-            tools: this.tools,
-        });
-
-        this.executor = AgentExecutor.fromAgentAndTools({
-            agent,
-            tools: this.tools,
-        });
     }
 
     private parseAgentResponse(output: unknown): AgentResponse {
         try {
+            // Handle LangChain's action/action_input format
             const processedOutput = this.extractActionInput(output);
             return this.responseParser.parse(processedOutput);
         } catch (error) {
             this.logger?.error('Failed to parse agent response', {
+                agentName: this.name,
                 error: error instanceof Error ? error.message : 'Unknown error',
                 rawOutput: output,
             });
             throw new Error('Invalid agent response format');
         }
+    }
+
+    private resolveUserInput(userPrompt?: Prompt): string {
+        if (!userPrompt) {
+            return 'Please analyze the current situation and respond if appropriate.';
+        }
+
+        return userPrompt.generate();
     }
 }

@@ -1,14 +1,11 @@
+import type { LoggerPort } from '@jterrazz/logger';
 import { DynamicStructuredTool, DynamicTool } from 'langchain/tools';
 import type { z } from 'zod/v4';
 
 import type { Tool } from '../../ports/tool.port.js';
 
-export interface Logger {
-    error(message: string, context?: Record<string, unknown>): void;
-}
-
 export interface SafeToolOptions<T> {
-    logger?: Logger;
+    logger?: LoggerPort;
     schema?: z.ZodSchema<T>;
 }
 
