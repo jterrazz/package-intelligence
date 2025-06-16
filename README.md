@@ -44,9 +44,9 @@ const model = new OpenRouterModelAdapter({
 
 // 2. Create an agent using a preset prompt
 const agent = new ChatAgentAdapter(
-    'discord-bot', 
-    new SystemPromptAdapter(PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR), 
-    { model }
+  'discord-bot',
+  new SystemPromptAdapter(PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR),
+  { model },
 );
 
 // 3. Run the agent
@@ -145,16 +145,12 @@ const systemPrompt = new SystemPromptAdapter(
 
 // 2. Create the user request (using a single array)
 const userPrompt = new UserPromptAdapter([
-    'Please review this TypeScript code for best practices:',
-    'const x = (s) => s.trim();',
+  'Please review this TypeScript code for best practices:',
+  'const x = (s) => s.trim();',
 ]);
 
 // 3. Configure and run the agent
-const agent = new ChatAgentAdapter(
-    'code-reviewer', 
-    systemPrompt, 
-    { model }
-);
+const agent = new ChatAgentAdapter('code-reviewer', systemPrompt, { model });
 
 const response = await agent.run(userPrompt);
 
@@ -192,12 +188,12 @@ const weatherTool = new SafeToolAdapter(
 
 // 2. Create an agent that knows how to use tools
 const agent = new ChatAgentAdapter(
-    'weather-bot',
-    new SystemPromptAdapter(PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
-    { 
-      model, 
-      tools: [weatherTool] // Pass the tool instance directly
-    },
+  'weather-bot',
+  new SystemPromptAdapter(PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
+  {
+    model,
+    tools: [weatherTool], // Pass the tool instance directly
+  },
 );
 
 // 3. Run the agent with a user query that requires the tool
@@ -218,10 +214,10 @@ console.log(response);
 | `ChatAgentAdapter`       | The main agent implementation. Runs prompts and coordinates tools.         |
 | `OpenRouterModelAdapter` | An adapter for connecting to any model on the OpenRouter platform.         |
 | `SafeToolAdapter`        | A type-safe wrapper for creating tools with validation and error handling. |
-| `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from a prompt array.     |
-| `UserPromptAdapter`      | A simple adapter to generate a user prompt string from a prompt array.       |
-| `AIResponseParser`       | A utility to parse a model's string output into a typed object using Zod.    |
-| `PROMPTS`                | A frozen object containing the entire composable prompt library.             |
+| `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from a prompt array.   |
+| `UserPromptAdapter`      | A simple adapter to generate a user prompt string from a prompt array.     |
+| `AIResponseParser`       | A utility to parse a model's string output into a typed object using Zod.  |
+| `PROMPTS`                | A frozen object containing the entire composable prompt library.           |
 
 ## Contributing
 

@@ -25,4 +25,4 @@ Avoid emotional language and stick to the facts.
 Use a formal, respectful, and clear tone.
 Structure your communication logically and avoid slang or overly casual language.
 </TONE>`,
-} as const; 
+} as const;

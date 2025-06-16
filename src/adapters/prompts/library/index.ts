@@ -12,9 +12,10 @@ import { DIRECTIVES } from './categories/directives.js';
 import { FORMAT } from './categories/format.js';
 import { LANGUAGE } from './categories/language.js';
 import { PERSONA } from './categories/persona.js';
-import { PRESETS } from './presets.js';
 import { TONE } from './categories/tone.js';
 import { VERBOSITY } from './categories/verbosity.js';
+
+import { PRESETS } from './presets.js';
 
 export const PROMPTS = {
     AGENT_LOGIC,

@@ -1,4 +1,4 @@
-import type { DynamicStructuredTool,DynamicTool } from 'langchain/tools';
+import type { DynamicStructuredTool, DynamicTool } from 'langchain/tools';
 import type { z } from 'zod/v4';
 
 /**
