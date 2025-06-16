@@ -1,0 +1,35 @@
+{
+  "name": "@jterrazz/intelligence",
+  "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
+  "version": "1.0.0",
+  "exports": {
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "ts-compile",
+    "test": "vitest",
+    "lint": "code-standards"
+  },
+  "devDependencies": {
+    "@jterrazz/quality": "^2.2.1",
+    "@jterrazz/test": "^3.0.0",
+    "@jterrazz/typescript": "^2.3.4"
+  },
+  "dependencies": {
+    "@jterrazz/logger": "^1.3.4",
+    "@langchain/community": "^0.3.46",
+    "@langchain/core": "^0.3.58",
+    "@langchain/openai": "^0.5.13",
+    "zod": "^3.25.65"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
+  }
+}
