@@ -4,28 +4,26 @@
  * making it easy to import all categories from a single location.
  */
 
-import { DOMAIN } from './categories/domain.js';
+import { DOMAINS } from './categories/domain.js';
 
-import { AGENT_LOGIC } from './categories/agent-logic.js';
-import { AGENT_SKILLS } from './categories/agent-skills.js';
-import { DIRECTIVES } from './categories/directives.js';
-import { FORMAT } from './categories/format.js';
-import { LANGUAGE } from './categories/language.js';
-import { PERSONA } from './categories/persona.js';
-import { TONE } from './categories/tone.js';
+import { FORMATS } from './categories/format.js';
+import { FOUNDATIONS } from './categories/foundations.js';
+import { LANGUAGES } from './categories/language.js';
+import { PERSONAS } from './categories/persona.js';
+import { RESPONSE } from './categories/response.js';
+import { TONES } from './categories/tone.js';
 import { VERBOSITY } from './categories/verbosity.js';
 
 import { PRESETS } from './presets.js';
 
 export const PROMPTS = {
-    AGENT_LOGIC,
-    AGENT_SKILLS,
-    DIRECTIVES,
-    DOMAIN,
-    FORMAT,
-    LANGUAGE,
-    PERSONA,
+    DOMAINS,
+    FORMATS,
+    FOUNDATIONS,
+    LANGUAGES,
+    PERSONAS,
     PRESETS,
-    TONE,
-    VERBOSITY,
+    RESPONSE_STRATEGIES: RESPONSE,
+    TONES,
+    VERBOSITY_LEVELS: VERBOSITY,
 } as const;

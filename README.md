@@ -205,7 +205,7 @@ console.log(response);
 
 This example shows how to use `QueryAgentAdapter` with schema parsing for structured responses.
 
-```typescript
+  ```typescript
 import {
   QueryAgentAdapter,
   OpenRouterModelAdapter,
@@ -260,7 +260,7 @@ console.log('Parsed data:', parsedData);
 
 This example shows how to give an agent a tool and have it respond to a user query.
 
-```typescript
+  ```typescript
 import {
   ChatAgentAdapter,
   OpenRouterModelAdapter,

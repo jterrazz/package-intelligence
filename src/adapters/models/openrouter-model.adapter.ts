@@ -9,6 +9,10 @@ export interface OpenRouterConfig {
      */
     apiKey: string;
     /**
+     * The maximum number of tokens to generate
+     */
+    maxTokens?: number;
+    /**
      * Optional metadata for request headers
      */
     metadata?: OpenRouterMetadata;
@@ -16,10 +20,6 @@ export interface OpenRouterConfig {
      * The model to use (e.g., 'google/gemini-2.5-flash-preview-05-20:thinking')
      */
     modelName: string;
-    /**
-     * The maximum number of tokens to generate
-     */
-    maxTokens?: number;
 }
 
 export interface OpenRouterMetadata {

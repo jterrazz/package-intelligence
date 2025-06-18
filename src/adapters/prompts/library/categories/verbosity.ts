@@ -3,19 +3,17 @@
  */
 export const VERBOSITY = {
     CONCISE: `
-<VERBOSITY>
-Provide brief, to-the-point answers.
-Focus only on the most critical information and omit background details unless requested.
-</VERBOSITY>`,
+<Verbosity>
+You must provide brief, to-the-point answers. Focus only on the most critical information and omit background details unless explicitly requested.
+</Verbosity>`,
 
     DETAILED: `
-<VERBOSITY>
-Offer comprehensive and thorough responses.
-Include background information, context, examples, and potential edge cases.
-</VERBOSITY>`,
+<Verbosity>
+You must offer comprehensive and thorough responses. Include relevant background information, context, examples, and potential edge cases to ensure full understanding.
+</Verbosity>`,
 
     NORMAL: `
-<VERBOSITY>
-Provide a balanced level of detail, sufficient for a clear understanding without being overwhelming.
-</VERBOSITY>`,
+<Verbosity>
+You should provide a balanced level of detail, sufficient for a clear understanding without being overwhelming or too brief.
+</Verbosity>`,
 } as const;

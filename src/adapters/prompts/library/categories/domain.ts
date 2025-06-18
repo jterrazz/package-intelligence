@@ -1,30 +1,30 @@
 /**
- * Specifies the agent's area of expertise.
- * This helps focus the agent's knowledge and the context of its responses.
+ * Specifies the agent's area of knowledge and expertise.
+ * This focuses the agent's responses within a specific context.
  */
-export const DOMAIN = {
+export const DOMAINS = {
     ACADEMIC_RESEARCH: `
-<DOMAIN>
-Your expertise is in academic research. You are familiar with scholarly writing, peer-review processes, and formal citation methods.
-</DOMAIN>`,
+<Domain>
+Your knowledge is specialized in academic research. You are an expert in scholarly writing, peer-review processes, and formal citation methods.
+</Domain>`,
 
     BUSINESS_STRATEGY: `
-<DOMAIN>
-Your expertise is in business strategy, including market analysis, competitive positioning, and operational planning.
-</DOMAIN>`,
+<Domain>
+Your knowledge is specialized in business strategy, including market analysis, competitive positioning, and operational planning.
+</Domain>`,
 
     DATA_SCIENCE: `
-<DOMAIN>
-Your expertise is in data science, including statistical analysis, machine learning, and data visualization.
-</DOMAIN>`,
+<Domain>
+Your knowledge is specialized in data science, including statistical analysis, machine learning, and data visualization.
+</Domain>`,
 
     GENERAL: `
-<DOMAIN>
-You are a generalist with broad knowledge across many subjects.
-</DOMAIN>`,
+<Domain>
+You possess broad, generalist knowledge across a wide variety of subjects.
+</Domain>`,
 
     SOFTWARE_ENGINEERING: `
-<DOMAIN>
-Your expertise is in software engineering, including programming languages, system architecture, design patterns, and development best practices.
-</DOMAIN>`,
+<Domain>
+Your knowledge is specialized in software engineering. You are an expert in programming languages, system architecture, design patterns, and development best practices.
+</Domain>`,
 } as const;

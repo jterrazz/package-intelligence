@@ -1,11 +1,10 @@
-import { DOMAIN } from './categories/domain.js';
+import { DOMAINS } from './categories/domain.js';
 
-import { AGENT_LOGIC } from './categories/agent-logic.js';
-import { AGENT_SKILLS } from './categories/agent-skills.js';
-import { DIRECTIVES } from './categories/directives.js';
-import { FORMAT } from './categories/format.js';
-import { PERSONA } from './categories/persona.js';
-import { TONE } from './categories/tone.js';
+import { FORMATS } from './categories/format.js';
+import { FOUNDATIONS } from './categories/foundations.js';
+import { PERSONAS } from './categories/persona.js';
+import { RESPONSE } from './categories/response.js';
+import { TONES } from './categories/tone.js';
 import { VERBOSITY } from './categories/verbosity.js';
 
 /**
@@ -13,46 +12,40 @@ import { VERBOSITY } from './categories/verbosity.js';
  */
 export const PRESETS = {
     /**
-     * A creative partner for brainstorming and ideation.
+     * A fun and engaging community animator for platforms like Discord.
      */
-    CREATIVE_BRAINSTORMER: [
-        DIRECTIVES.BE_ETHICAL,
-        PERSONA.CREATIVE_PARTNER,
-        DOMAIN.GENERAL,
-        TONE.HUMOROUS,
+    COMMUNITY_ANIMATOR: [
+        FOUNDATIONS.HARM_PREVENTION,
+        PERSONAS.COMMUNITY_ANIMATOR,
+        DOMAINS.GENERAL,
+        TONES.HUMOROUS,
         VERBOSITY.NORMAL,
-        FORMAT.MARKDOWN,
-        AGENT_LOGIC.ALWAYS_RESPOND,
-        AGENT_SKILLS.CREATIVE_IDEATION,
+        RESPONSE.CONTEXTUAL_ENGAGEMENT,
     ],
 
     /**
-     * A fun and engaging community animator for platforms like Discord.
+     * A creative partner for brainstorming and ideation.
      */
-    DISCORD_COMMUNITY_ANIMATOR: [
-        DIRECTIVES.BE_SAFE,
-        PERSONA.COMMUNITY_ANIMATOR,
-        DOMAIN.GENERAL,
-        TONE.HUMOROUS,
+    CREATIVE_BRAINSTORMER: [
+        FOUNDATIONS.ETHICAL_CONDUCT,
+        PERSONAS.CREATIVE_PARTNER,
+        DOMAINS.GENERAL,
+        TONES.HUMOROUS,
         VERBOSITY.NORMAL,
-        FORMAT.MARKDOWN,
-        AGENT_LOGIC.ALWAYS_RESPOND,
-        AGENT_LOGIC.CONTEXT_AWARE,
-        AGENT_SKILLS.CREATIVE_IDEATION,
+        RESPONSE.ALWAYS_ENGAGE,
     ],
 
     /**
      * A friendly and empathetic support agent for general queries.
      */
     EMPATHETIC_SUPPORT_AGENT: [
-        DIRECTIVES.BE_SAFE,
-        DIRECTIVES.BE_ETHICAL,
-        PERSONA.SUPPORT_AGENT,
-        DOMAIN.GENERAL,
-        TONE.EMPATHETIC,
+        FOUNDATIONS.HARM_PREVENTION,
+        FOUNDATIONS.ETHICAL_CONDUCT,
+        PERSONAS.SUPPORT_AGENT,
+        DOMAINS.GENERAL,
+        TONES.EMPATHETIC,
         VERBOSITY.NORMAL,
-        FORMAT.STEP_BY_STEP,
-        AGENT_LOGIC.ALWAYS_RESPOND,
-        AGENT_SKILLS.PROBLEM_SOLVING,
+        FORMATS.STEP_BY_STEP,
+        RESPONSE.ALWAYS_ENGAGE,
     ],
 } as const;

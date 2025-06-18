@@ -17,98 +17,76 @@ export interface QueryAgentOptions<T = string> {
 }
 
 /**
- * Query agent adapter that provides simple one-shot prompt-response capabilities
- * No tools, no complex logic - just direct model interaction with optional schema parsing
+ * A simple agent for direct, one-shot interactions with a model.
+ * It supports optional response parsing against a Zod schema but does not use tools.
  */
 export class QueryAgentAdapter<T = string> implements AgentPort {
-    protected readonly logger?: LoggerPort;
-    protected readonly name: string;
-    private lastParsedResult?: T;
-    private readonly model: ModelPort;
-    private readonly schema?: z.ZodSchema<T>;
-    private readonly systemPrompt: SystemPromptAdapter;
-
-    constructor(name: string, options: QueryAgentOptions<T>) {
-        this.name = name;
-        this.logger = options.logger;
-        this.systemPrompt = options.systemPrompt;
-        this.model = options.model;
-        this.schema = options.schema;
-    }
-
-    /**
-     * Get the last parsed result (only available if schema was provided and parsing succeeded)
-     */
-    getLastParsedResult(): T | undefined {
-        return this.lastParsedResult;
-    }
+    constructor(
+        public readonly name: string,
+        private readonly options: QueryAgentOptions<T>,
+    ) {}
 
     async run(userPrompt?: PromptPort): Promise<null | string> {
+        this.options.logger?.debug(`[${this.name}] Starting query execution.`);
+
         try {
-            const model = this.model.getModel();
-            const input = this.resolveUserInput(userPrompt);
+            const content = await this.invokeModel(userPrompt);
 
-            // Simple direct model call with system and user messages
-            const messages = [
-                { content: this.systemPrompt.generate(), role: 'system' as const },
-                { content: input, role: 'user' as const },
-            ];
-
-            this.logger?.debug('Query agent executing', {
-                agentName: this.name,
-                hasSchema: !!this.schema,
-                hasUserPrompt: !!userPrompt,
-                systemPromptLength: this.systemPrompt.generate().length,
-            });
-
-            const result = await model.invoke(messages);
-            const content = result.content;
-
-            if (typeof content !== 'string') {
-                throw new Error('Model returned non-string content');
+            if (this.options.schema) {
+                this.parseResponse(content, this.options.schema);
+                this.options.logger?.info(`[${this.name}] Execution finished and response parsed.`);
+            } else {
+                this.options.logger?.info(`[${this.name}] Execution finished.`);
             }
-
-            // Parse with schema if available and store result
-            if (this.schema) {
-                this.lastParsedResult = this.parseResponse(content, this.schema);
-            }
-
-            this.logger?.info('Query agent completed successfully', {
-                agentName: this.name,
-                parsed: !!this.schema,
-                responseLength: content.length,
-            });
 
             return content;
         } catch (error) {
-            this.logger?.error('Error running query agent', {
-                agentName: this.name,
+            this.options.logger?.error(`[${this.name}] Execution failed.`, {
                 error: error instanceof Error ? error.message : 'Unknown error',
-                userPrompt: userPrompt ? 'Prompt object' : 'none',
             });
             return null;
         }
     }
 
-    protected parseResponse<T>(content: string, schema: z.ZodSchema<T>): T {
+    private async invokeModel(userPrompt?: PromptPort): Promise<string> {
+        const userInput = this.resolveUserInput(userPrompt);
+        const systemMessage = this.options.systemPrompt.generate();
+
+        const messages = [
+            { content: systemMessage, role: 'system' as const },
+            { content: userInput, role: 'user' as const },
+        ];
+
+        this.options.logger?.debug(`[${this.name}] Invoking model...`, {
+            hasSchema: !!this.options.schema,
+        });
+
+        const response = await this.options.model.getModel().invoke(messages);
+        const { content } = response;
+
+        if (typeof content !== 'string') {
+            throw new Error('Model returned a non-string content type.');
+        }
+
+        return content;
+    }
+
+    private parseResponse<TResponse>(content: string, schema: z.ZodSchema<TResponse>): void {
         try {
-            const parser = new AIResponseParser(schema);
-            return parser.parse(content);
+            new AIResponseParser(schema).parse(content);
         } catch (error) {
-            this.logger?.error('Failed to parse response', {
-                agentName: this.name,
+            this.options.logger?.error(`[${this.name}] Failed to parse model response.`, {
                 error: error instanceof Error ? error.message : 'Unknown error',
                 rawContent: content,
             });
-            throw new Error('Invalid response format from model');
+            throw new Error('Invalid response format from model.');
         }
     }
 
-    protected resolveUserInput(userPrompt?: PromptPort): string {
-        if (!userPrompt) {
-            return 'Please provide a response based on your system instructions.';
+    private resolveUserInput(userPrompt?: PromptPort): string {
+        if (userPrompt) {
+            return userPrompt.generate();
         }
-
-        return userPrompt.generate();
+        return 'Proceed with your instructions.';
     }
 }

@@ -6,7 +6,7 @@ import { SystemPromptAdapter } from '../system-prompt.adapter.js';
 describe('Prompt Library Presets', () => {
     it('should generate the correct prompt for DISCORD_COMMUNITY_ANIMATOR', () => {
         // Given - a Discord community animator preset
-        const prompt = new SystemPromptAdapter(PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR);
+        const prompt = new SystemPromptAdapter(PROMPTS.PRESETS.COMMUNITY_ANIMATOR);
 
         // When - generating the prompt
         const result = prompt.generate();
