@@ -31,13 +31,13 @@ Get your first agent running in under a minute. This example uses a preset to cr
 ```typescript
 import {
   ChatAgentAdapter,
-  OpenRouterModelAdapter,
+  OpenRouterAdapter,
   SystemPromptAdapter,
   PROMPTS,
 } from '@jterrazz/intelligence';
 
 // 1. Set up the model provider
-const model = new OpenRouterModelAdapter({
+const model = new OpenRouterAdapter({
   apiKey: process.env.OPENROUTER_API_KEY!, // Make sure to set this environment variable
   modelName: 'anthropic/claude-3.5-sonnet',
 });
@@ -45,7 +45,7 @@ const model = new OpenRouterModelAdapter({
 // 2. Create an agent using a preset prompt
 const agent = new ChatAgentAdapter('discord-bot', {
   model,
-  systemPrompt: new SystemPromptAdapter(PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR),
+  systemPrompt: new SystemPromptAdapter(PROMPTS.PRESETS.COMMUNITY_ANIMATOR),
 });
 
 // 3. Run the agent
@@ -63,10 +63,14 @@ console.log(response);
 
 Instead of writing monolithic prompts, the library provides a collection of composable string constants. Mix and match them to build a precise, fine-grained system prompt that defines your agent's behavior.
 
-- **`PERSONA`**: Who the agent is (e.g., `EXPERT_ADVISOR`).
-- **`TONE`**: How the agent communicates (e.g., `PROFESSIONAL`, `EMPATHETIC`).
-- **`FORMAT`** How the agent structures its response (e.g., `MARKDOWN`, `JSON`).
-- **`DIRECTIVES`**: Core rules the agent must follow (e.g., `BE_SAFE`, `BE_FACTUAL`).
+- **`FOUNDATIONS`**: Core, non-negotiable rules (e.g., `PROMPTS.FOUNDATIONS.ETHICAL_CONDUCT`).
+- **`PERSONAS`**: The agent's identity and purpose (e.g., `PROMPTS.PERSONAS.EXPERT_ADVISOR`).
+- **`DOMAINS`**: The agent's area of expertise (e.g., `PROMPTS.DOMAINS.SOFTWARE_ENGINEERING`).
+- **`TONES`**: The emotional flavor of communication (e.g., `PROMPTS.TONES.PROFESSIONAL`).
+- **`FORMATS`**: The structural format of the output (e.g., `PROMPTS.FORMATS.JSON`).
+- **`LANGUAGES`**: The natural language for the response (e.g., `PROMPTS.LANGUAGES.ENGLISH_NATIVE`).
+- **`VERBOSITY_LEVELS`**: The level of detail in the response (e.g., `PROMPTS.VERBOSITY_LEVELS.DETAILED`).
+- **`RESPONSE_STRATEGIES`**: The strategic approach to responding (e.g., `PROMPTS.RESPONSE_STRATEGIES.ALWAYS_ENGAGE`).
 
 This approach makes agent behavior more predictable and easier to modify.
 
@@ -100,7 +104,7 @@ The adapter handles errors gracefully and integrates seamlessly with the agent, 
 The library is built on a hexagonal architecture.
 
 - **Ports (`/ports`)**: Define the contracts (interfaces) for core components like `Agent`, `Model`, and `Tool`.
-- **Adapters (`/adapters`)**: Provide concrete implementations. For example, `ChatAgentAdapter` is an adapter that uses LangChain, and `OpenRouterModelAdapter` is an adapter for the OpenRouter API.
+- **Adapters (`/adapters`)**: Provide concrete implementations. For example, `ChatAgentAdapter` is an adapter that uses LangChain, and `OpenRouterAdapter` is an adapter for the OpenRouter API.
 
 This separation of concerns means you can easily create your own adapters to support different models or services without changing the application's core logic.
 
@@ -121,25 +125,25 @@ This recipe creates an agent that acts as an expert software engineer, providing
 ```typescript
 import {
   ChatAgentAdapter,
-  OpenRouterModelAdapter,
+  OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
   PROMPTS,
 } from '@jterrazz/intelligence';
 
-const model = new OpenRouterModelAdapter({
+const model = new OpenRouterAdapter({
   apiKey: process.env.OPENROUTER_API_KEY!,
   modelName: 'anthropic/claude-3.5-sonnet',
 });
 
 // 1. Compose the system prompt from multiple parts (using rest arguments)
 const systemPrompt = new SystemPromptAdapter(
-  PROMPTS.PERSONA.EXPERT_ADVISOR,
-  PROMPTS.DOMAIN.SOFTWARE_ENGINEERING,
-  PROMPTS.TONE.PROFESSIONAL,
-  PROMPTS.VERBOSITY.DETAILED,
-  PROMPTS.FORMAT.MARKDOWN,
-  PROMPTS.DIRECTIVES.BE_FACTUAL,
+  PROMPTS.PERSONAS.EXPERT_ADVISOR,
+  PROMPTS.DOMAINS.SOFTWARE_ENGINEERING,
+  PROMPTS.TONES.PROFESSIONAL,
+  PROMPTS.VERBOSITY_LEVELS.DETAILED,
+  PROMPTS.FORMATS.MARKDOWN,
+  PROMPTS.FOUNDATIONS.FACTUAL_ACCURACY,
 );
 
 // 2. Create the user request (using a single array)
@@ -166,22 +170,22 @@ This example shows how to use the simpler `QueryAgentAdapter` for one-shot respo
 ```typescript
 import {
   QueryAgentAdapter,
-  OpenRouterModelAdapter,
+  OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
   PROMPTS,
 } from '@jterrazz/intelligence';
 
-const model = new OpenRouterModelAdapter({
+const model = new OpenRouterAdapter({
   apiKey: process.env.OPENROUTER_API_KEY!,
   modelName: 'anthropic/claude-3.5-sonnet',
 });
 
 // 1. Create a simple system prompt for text processing
 const systemPrompt = new SystemPromptAdapter(
-  PROMPTS.PERSONA.EXPERT_ADVISOR,
-  PROMPTS.TONE.PROFESSIONAL,
-  PROMPTS.FORMAT.MARKDOWN,
+  PROMPTS.PERSONAS.EXPERT_ADVISOR,
+  PROMPTS.TONES.PROFESSIONAL,
+  PROMPTS.FORMATS.MARKDOWN,
   'You are a helpful assistant that improves text clarity and grammar.',
 );
 
@@ -230,9 +234,9 @@ const extractionSchema = z.object({
 
 // 2. Create a system prompt for data extraction
 const systemPrompt = new SystemPromptAdapter(
-  PROMPTS.PERSONA.EXPERT_ADVISOR,
-  PROMPTS.TONE.PROFESSIONAL,
-  PROMPTS.FORMAT.JSON,
+  PROMPTS.PERSONAS.EXPERT_ADVISOR,
+  PROMPTS.TONES.PROFESSIONAL,
+  PROMPTS.FORMATS.JSON,
   'You extract contact information from text and return it as JSON.',
 );
 
@@ -266,6 +270,7 @@ import {
   OpenRouterModelAdapter,
   SafeToolAdapter,
   SystemPromptAdapter,
+  UserPromptAdapter,
   PROMPTS,
 } from '@jterrazz/intelligence';
 import { z } from 'zod/v4';
@@ -293,7 +298,7 @@ const agent = new ChatAgentAdapter('weather-bot', {
 });
 
 // 3. Run the agent with a user query that requires the tool
-const response = await agent.run({ generate: () => "What's the weather like in Boston?" });
+const response = await agent.run(new UserPromptAdapter("What's the weather like in Boston?"));
 
 console.log(response);
 // Expected output: "The weather in Boston is 75°F and sunny."
