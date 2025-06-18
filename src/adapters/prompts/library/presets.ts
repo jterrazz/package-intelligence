@@ -3,7 +3,7 @@ import { DOMAINS } from './categories/domain.js';
 import { FORMATS } from './categories/format.js';
 import { FOUNDATIONS } from './categories/foundations.js';
 import { PERSONAS } from './categories/persona.js';
-import { RESPONSE } from './categories/response.js';
+import { RESPONSES } from './categories/response.js';
 import { TONES } from './categories/tone.js';
 import { VERBOSITY } from './categories/verbosity.js';
 
@@ -20,7 +20,7 @@ export const PRESETS = {
         DOMAINS.GENERAL,
         TONES.HUMOROUS,
         VERBOSITY.NORMAL,
-        RESPONSE.CONTEXTUAL_ENGAGEMENT,
+        RESPONSES.CONTEXTUAL_ENGAGEMENT,
     ],
 
     /**
@@ -32,7 +32,7 @@ export const PRESETS = {
         DOMAINS.GENERAL,
         TONES.HUMOROUS,
         VERBOSITY.NORMAL,
-        RESPONSE.ALWAYS_ENGAGE,
+        RESPONSES.ALWAYS_ENGAGE,
     ],
 
     /**
@@ -46,6 +46,6 @@ export const PRESETS = {
         TONES.EMPATHETIC,
         VERBOSITY.NORMAL,
         FORMATS.STEP_BY_STEP,
-        RESPONSE.ALWAYS_ENGAGE,
+        RESPONSES.ALWAYS_ENGAGE,
     ],
 } as const;

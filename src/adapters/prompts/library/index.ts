@@ -10,20 +10,20 @@ import { FORMATS } from './categories/format.js';
 import { FOUNDATIONS } from './categories/foundations.js';
 import { LANGUAGES } from './categories/language.js';
 import { PERSONAS } from './categories/persona.js';
-import { RESPONSE } from './categories/response.js';
+import { RESPONSES } from './categories/response.js';
 import { TONES } from './categories/tone.js';
 import { VERBOSITY } from './categories/verbosity.js';
 
 import { PRESETS } from './presets.js';
 
-export const PROMPTS = {
+export const PROMPT_LIBRARY = {
     DOMAINS,
     FORMATS,
     FOUNDATIONS,
     LANGUAGES,
     PERSONAS,
     PRESETS,
-    RESPONSE_STRATEGIES: RESPONSE,
+    RESPONSES,
     TONES,
-    VERBOSITY_LEVELS: VERBOSITY,
+    VERBOSITY,
 } as const;

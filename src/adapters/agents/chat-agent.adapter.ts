@@ -27,9 +27,9 @@ const SYSTEM_PROMPT_TEMPLATE = `
 </OBJECTIVE>
 
 <OUTPUT_FORMAT>
-CRITICAL: The format instructions in this section are the ONLY valid way to structure your response. Any formatting guidelines within the <OBJECTIVE> section (like message templates) apply ONLY to the content that goes inside the "RESPOND: " part of your final answer.
+CRITICAL: The format instructions in this section are the ONLY valid way to structure your response. Your entire response MUST be a single JSON markdown code block. Any formatting guidelines within the <OBJECTIVE> section apply ONLY to the content inside the "RESPOND:" part of your final "action_input".
 
-You have two ways to respond:
+REQUIRED: You have two ways to respond:
 
 1.  **Call a tool** to gather information. For this, you MUST output a JSON blob with the tool's name and its input.
     *Valid tool names are: {tool_names}*
@@ -40,7 +40,8 @@ You have two ways to respond:
     }}
     \`\`\`
 
-2.  **Provide the Final Answer** once you have enough information. For this, you MUST output a JSON blob with the "Final Answer" action. The input must start with "RESPOND: " or "SILENT: ".
+2.  **Provide the Final Answer** once you have enough information. For this, you MUST output a JSON blob with the "Final Answer" action.
+    The "action_input" for a "Final Answer" MUST be a string that begins with either "RESPOND: " for a message or "SILENT: " for no message. This prefix is a literal part of the output string and MUST NOT be omitted.
     - To send a message:
       \`\`\`json
       {{
@@ -55,6 +56,8 @@ You have two ways to respond:
         "action_input": "SILENT: <your reason for staying silent>"
       }}
       \`\`\`
+
+    YOU MUST ALWAYS INCLUDE "RESPOND:" OR "SILENT:" IN YOUR FINAL ANSWER'S "action_input". FAILURE TO DO SO WILL CAUSE AN ERROR.
 </OUTPUT_FORMAT>
 
 <EXECUTION_CONTEXT>
@@ -99,6 +102,10 @@ export class ChatAgentAdapter<T = unknown> implements AgentPort {
             }
 
             const agentResponse = this.parseAgentOutput(result.output);
+
+            if (!agentResponse) {
+                return null;
+            }
 
             if (!agentResponse.shouldRespond) {
                 this.options.logger?.info(`[${this.name}] Agent chose to remain silent.`, {
@@ -155,7 +162,7 @@ export class ChatAgentAdapter<T = unknown> implements AgentPort {
         });
     }
 
-    private parseAgentOutput(output: string): {
+    private parseAgentOutput(output: string): null | {
         message?: string;
         reason?: string;
         shouldRespond: boolean;
@@ -172,12 +179,12 @@ export class ChatAgentAdapter<T = unknown> implements AgentPort {
             return { reason: silentMatch[1].trim(), shouldRespond: false };
         }
 
-        this.options.logger?.warn(
-            `[${this.name}] Agent output was missing 'RESPOND:' or 'SILENT:' prefix. Treating as a direct response.`,
+        this.options.logger?.error(
+            `[${this.name}] Agent output was missing 'RESPOND:' or 'SILENT:' prefix.`,
             { rawOutput: output },
         );
 
-        return { message: text, shouldRespond: true };
+        return null;
     }
 
     private resolveUserInput(userPrompt?: PromptPort): string {

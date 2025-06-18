@@ -33,7 +33,7 @@ import {
   ChatAgentAdapter,
   OpenRouterAdapter,
   SystemPromptAdapter,
-  PROMPTS,
+  PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
 
 // 1. Set up the model provider
@@ -45,7 +45,7 @@ const model = new OpenRouterAdapter({
 // 2. Create an agent using a preset prompt
 const agent = new ChatAgentAdapter('discord-bot', {
   model,
-  systemPrompt: new SystemPromptAdapter(PROMPTS.PRESETS.COMMUNITY_ANIMATOR),
+  systemPrompt: new SystemPromptAdapter(PROMPT_LIBRARY.PRESETS.COMMUNITY_ANIMATOR),
 });
 
 // 3. Run the agent
@@ -63,14 +63,14 @@ console.log(response);
 
 Instead of writing monolithic prompts, the library provides a collection of composable string constants. Mix and match them to build a precise, fine-grained system prompt that defines your agent's behavior.
 
-- **`FOUNDATIONS`**: Core, non-negotiable rules (e.g., `PROMPTS.FOUNDATIONS.ETHICAL_CONDUCT`).
-- **`PERSONAS`**: The agent's identity and purpose (e.g., `PROMPTS.PERSONAS.EXPERT_ADVISOR`).
-- **`DOMAINS`**: The agent's area of expertise (e.g., `PROMPTS.DOMAINS.SOFTWARE_ENGINEERING`).
-- **`TONES`**: The emotional flavor of communication (e.g., `PROMPTS.TONES.PROFESSIONAL`).
-- **`FORMATS`**: The structural format of the output (e.g., `PROMPTS.FORMATS.JSON`).
-- **`LANGUAGES`**: The natural language for the response (e.g., `PROMPTS.LANGUAGES.ENGLISH_NATIVE`).
-- **`VERBOSITY_LEVELS`**: The level of detail in the response (e.g., `PROMPTS.VERBOSITY_LEVELS.DETAILED`).
-- **`RESPONSE_STRATEGIES`**: The strategic approach to responding (e.g., `PROMPTS.RESPONSE_STRATEGIES.ALWAYS_ENGAGE`).
+- **`FOUNDATIONS`**: Core, non-negotiable rules (e.g., `PROMPT_LIBRARY.FOUNDATIONS.ETHICAL_CONDUCT`).
+- **`PERSONAS`**: The agent's identity and purpose (e.g., `PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR`).
+- **`DOMAINS`**: The agent's area of expertise (e.g., `PROMPT_LIBRARY.DOMAINS.SOFTWARE_ENGINEERING`).
+- **`TONES`**: The emotional flavor of communication (e.g., `PROMPT_LIBRARY.TONES.PROFESSIONAL`).
+- **`FORMATS`**: The structural format of the output (e.g., `PROMPT_LIBRARY.FORMATS.JSON`).
+- **`LANGUAGES`**: The natural language for the response (e.g., `PROMPT_LIBRARY.LANGUAGES.ENGLISH_NATIVE`).
+- **`VERBOSITY`**: The level of detail in the response (e.g., `PROMPT_LIBRARY.VERBOSITY.DETAILED`).
+- **`RESPONSES`**: The strategic approach to responding (e.g., `PROMPT_LIBRARY.RESPONSES.ALWAYS_ENGAGE`).
 
 This approach makes agent behavior more predictable and easier to modify.
 
@@ -128,7 +128,7 @@ import {
   OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
-  PROMPTS,
+  PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
 
 const model = new OpenRouterAdapter({
@@ -138,12 +138,12 @@ const model = new OpenRouterAdapter({
 
 // 1. Compose the system prompt from multiple parts (using rest arguments)
 const systemPrompt = new SystemPromptAdapter(
-  PROMPTS.PERSONAS.EXPERT_ADVISOR,
-  PROMPTS.DOMAINS.SOFTWARE_ENGINEERING,
-  PROMPTS.TONES.PROFESSIONAL,
-  PROMPTS.VERBOSITY_LEVELS.DETAILED,
-  PROMPTS.FORMATS.MARKDOWN,
-  PROMPTS.FOUNDATIONS.FACTUAL_ACCURACY,
+  PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR,
+  PROMPT_LIBRARY.DOMAINS.SOFTWARE_ENGINEERING,
+  PROMPT_LIBRARY.TONES.PROFESSIONAL,
+  PROMPT_LIBRARY.VERBOSITY.DETAILED,
+  PROMPT_LIBRARY.FORMATS.MARKDOWN,
+  PROMPT_LIBRARY.FOUNDATIONS.FACTUAL_ACCURACY,
 );
 
 // 2. Create the user request (using a single array)
@@ -173,7 +173,7 @@ import {
   OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
-  PROMPTS,
+  PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
 
 const model = new OpenRouterAdapter({
@@ -183,9 +183,9 @@ const model = new OpenRouterAdapter({
 
 // 1. Create a simple system prompt for text processing
 const systemPrompt = new SystemPromptAdapter(
-  PROMPTS.PERSONAS.EXPERT_ADVISOR,
-  PROMPTS.TONES.PROFESSIONAL,
-  PROMPTS.FORMATS.MARKDOWN,
+  PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR,
+  PROMPT_LIBRARY.TONES.PROFESSIONAL,
+  PROMPT_LIBRARY.FORMATS.MARKDOWN,
   'You are a helpful assistant that improves text clarity and grammar.',
 );
 
@@ -212,14 +212,14 @@ This example shows how to use `QueryAgentAdapter` with schema parsing for struct
 ```typescript
 import {
   QueryAgentAdapter,
-  OpenRouterModelAdapter,
+  OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
-  PROMPTS,
+  PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
 import { z } from 'zod/v4';
 
-const model = new OpenRouterModelAdapter({
+const model = new OpenRouterAdapter({
   apiKey: process.env.OPENROUTER_API_KEY!,
   modelName: 'anthropic/claude-3.5-sonnet',
 });
@@ -234,9 +234,9 @@ const extractionSchema = z.object({
 
 // 2. Create a system prompt for data extraction
 const systemPrompt = new SystemPromptAdapter(
-  PROMPTS.PERSONAS.EXPERT_ADVISOR,
-  PROMPTS.TONES.PROFESSIONAL,
-  PROMPTS.FORMATS.JSON,
+  PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR,
+  PROMPT_LIBRARY.TONES.PROFESSIONAL,
+  PROMPT_LIBRARY.FORMATS.JSON,
   'You extract contact information from text and return it as JSON.',
 );
 
@@ -267,11 +267,11 @@ This example shows how to give an agent a tool and have it respond to a user que
 ```typescript
 import {
   ChatAgentAdapter,
-  OpenRouterModelAdapter,
+  OpenRouterAdapter,
   SafeToolAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
-  PROMPTS,
+  PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
 import { z } from 'zod/v4';
 
@@ -293,7 +293,7 @@ const weatherTool = new SafeToolAdapter(
 // 2. Create an agent that knows how to use tools
 const agent = new ChatAgentAdapter('weather-bot', {
   model,
-  systemPrompt: new SystemPromptAdapter(PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
+  systemPrompt: new SystemPromptAdapter(PROMPT_LIBRARY.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
   tools: [weatherTool], // Pass the tool instance directly
 });
 
@@ -319,7 +319,7 @@ console.log(response);
 | `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from a prompt array.   |
 | `UserPromptAdapter`      | A simple adapter to generate a user prompt string from a prompt array.     |
 | `AIResponseParser`       | A utility to parse a model's string output into a typed object using Zod.  |
-| `PROMPTS`                | A frozen object containing the entire composable prompt library.           |
+| `PROMPT_LIBRARY`         | A frozen object containing the entire composable prompt library.           |
 
 ## Contributing
 

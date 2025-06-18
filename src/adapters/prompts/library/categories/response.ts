@@ -1,7 +1,7 @@
 /**
  * Defines the agent's strategic approach to when and how it should respond.
  */
-export const RESPONSE = {
+export const RESPONSES = {
     ALWAYS_ENGAGE: `
 <ResponseStrategy>
 You must always provide a response to the user's input. Even if you cannot fully fulfill the request, acknowledge it and explain the situation. Your primary directive is to be responsive.

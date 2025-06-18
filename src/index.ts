@@ -1,7 +1,7 @@
 export { ChatAgentAdapter } from './adapters/agents/chat-agent.adapter.js';
 export { QueryAgentAdapter } from './adapters/agents/query-agent.adapter.js';
 export { OpenRouterModelAdapter as OpenRouterAdapter } from './adapters/models/openrouter-model.adapter.js';
-export { PROMPTS } from './adapters/prompts/library/index.js';
+export { PROMPT_LIBRARY } from './adapters/prompts/library/index.js';
 export { SystemPromptAdapter } from './adapters/prompts/system-prompt.adapter.js';
 export { UserPromptAdapter } from './adapters/prompts/user-prompt.adapter.js';
 export { SafeToolAdapter } from './adapters/tools/safe-tool.adapter.js';
