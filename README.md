@@ -43,11 +43,10 @@ const model = new OpenRouterModelAdapter({
 });
 
 // 2. Create an agent using a preset prompt
-const agent = new ChatAgentAdapter(
-  'discord-bot',
-  new SystemPromptAdapter(PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR),
-  { model },
-);
+const agent = new ChatAgentAdapter('discord-bot', {
+  model,
+  systemPrompt: new SystemPromptAdapter(PROMPTS.PRESETS.DISCORD_COMMUNITY_ANIMATOR),
+});
 
 // 3. Run the agent
 const response = await agent.run();
@@ -150,11 +149,111 @@ const userPrompt = new UserPromptAdapter([
 ]);
 
 // 3. Configure and run the agent
-const agent = new ChatAgentAdapter('code-reviewer', systemPrompt, { model });
+const agent = new ChatAgentAdapter('code-reviewer', {
+  model,
+  systemPrompt,
+});
 
 const response = await agent.run(userPrompt);
 
 console.log(response);
+```
+
+### Recipe: Simple Text Processor (QueryAgent)
+
+This example shows how to use the simpler `QueryAgentAdapter` for one-shot responses without tools.
+
+```typescript
+import {
+  QueryAgentAdapter,
+  OpenRouterModelAdapter,
+  SystemPromptAdapter,
+  UserPromptAdapter,
+  PROMPTS,
+} from '@jterrazz/intelligence';
+
+const model = new OpenRouterModelAdapter({
+  apiKey: process.env.OPENROUTER_API_KEY!,
+  modelName: 'anthropic/claude-3.5-sonnet',
+});
+
+// 1. Create a simple system prompt for text processing
+const systemPrompt = new SystemPromptAdapter(
+  PROMPTS.PERSONA.EXPERT_ADVISOR,
+  PROMPTS.TONE.PROFESSIONAL,
+  PROMPTS.FORMAT.MARKDOWN,
+  'You are a helpful assistant that improves text clarity and grammar.',
+);
+
+// 2. Create a query agent (no tools needed)
+const agent = new QueryAgentAdapter('text-processor', {
+  model,
+  systemPrompt,
+});
+
+// 3. Run a simple query
+const userPrompt = new UserPromptAdapter(
+  'Please improve this text: "Me and john was going to store yesterday"',
+);
+const response = await agent.run(userPrompt);
+
+console.log(response);
+// Expected output: A grammatically corrected and improved version of the text
+```
+
+### Recipe: Structured Data Extraction (QueryAgent with Schema)
+
+This example shows how to use `QueryAgentAdapter` with schema parsing for structured responses.
+
+```typescript
+import {
+  QueryAgentAdapter,
+  OpenRouterModelAdapter,
+  SystemPromptAdapter,
+  UserPromptAdapter,
+  PROMPTS,
+} from '@jterrazz/intelligence';
+import { z } from 'zod/v4';
+
+const model = new OpenRouterModelAdapter({
+  apiKey: process.env.OPENROUTER_API_KEY!,
+  modelName: 'anthropic/claude-3.5-sonnet',
+});
+
+// 1. Define the response schema
+const extractionSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  phone: z.string().optional(),
+  company: z.string().optional(),
+});
+
+// 2. Create a system prompt for data extraction
+const systemPrompt = new SystemPromptAdapter(
+  PROMPTS.PERSONA.EXPERT_ADVISOR,
+  PROMPTS.TONE.PROFESSIONAL,
+  PROMPTS.FORMAT.JSON,
+  'You extract contact information from text and return it as JSON.',
+);
+
+// 3. Create a query agent with schema parsing
+const agent = new QueryAgentAdapter('contact-extractor', {
+  model,
+  schema: extractionSchema,
+  systemPrompt,
+});
+
+// 4. Run the query
+const userPrompt = new UserPromptAdapter(
+  'Extract contact info: "Hi, I\'m John Doe from TechCorp. Email me at john@techcorp.com or call 555-1234"',
+);
+const response = await agent.run(userPrompt);
+
+// 5. Get both raw response and parsed data
+console.log('Raw response:', response);
+const parsedData = agent.getLastParsedResult();
+console.log('Parsed data:', parsedData);
+// Expected: { name: "John Doe", email: "john@techcorp.com", phone: "555-1234", company: "TechCorp" }
 ```
 
 ### Recipe: Weather Bot with Tools
@@ -187,14 +286,11 @@ const weatherTool = new SafeToolAdapter(
 );
 
 // 2. Create an agent that knows how to use tools
-const agent = new ChatAgentAdapter(
-  'weather-bot',
-  new SystemPromptAdapter(PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
-  {
-    model,
-    tools: [weatherTool], // Pass the tool instance directly
-  },
-);
+const agent = new ChatAgentAdapter('weather-bot', {
+  model,
+  systemPrompt: new SystemPromptAdapter(PROMPTS.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
+  tools: [weatherTool], // Pass the tool instance directly
+});
 
 // 3. Run the agent with a user query that requires the tool
 const response = await agent.run({ generate: () => "What's the weather like in Boston?" });
@@ -212,6 +308,7 @@ console.log(response);
 | Class                    | Description                                                                |
 | ------------------------ | -------------------------------------------------------------------------- |
 | `ChatAgentAdapter`       | The main agent implementation. Runs prompts and coordinates tools.         |
+| `QueryAgentAdapter`      | A simpler agent for one-shot responses without tools or complex logic.     |
 | `OpenRouterModelAdapter` | An adapter for connecting to any model on the OpenRouter platform.         |
 | `SafeToolAdapter`        | A type-safe wrapper for creating tools with validation and error handling. |
 | `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from a prompt array.   |

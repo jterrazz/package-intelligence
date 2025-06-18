@@ -1,7 +1,7 @@
 /**
  * Port for prompt generation
  */
-export interface Prompt {
+export interface PromptPort {
     /**
      * Generate the prompt text
      */

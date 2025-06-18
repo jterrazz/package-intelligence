@@ -1,82 +1,113 @@
 import { type LoggerPort } from '@jterrazz/logger';
-import {
-    ChatPromptTemplate,
-    HumanMessagePromptTemplate,
-    SystemMessagePromptTemplate,
-} from '@langchain/core/prompts';
+import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { AgentExecutor, createStructuredChatAgent } from 'langchain/agents';
-import { z } from 'zod/v4';
+import { type z } from 'zod/v4';
 
-import type { Agent } from '../../ports/agent.port.js';
-import type { Model } from '../../ports/model.port.js';
-import type { Prompt } from '../../ports/prompt.port.js';
-import type { Tool } from '../../ports/tool.port.js';
+import { type AgentPort } from '../../ports/agent.port.js';
+import type { ModelPort } from '../../ports/model.port.js';
+import type { PromptPort } from '../../ports/prompt.port.js';
+import type { ToolPort } from '../../ports/tool.port.js';
 
 import { AIResponseParser } from '../utils/ai-response-parser.js';
 
 import type { SystemPromptAdapter } from '../prompts/system-prompt.adapter.js';
 
-export type AgentResponse = z.infer<typeof AgentResponseSchema>;
-
-export interface ChatAgentOptions {
+export interface ChatAgentOptions<T = unknown> {
     logger?: LoggerPort;
-    model: Model;
-    tools: Tool[];
+    model: ModelPort;
+    schema?: z.ZodSchema<T>;
+    systemPrompt: SystemPromptAdapter;
+    tools: ToolPort[];
 }
 
-// Schema for agent responses
-const AgentResponseSchema = z.object({
-    message: z.string().optional(),
-    reason: z.string().optional(),
-    shouldRespond: z.boolean(),
-});
+// Internal response type for LangChain agent responses
+type InternalChatResponse = {
+    message?: string;
+    reason?: string;
+    shouldRespond: boolean;
+};
 
-// LangChain-specific framework rules (internal to this adapter)
-const LANGCHAIN_FRAMEWORK_RULES = `
-<AGENT_FRAMEWORK>
-You are a chat agent piloted by the LangChain framework.
+const SYSTEM_PROMPT_TEMPLATE = `
+<OBJECTIVE>
+{mission_prompt}
+</OBJECTIVE>
 
-You have access to the following tools: {tools}
-Tool names: {tool_names}
-Agent scratchpad: {agent_scratchpad}
+<OUTPUT_FORMAT>
+CRITICAL: The format instructions in this section are the ONLY valid way to structure your response. Any formatting guidelines within the <OBJECTIVE> section (like message templates) apply ONLY to the content that goes inside the "RESPOND: " part of your final answer.
 
-When you want to provide your final response, you MUST format it exactly like this:
+You have two ways to respond:
 
-\`\`\`json
-{{"action": "Final Answer", "action_input": {{"shouldRespond": false, "reason": "<your reason>"}}}}
-\`\`\`
+1.  **Call a tool** to gather information. For this, you MUST output a JSON blob with the tool's name and its input.
+    *Valid tool names are: {tool_names}*
+    \`\`\`json
+    {{
+      "action": "tool_name_to_use",
+      "action_input": "the input for the tool, or an empty object {{}} if no input is needed"
+    }}
+    \`\`\`
 
-OR 
+2.  **Provide the Final Answer** once you have enough information. For this, you MUST output a JSON blob with the "Final Answer" action. The input must start with "RESPOND: " or "SILENT: ".
+    - To send a message:
+      \`\`\`json
+      {{
+        "action": "Final Answer",
+        "action_input": "RESPOND: <your response message>"
+      }}
+      \`\`\`
+    - To stay silent:
+      \`\`\`json
+      {{
+        "action": "Final Answer",
+        "action_input": "SILENT: <your reason for staying silent>"
+      }}
+      \`\`\`
+</OUTPUT_FORMAT>
 
-\`\`\`json
-{{"action": "Final Answer", "action_input": {{"shouldRespond": true, "message": "<your response message>"}}}}
-\`\`\`
+<EXECUTION_CONTEXT>
+This is internal data for your reference.
 
-"shouldRespond" set to true means the message will be sent to the user.
-"shouldRespond" set to false means the message will not be sent to the user.
+<TOOLS>
+{tools}
+</TOOLS>
 
-ALWAYS use this exact format with markdown code blocks and the action/action_input structure.
-</AGENT_FRAMEWORK>`;
+<WORKING_MEMORY>
+This is your internal thought process and previous tool usage.
+{agent_scratchpad}
+</WORKING_MEMORY>
+</EXECUTION_CONTEXT>
+`;
 
 /**
  * Chat agent adapter that provides structured chat capabilities with optional responses
  */
-export class ChatAgentAdapter implements Agent {
-    private readonly executorPromise: Promise<AgentExecutor>;
-    private readonly logger?: LoggerPort;
-    private readonly name: string;
-    private readonly responseParser: AIResponseParser<AgentResponse>;
+export class ChatAgentAdapter<T = unknown> implements AgentPort {
+    protected readonly logger?: LoggerPort;
+    protected readonly name: string;
+    private lastParsedResult?: T;
+    private readonly model: ModelPort;
+    private readonly schema?: z.ZodSchema<T>;
+    private readonly systemPrompt: SystemPromptAdapter;
+    private readonly tools: ToolPort[];
 
-    constructor(name: string, systemPrompt: SystemPromptAdapter, options: ChatAgentOptions) {
+    constructor(name: string, options: ChatAgentOptions<T>) {
         this.name = name;
         this.logger = options.logger;
-        this.responseParser = new AIResponseParser(AgentResponseSchema);
-        this.executorPromise = this.createExecutor(systemPrompt, options);
+        this.model = options.model;
+        this.schema = options.schema;
+        this.systemPrompt = options.systemPrompt;
+        this.tools = options.tools;
     }
 
-    async run(userPrompt?: Prompt): Promise<null | string> {
+    /**
+     * Get the last successfully parsed user data result (if schema was provided)
+     */
+    getLastParsedResult(): T | undefined {
+        return this.lastParsedResult;
+    }
+
+    async run(userPrompt?: PromptPort): Promise<null | string> {
         try {
-            const executor = await this.executorPromise;
+            const executor = await this.createExecutor();
             const input = this.resolveUserInput(userPrompt);
             const result = await executor.invoke({ input });
 
@@ -103,21 +134,42 @@ export class ChatAgentAdapter implements Agent {
         }
     }
 
-    private async createExecutor(
-        systemPrompt: SystemPromptAdapter,
-        options: ChatAgentOptions,
-    ): Promise<AgentExecutor> {
-        const model = options.model.getModel();
+    protected parseResponse<T>(content: string, schema: z.ZodSchema<T>): T {
+        try {
+            const parser = new AIResponseParser(schema);
+            return parser.parse(content);
+        } catch (error) {
+            this.logger?.error('Failed to parse response', {
+                agentName: this.name,
+                error: error instanceof Error ? error.message : 'Unknown error',
+                rawContent: content,
+            });
+            throw new Error('Invalid response format from model');
+        }
+    }
+
+    protected resolveUserInput(userPrompt?: PromptPort): string {
+        if (!userPrompt) {
+            return 'Please provide a response based on your system instructions.';
+        }
+
+        return userPrompt.generate();
+    }
+
+    private async createExecutor(): Promise<AgentExecutor> {
+        const model = this.model.getModel();
 
         // Convert Tool instances to DynamicTool instances
-        const dynamicTools = options.tools.map((tool) => tool.getDynamicTool());
+        const dynamicTools = this.tools.map((tool) => tool.getDynamicTool());
 
-        // Combine LangChain framework rules with user-provided system prompts
-        const systemPromptText = `${LANGCHAIN_FRAMEWORK_RULES}\n\n${systemPrompt.generate()}`;
-        const systemTemplate = SystemMessagePromptTemplate.fromTemplate(systemPromptText);
-        const humanTemplate = HumanMessagePromptTemplate.fromTemplate('{input}');
-
-        const prompt = ChatPromptTemplate.fromMessages([systemTemplate, humanTemplate]);
+        // Use LangChain's clean tuple-based message format
+        const prompt = ChatPromptTemplate.fromMessages([
+            [
+                'system',
+                SYSTEM_PROMPT_TEMPLATE.replace('{mission_prompt}', this.systemPrompt.generate()),
+            ],
+            ['human', '{input}'],
+        ]);
 
         const agent = await createStructuredChatAgent({
             llm: model,
@@ -128,47 +180,31 @@ export class ChatAgentAdapter implements Agent {
         return AgentExecutor.fromAgentAndTools({
             agent,
             tools: dynamicTools,
+            verbose: true,
         });
     }
 
-    private extractActionInput(output: unknown): string {
-        if (typeof output === 'object' && output !== null) {
-            return JSON.stringify(output);
-        }
-
-        if (typeof output !== 'string') {
-            return String(output);
-        }
-
-        // Check for LangChain's action/action_input format first
-        const codeBlockMatch = output.match(/```(?:json)?\s*([\s\S]*?)```/i);
-        if (codeBlockMatch) {
-            const content = codeBlockMatch[1].trim();
-            try {
-                const parsed = JSON.parse(content);
-                if (parsed.action === 'Final Answer' && parsed.action_input) {
-                    return JSON.stringify(parsed.action_input);
-                }
-            } catch {
-                // Fall through to return original content
-            }
-            return content;
-        }
-
-        // Fallback: Look for "Final Answer:" pattern
-        if (output.includes('Final Answer:')) {
-            const actionInputMatch = output.match(/Final Answer:\s*([\s\S]*?)$/i);
-            if (actionInputMatch) {
-                return actionInputMatch[1].trim();
-            }
-        }
-
-        return output;
-    }
-
-    private handleResponse(response: AgentResponse): null | string {
+    private handleResponse(response: InternalChatResponse): null | string {
         if (response.shouldRespond && response.message) {
             this.logger?.info('Agent responding with message', { agentName: this.name });
+
+            // If schema is provided, parse the message as JSON and store result
+            if (this.schema) {
+                try {
+                    this.lastParsedResult = this.parseResponse(response.message, this.schema);
+                    this.logger?.debug('Successfully parsed JSON response', {
+                        agentName: this.name,
+                    });
+                } catch (error) {
+                    this.logger?.warn('Failed to parse message as JSON with provided schema', {
+                        agentName: this.name,
+                        error: error instanceof Error ? error.message : 'Unknown error',
+                        message: response.message,
+                    });
+                    // Continue with returning the raw message even if JSON parsing fails
+                }
+            }
+
             return response.message;
         }
 
@@ -184,11 +220,10 @@ export class ChatAgentAdapter implements Agent {
         return null;
     }
 
-    private parseAgentResponse(output: unknown): AgentResponse {
+    private parseAgentResponse(output: unknown): InternalChatResponse {
         try {
-            // Handle LangChain's action/action_input format
-            const processedOutput = this.extractActionInput(output);
-            return this.responseParser.parse(processedOutput);
+            // Parse the simple text format
+            return this.parseTextResponse(output);
         } catch (error) {
             this.logger?.error('Failed to parse agent response', {
                 agentName: this.name,
@@ -199,11 +234,31 @@ export class ChatAgentAdapter implements Agent {
         }
     }
 
-    private resolveUserInput(userPrompt?: Prompt): string {
-        if (!userPrompt) {
-            return 'Please analyze the current situation and respond if appropriate.';
+    private parseTextResponse(output: unknown): InternalChatResponse {
+        const text = typeof output === 'string' ? output.trim() : String(output).trim();
+
+        // Check for "RESPOND:" pattern
+        const respondMatch = text.match(/^RESPOND:\s*([\s\S]+)$/i);
+        if (respondMatch) {
+            return {
+                message: respondMatch[1].trim(),
+                shouldRespond: true,
+            };
         }
 
-        return userPrompt.generate();
+        // Check for "SILENT:" pattern
+        const silentMatch = text.match(/^SILENT:\s*([\s\S]+)$/i);
+        if (silentMatch) {
+            return {
+                reason: silentMatch[1].trim(),
+                shouldRespond: false,
+            };
+        }
+
+        // Fallback: treat as a regular message
+        return {
+            message: text,
+            shouldRespond: true,
+        };
     }
 }

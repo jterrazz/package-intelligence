@@ -1,7 +1,7 @@
 import type { BaseLanguageModel } from '@langchain/core/language_models/base';
 import { ChatOpenAI } from '@langchain/openai';
 
-import type { Model } from '../../ports/model.port.js';
+import type { ModelPort } from '../../ports/model.port.js';
 
 export interface OpenRouterConfig {
     /**
@@ -9,23 +9,34 @@ export interface OpenRouterConfig {
      */
     apiKey: string;
     /**
+     * Optional metadata for request headers
+     */
+    metadata?: OpenRouterMetadata;
+    /**
      * The model to use (e.g., 'google/gemini-2.5-flash-preview-05-20:thinking')
      */
     modelName: string;
     /**
-     * Application title for X-Title header (optional)
+     * The maximum number of tokens to generate
      */
-    title?: string;
+    maxTokens?: number;
+}
+
+export interface OpenRouterMetadata {
     /**
-     * Website URL for HTTP-Referer header (optional)
+     * Application title for X-Title header
      */
-    websiteUrl?: string;
+    application?: string;
+    /**
+     * Website URL for HTTP-Referer header
+     */
+    website?: string;
 }
 
 /**
  * OpenRouter adapter that provides access to various models through OpenRouter's API
  */
-export class OpenRouterModelAdapter implements Model {
+export class OpenRouterModelAdapter implements ModelPort {
     private readonly model: BaseLanguageModel;
 
     constructor(config: OpenRouterConfig) {
@@ -33,10 +44,13 @@ export class OpenRouterModelAdapter implements Model {
             configuration: {
                 baseURL: 'https://openrouter.ai/api/v1',
                 defaultHeaders: {
-                    ...(config.websiteUrl && { 'HTTP-Referer': config.websiteUrl }),
-                    ...(config.title && { 'X-Title': config.title }),
+                    ...(config.metadata?.website && {
+                        'HTTP-Referer': config.metadata.website,
+                    }),
+                    ...(config.metadata?.application && { 'X-Title': config.metadata.application }),
                 },
             },
+            maxTokens: config.maxTokens ?? 64_000,
             modelName: config.modelName,
             openAIApiKey: config.apiKey,
         });

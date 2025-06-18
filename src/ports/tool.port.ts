@@ -4,7 +4,7 @@ import type { z } from 'zod/v4';
 /**
  * Port for tools
  */
-export interface Tool {
+export interface ToolPort {
     /**
      * Get the underlying LangChain tool instance
      */

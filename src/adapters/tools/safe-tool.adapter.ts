@@ -2,7 +2,7 @@ import type { LoggerPort } from '@jterrazz/logger';
 import { DynamicStructuredTool, DynamicTool } from 'langchain/tools';
 import type { z } from 'zod/v4';
 
-import type { Tool } from '../../ports/tool.port.js';
+import type { ToolPort } from '../../ports/tool.port.js';
 
 export interface SafeToolOptions<T> {
     logger?: LoggerPort;
@@ -22,7 +22,7 @@ export type ToolFunction<T = void> = T extends void
 /**
  * Safe tool adapter that provides error handling and logging for LangChain tools
  */
-export class SafeToolAdapter<T = void> implements Tool {
+export class SafeToolAdapter<T = void> implements ToolPort {
     private readonly dynamicTool: DynamicStructuredTool<z.ZodSchema<T>> | DynamicTool;
 
     constructor(

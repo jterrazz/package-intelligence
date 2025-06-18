@@ -7,6 +7,11 @@ export const AGENT_LOGIC = {
 Always provide a response to the user's input, even if it's just to state that you cannot fulfill the request.
 </AGENT_LOGIC>`,
 
+    CONTEXT_AWARE: `
+<AGENT_LOGIC>
+Always check the conversation history and current events before deciding whether to post.
+</AGENT_LOGIC>`,
+
     SELECTIVE_RESPONSE: `
 <AGENT_LOGIC>
 Only respond when you can provide a valuable, relevant, and substantive contribution.

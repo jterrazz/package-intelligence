@@ -1,12 +1,12 @@
-import type { Prompt } from './prompt.port.js';
+import type { PromptPort } from './prompt.port.js';
 
 /**
  * Port for chat agents
  */
-export interface Agent {
+export interface AgentPort {
     /**
      * Run the agent with optional user prompt and return optional response
      * @param userPrompt - The user prompt to process
      */
-    run(userPrompt?: Prompt): Promise<null | string>;
+    run(userPrompt?: PromptPort): Promise<null | string>;
 }
