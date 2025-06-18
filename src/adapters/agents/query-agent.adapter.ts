@@ -14,6 +14,7 @@ export interface QueryAgentOptions<T = string> {
     model: ModelPort;
     schema?: z.ZodSchema<T>;
     systemPrompt: SystemPromptAdapter;
+    verbose?: boolean;
 }
 
 /**
@@ -60,6 +61,12 @@ export class QueryAgentAdapter<T = string> implements AgentPort {
         this.options.logger?.debug(`[${this.name}] Invoking model...`, {
             hasSchema: !!this.options.schema,
         });
+
+        if (this.options.verbose) {
+            this.options.logger?.info(`[${this.name}] Sending messages to model...`, {
+                messages,
+            });
+        }
 
         const response = await this.options.model.getModel().invoke(messages);
         const { content } = response;

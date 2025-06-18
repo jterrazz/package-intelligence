@@ -18,6 +18,7 @@ export interface ChatAgentOptions<T = unknown> {
     schema?: z.ZodSchema<T>;
     systemPrompt: SystemPromptAdapter;
     tools: ToolPort[];
+    verbose?: boolean;
 }
 
 const SYSTEM_PROMPT_TEMPLATE = `
@@ -150,7 +151,7 @@ export class ChatAgentAdapter<T = unknown> implements AgentPort {
         return AgentExecutor.fromAgentAndTools({
             agent,
             tools,
-            verbose: true,
+            verbose: this.options.verbose,
         });
     }
 
