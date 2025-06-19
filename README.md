@@ -95,8 +95,7 @@ const agent = new BasicAgentAdapter('contact-extractor', {
 
 // 3. Run the agent and get the parsed result
 const text = 'Say hi to John Doe, you can reach him at john.doe@example.com.';
-await agent.run(new UserPromptAdapter(text));
-const contact = agent.getLastParsedResult();
+const contact = await agent.run(new UserPromptAdapter(text));
 
 console.log(contact);
 // Output: { name: 'John Doe', email: 'john.doe@example.com' }
