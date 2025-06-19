@@ -12,7 +12,7 @@ import { AIResponseParser } from '../utils/ai-response-parser.js';
 
 import type { SystemPromptAdapter } from '../prompts/system-prompt.adapter.js';
 
-export interface ChatAgentOptions<T = unknown> {
+export interface AutonomousAgentOptions<T = unknown> {
     logger?: LoggerPort;
     model: ModelPort;
     schema?: z.ZodSchema<T>;
@@ -75,13 +75,13 @@ This is your internal thought process and previous tool usage.
 `;
 
 /**
- * An advanced agent that uses tools and a structured prompt to engage in conversational chat.
+ * An autonomous agent that uses tools and a structured prompt to accomplish tasks.
  * It can decide whether to respond or remain silent and supports schema-validated responses.
  */
-export class ChatAgentAdapter<T = unknown> implements AgentPort {
+export class AutonomousAgentAdapter<T = unknown> implements AgentPort {
     constructor(
         public readonly name: string,
-        private readonly options: ChatAgentOptions<T>,
+        private readonly options: AutonomousAgentOptions<T>,
     ) {}
 
     async run(userPrompt?: PromptPort): Promise<null | string> {

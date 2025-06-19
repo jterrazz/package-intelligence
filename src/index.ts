@@ -1,5 +1,5 @@
-export { ChatAgentAdapter } from './adapters/agents/chat-agent.adapter.js';
-export { QueryAgentAdapter } from './adapters/agents/query-agent.adapter.js';
+export { AutonomousAgentAdapter } from './adapters/agents/autonomous-agent.adapter.js';
+export { BasicAgentAdapter } from './adapters/agents/basic-agent.adapter.js';
 export { OpenRouterModelAdapter as OpenRouterAdapter } from './adapters/models/openrouter-model.adapter.js';
 export { PROMPT_LIBRARY } from './adapters/prompts/library/index.js';
 export { SystemPromptAdapter } from './adapters/prompts/system-prompt.adapter.js';

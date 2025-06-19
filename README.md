@@ -30,7 +30,7 @@ Get your first agent running in under a minute. This example uses a preset to cr
 
 ```typescript
 import {
-  ChatAgentAdapter,
+  AutonomousAgentAdapter,
   OpenRouterAdapter,
   SystemPromptAdapter,
   PROMPT_LIBRARY,
@@ -43,7 +43,7 @@ const model = new OpenRouterAdapter({
 });
 
 // 2. Create an agent using a preset prompt
-const agent = new ChatAgentAdapter('discord-bot', {
+const agent = new AutonomousAgentAdapter('discord-bot', {
   model,
   systemPrompt: new SystemPromptAdapter(PROMPT_LIBRARY.PRESETS.COMMUNITY_ANIMATOR),
 });
@@ -104,7 +104,7 @@ The adapter handles errors gracefully and integrates seamlessly with the agent, 
 The library is built on a hexagonal architecture.
 
 - **Ports (`/ports`)**: Define the contracts (interfaces) for core components like `Agent`, `Model`, and `Tool`.
-- **Adapters (`/adapters`)**: Provide concrete implementations. For example, `ChatAgentAdapter` is an adapter that uses LangChain, and `OpenRouterAdapter` is an adapter for the OpenRouter API.
+- **Adapters (`/adapters`)**: Provide concrete implementations. For example, `AutonomousAgentAdapter` is an adapter that uses LangChain, and `OpenRouterAdapter` is an adapter for the OpenRouter API.
 
 This separation of concerns means you can easily create your own adapters to support different models or services without changing the application's core logic.
 
@@ -124,7 +124,7 @@ This recipe creates an agent that acts as an expert software engineer, providing
 
 ```typescript
 import {
-  ChatAgentAdapter,
+  AutonomousAgentAdapter,
   OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
@@ -153,7 +153,7 @@ const userPrompt = new UserPromptAdapter([
 ]);
 
 // 3. Configure and run the agent
-const agent = new ChatAgentAdapter('code-reviewer', {
+const agent = new AutonomousAgentAdapter('code-reviewer', {
   model,
   systemPrompt,
 });
@@ -163,13 +163,13 @@ const response = await agent.run(userPrompt);
 console.log(response);
 ```
 
-### Recipe: Simple Text Processor (QueryAgent)
+### Recipe: Simple Text Processor (BasicAgent)
 
-This example shows how to use the simpler `QueryAgentAdapter` for one-shot responses without tools.
+This example shows how to use the simpler `BasicAgentAdapter` for one-shot responses without tools.
 
 ```typescript
 import {
-  QueryAgentAdapter,
+  BasicAgentAdapter,
   OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
@@ -189,8 +189,8 @@ const systemPrompt = new SystemPromptAdapter(
   'You are a helpful assistant that improves text clarity and grammar.',
 );
 
-// 2. Create a query agent (no tools needed)
-const agent = new QueryAgentAdapter('text-processor', {
+// 2. Create a basic agent (no tools needed)
+const agent = new BasicAgentAdapter('text-processor', {
   model,
   systemPrompt,
 });
@@ -205,13 +205,13 @@ console.log(response);
 // Expected output: A grammatically corrected and improved version of the text
 ```
 
-### Recipe: Structured Data Extraction (QueryAgent with Schema)
+### Recipe: Structured Data Extraction (BasicAgent with Schema)
 
-This example shows how to use `QueryAgentAdapter` with schema parsing for structured responses.
+This example shows how to use `BasicAgentAdapter` with schema parsing for structured responses.
 
 ```typescript
 import {
-  QueryAgentAdapter,
+  BasicAgentAdapter,
   OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
@@ -240,8 +240,8 @@ const systemPrompt = new SystemPromptAdapter(
   'You extract contact information from text and return it as JSON.',
 );
 
-// 3. Create a query agent with schema parsing
-const agent = new QueryAgentAdapter('contact-extractor', {
+// 3. Create a basic agent with schema parsing
+const agent = new BasicAgentAdapter('contact-extractor', {
   model,
   schema: extractionSchema,
   systemPrompt,
@@ -266,7 +266,7 @@ This example shows how to give an agent a tool and have it respond to a user que
 
 ```typescript
 import {
-  ChatAgentAdapter,
+  AutonomousAgentAdapter,
   OpenRouterAdapter,
   SafeToolAdapter,
   SystemPromptAdapter,
@@ -291,7 +291,7 @@ const weatherTool = new SafeToolAdapter(
 );
 
 // 2. Create an agent that knows how to use tools
-const agent = new ChatAgentAdapter('weather-bot', {
+const agent = new AutonomousAgentAdapter('weather-bot', {
   model,
   systemPrompt: new SystemPromptAdapter(PROMPT_LIBRARY.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
   tools: [weatherTool], // Pass the tool instance directly
@@ -310,16 +310,16 @@ console.log(response);
 
 ### Core Components
 
-| Class                    | Description                                                                |
-| ------------------------ | -------------------------------------------------------------------------- |
-| `ChatAgentAdapter`       | The main agent implementation. Runs prompts and coordinates tools.         |
-| `QueryAgentAdapter`      | A simpler agent for one-shot responses without tools or complex logic.     |
-| `OpenRouterModelAdapter` | An adapter for connecting to any model on the OpenRouter platform.         |
-| `SafeToolAdapter`        | A type-safe wrapper for creating tools with validation and error handling. |
-| `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from a prompt array.   |
-| `UserPromptAdapter`      | A simple adapter to generate a user prompt string from a prompt array.     |
-| `AIResponseParser`       | A utility to parse a model's string output into a typed object using Zod.  |
-| `PROMPT_LIBRARY`         | A frozen object containing the entire composable prompt library.           |
+| Class                    | Description                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------- |
+| `AutonomousAgentAdapter` | The main agent implementation. Runs prompts and coordinates tools autonomously. |
+| `BasicAgentAdapter`      | A basic agent for one-shot responses without tools or complex logic.            |
+| `OpenRouterModelAdapter` | An adapter for connecting to any model on the OpenRouter platform.              |
+| `SafeToolAdapter`        | A type-safe wrapper for creating tools with validation and error handling.      |
+| `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from a prompt array.        |
+| `UserPromptAdapter`      | A simple adapter to generate a user prompt string from a prompt array.          |
+| `AIResponseParser`       | A utility to parse a model's string output into a typed object using Zod.       |
+| `PROMPT_LIBRARY`         | A frozen object containing the entire composable prompt library.                |
 
 ## Contributing
 
