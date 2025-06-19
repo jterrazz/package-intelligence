@@ -5,16 +5,17 @@
 [![NPM Version](https://img.shields.io/npm/v/@jterrazz/intelligence.svg)](https://www.npmjs.com/package/@jterrazz/intelligence)
 [![License](https://img.shields.io/npm/l/@jterrazz/intelligence.svg)](./LICENSE)
 
-`@jterrazz/intelligence` provides a clean, structured, and extensible foundation for building sophisticated AI agents. By combining a composable prompt system, safe tool integration, and a ports-and-adapters architecture, it empowers developers to create reliable and maintainable AI-powered applications.
+`@jterrazz/intelligence` provides a clean, structured, and extensible foundation for building sophisticated AI agents. It's designed to help you create reliable and maintainable AI-powered applications by focusing on composability and type safety.
 
 ---
 
-## Why Use This Library?
+## Core Principles
 
-- **🤖 Build Predictable Agents**: Use the composable prompt library to ensure your agents have a consistent personality, tone, and behavior.
-- **🛠️ Integrate Tools Safely**: `SafeToolAdapter` provides built-in error handling, logging, and Zod-based schema validation for all your tools.
-- **🏗️ Stay Flexible**: The ports-and-adapters architecture makes it easy to swap out underlying models or frameworks (like LangChain) without rewriting your core logic.
-- **🎯 Get Type-Safe Responses**: Move beyond string parsing with `AIResponseParser`, which validates and types your model's output against a Zod schema.
+- **Composable Prompts**: Instead of monolithic prompts, the library offers a collection of constants. Mix and match them to build a precise system prompt that defines your agent's behavior, personality, and output format.
+
+- **Safe, Typed Tools**: A `SafeToolAdapter` provides built-in error handling and Zod-based schema validation for any tool you create. This ensures that tool inputs are valid and that your agent can gracefully handle execution errors.
+
+- **Ports & Adapters Architecture**: The library uses a hexagonal architecture to separate core logic from implementation details. This makes it easy to swap out underlying models or services (e.g., switching from OpenAI to Anthropic) without rewriting your application.
 
 ## Installation
 
@@ -26,7 +27,7 @@ npm install @jterrazz/intelligence
 
 ## Quick Start
 
-Get your first agent running in under a minute. This example uses a preset to create a helpful Discord community animator.
+Get your first agent running in minutes. This example creates a helpful agent for a Discord community.
 
 ```typescript
 import {
@@ -55,117 +56,11 @@ console.log(response);
 // Output might be: "Hello, community! I'm here to help with any questions and keep the good vibes flowing. What's on your mind today?"
 ```
 
----
+## Usage Examples
 
-## Core Concepts
+### 1. Basic Agent for Structured Data Extraction
 
-### 1. Composable Prompts
-
-Instead of writing monolithic prompts, the library provides a collection of composable string constants. Mix and match them to build a precise, fine-grained system prompt that defines your agent's behavior.
-
-- **`FOUNDATIONS`**: Core, non-negotiable rules (e.g., `PROMPT_LIBRARY.FOUNDATIONS.ETHICAL_CONDUCT`).
-- **`PERSONAS`**: The agent's identity and purpose (e.g., `PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR`).
-- **`DOMAINS`**: The agent's area of expertise (e.g., `PROMPT_LIBRARY.DOMAINS.SOFTWARE_ENGINEERING`).
-- **`TONES`**: The emotional flavor of communication (e.g., `PROMPT_LIBRARY.TONES.PROFESSIONAL`).
-- **`FORMATS`**: The structural format of the output (e.g., `PROMPT_LIBRARY.FORMATS.JSON`).
-- **`LANGUAGES`**: The natural language for the response (e.g., `PROMPT_LIBRARY.LANGUAGES.ENGLISH_NATIVE`).
-- **`VERBOSITY`**: The level of detail in the response (e.g., `PROMPT_LIBRARY.VERBOSITY.DETAILED`).
-- **`RESPONSES`**: The strategic approach to responding (e.g., `PROMPT_LIBRARY.RESPONSES.ALWAYS_ENGAGE`).
-
-This approach makes agent behavior more predictable and easier to modify.
-
-### 2. Safe Tool Integration
-
-The `SafeToolAdapter` is a wrapper for your functions that ensures they are executed safely.
-
-```typescript
-import { SafeToolAdapter } from '@jterrazz/intelligence';
-import { z } from 'zod/v4';
-
-const weatherTool = new SafeToolAdapter(
-  {
-    name: 'get_weather',
-    description: 'Get the current weather for a specific city.',
-    execute: async ({ city }) => `The weather in ${city} is currently sunny.`,
-  },
-  {
-    // Zod schema for automatic validation and type-safety
-    schema: z.object({
-      city: z.string().describe('The city name'),
-    }),
-  },
-);
-```
-
-The adapter handles errors gracefully and integrates seamlessly with the agent, which will automatically provide the Zod schema to the underlying model.
-
-### 3. Ports and Adapters Architecture
-
-The library is built on a hexagonal architecture.
-
-- **Ports (`/ports`)**: Define the contracts (interfaces) for core components like `Agent`, `Model`, and `Tool`.
-- **Adapters (`/adapters`)**: Provide concrete implementations. For example, `AutonomousAgentAdapter` is an adapter that uses LangChain, and `OpenRouterAdapter` is an adapter for the OpenRouter API.
-
-This separation of concerns means you can easily create your own adapters to support different models or services without changing the application's core logic.
-
-```
-src/
-├── ports/      # Abstract interfaces (the "what")
-└── adapters/   # Concrete implementations (the "how")
-```
-
----
-
-## Recipes
-
-### Recipe: Code Review Assistant
-
-This recipe creates an agent that acts as an expert software engineer, providing detailed feedback on code.
-
-```typescript
-import {
-  AutonomousAgentAdapter,
-  OpenRouterAdapter,
-  SystemPromptAdapter,
-  UserPromptAdapter,
-  PROMPT_LIBRARY,
-} from '@jterrazz/intelligence';
-
-const model = new OpenRouterAdapter({
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  modelName: 'anthropic/claude-3.5-sonnet',
-});
-
-// 1. Compose the system prompt from multiple parts (using rest arguments)
-const systemPrompt = new SystemPromptAdapter(
-  PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR,
-  PROMPT_LIBRARY.DOMAINS.SOFTWARE_ENGINEERING,
-  PROMPT_LIBRARY.TONES.PROFESSIONAL,
-  PROMPT_LIBRARY.VERBOSITY.DETAILED,
-  PROMPT_LIBRARY.FORMATS.MARKDOWN,
-  PROMPT_LIBRARY.FOUNDATIONS.FACTUAL_ACCURACY,
-);
-
-// 2. Create the user request (using a single array)
-const userPrompt = new UserPromptAdapter([
-  'Please review this TypeScript code for best practices:',
-  'const x = (s) => s.trim();',
-]);
-
-// 3. Configure and run the agent
-const agent = new AutonomousAgentAdapter('code-reviewer', {
-  model,
-  systemPrompt,
-});
-
-const response = await agent.run(userPrompt);
-
-console.log(response);
-```
-
-### Recipe: Simple Text Processor (BasicAgent)
-
-This example shows how to use the simpler `BasicAgentAdapter` for one-shot responses without tools.
+Use `BasicAgentAdapter` for simpler, one-shot tasks where you need a structured response but don't require complex tool use. This example extracts contact information from a string into a typed object.
 
 ```typescript
 import {
@@ -175,94 +70,41 @@ import {
   UserPromptAdapter,
   PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
+import { z } from 'zod';
 
 const model = new OpenRouterAdapter({
   apiKey: process.env.OPENROUTER_API_KEY!,
   modelName: 'anthropic/claude-3.5-sonnet',
 });
 
-// 1. Create a simple system prompt for text processing
-const systemPrompt = new SystemPromptAdapter(
-  PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR,
-  PROMPT_LIBRARY.TONES.PROFESSIONAL,
-  PROMPT_LIBRARY.FORMATS.MARKDOWN,
-  'You are a helpful assistant that improves text clarity and grammar.',
-);
-
-// 2. Create a basic agent (no tools needed)
-const agent = new BasicAgentAdapter('text-processor', {
-  model,
-  systemPrompt,
+// 1. Define the schema for the structured response
+const contactSchema = z.object({
+  name: z.string().describe('The full name of the person'),
+  email: z.string().email().describe('The email address'),
 });
 
-// 3. Run a simple query
-const userPrompt = new UserPromptAdapter(
-  'Please improve this text: "Me and john was going to store yesterday"',
-);
-const response = await agent.run(userPrompt);
-
-console.log(response);
-// Expected output: A grammatically corrected and improved version of the text
-```
-
-### Recipe: Structured Data Extraction (BasicAgent with Schema)
-
-This example shows how to use `BasicAgentAdapter` with schema parsing for structured responses.
-
-```typescript
-import {
-  BasicAgentAdapter,
-  OpenRouterAdapter,
-  SystemPromptAdapter,
-  UserPromptAdapter,
-  PROMPT_LIBRARY,
-} from '@jterrazz/intelligence';
-import { z } from 'zod/v4';
-
-const model = new OpenRouterAdapter({
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  modelName: 'anthropic/claude-3.5-sonnet',
-});
-
-// 1. Define the response schema
-const extractionSchema = z.object({
-  name: z.string(),
-  email: z.string().email(),
-  phone: z.string().optional(),
-  company: z.string().optional(),
-});
-
-// 2. Create a system prompt for data extraction
-const systemPrompt = new SystemPromptAdapter(
-  PROMPT_LIBRARY.PERSONAS.EXPERT_ADVISOR,
-  PROMPT_LIBRARY.TONES.PROFESSIONAL,
-  PROMPT_LIBRARY.FORMATS.JSON,
-  'You extract contact information from text and return it as JSON.',
-);
-
-// 3. Create a basic agent with schema parsing
+// 2. Create an agent with the schema
 const agent = new BasicAgentAdapter('contact-extractor', {
   model,
-  schema: extractionSchema,
-  systemPrompt,
+  schema: contactSchema,
+  systemPrompt: new SystemPromptAdapter(
+    PROMPT_LIBRARY.FORMATS.JSON,
+    'You are an expert at extracting contact details from text.',
+  ),
 });
 
-// 4. Run the query
-const userPrompt = new UserPromptAdapter(
-  'Extract contact info: "Hi, I\'m John Doe from TechCorp. Email me at john@techcorp.com or call 555-1234"',
-);
-const response = await agent.run(userPrompt);
+// 3. Run the agent and get the parsed result
+const text = 'Say hi to John Doe, you can reach him at john.doe@example.com.';
+await agent.run(new UserPromptAdapter(text));
+const contact = agent.getLastParsedResult();
 
-// 5. Get both raw response and parsed data
-console.log('Raw response:', response);
-const parsedData = agent.getLastParsedResult();
-console.log('Parsed data:', parsedData);
-// Expected: { name: "John Doe", email: "john@techcorp.com", phone: "555-1234", company: "TechCorp" }
+console.log(contact);
+// Output: { name: 'John Doe', email: 'john.doe@example.com' }
 ```
 
-### Recipe: Weather Bot with Tools
+### 2. Autonomous Agent with a Custom Tool
 
-This example shows how to give an agent a tool and have it respond to a user query.
+Use `AutonomousAgentAdapter` when you need an agent that can reason and use tools to accomplish a task. This example creates a simple weather tool and an agent that can use it.
 
 ```typescript
 import {
@@ -273,59 +115,54 @@ import {
   UserPromptAdapter,
   PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
-import { z } from 'zod/v4';
+import { z } from 'zod';
 
-// Assume 'model' is already configured
-
-// 1. Define the tool
-const weatherTool = new SafeToolAdapter(
-  {
-    name: 'get_weather',
-    description: 'Get the current weather for a location.',
-    execute: async ({ city }) => {
-      // In a real app, you would fetch from a weather API here
-      return `The weather in ${city} is 75°F and sunny.`;
-    },
-  },
-  { schema: z.object({ city: z.string().describe('City name') }) },
-);
-
-// 2. Create an agent that knows how to use tools
-const agent = new AutonomousAgentAdapter('weather-bot', {
-  model,
-  systemPrompt: new SystemPromptAdapter(PROMPT_LIBRARY.PRESETS.EMPATHETIC_SUPPORT_AGENT), // A good general-purpose preset
-  tools: [weatherTool], // Pass the tool instance directly
+const model = new OpenRouterAdapter({
+  apiKey: process.env.OPENROUTER_API_KEY!,
+  modelName: 'anthropic/claude-3.5-sonnet',
 });
 
-// 3. Run the agent with a user query that requires the tool
-const response = await agent.run(new UserPromptAdapter("What's the weather like in Boston?"));
+// 1. Define a tool with input validation
+const weatherTool = new SafeToolAdapter({
+  name: 'get_weather',
+  description: 'Gets the current weather for a specified city.',
+  schema: z.object({
+    city: z.string().describe('The name of the city'),
+  }),
+  execute: async ({ city }) => {
+    // In a real app, you would call a weather API here
+    if (city.toLowerCase() === 'paris') {
+      return 'The weather in Paris is sunny and 25°C.';
+    }
+    return `Sorry, I don't have weather information for ${city}.`;
+  },
+});
+
+// 2. Create an agent and provide it with the tool
+const agent = new AutonomousAgentAdapter('weather-assistant', {
+  model,
+  tools: [weatherTool],
+  systemPrompt: new SystemPromptAdapter('You are a helpful weather assistant.'),
+});
+
+// 3. Run the agent
+const response = await agent.run(new UserPromptAdapter("What's the weather like in Paris?"));
 
 console.log(response);
-// Expected output: "The weather in Boston is 75°F and sunny."
+// Output: "The weather in Paris is sunny and 25°C."
 ```
 
----
+## Development
 
-## API Reference
-
-### Core Components
-
-| Class                    | Description                                                                     |
-| ------------------------ | ------------------------------------------------------------------------------- |
-| `AutonomousAgentAdapter` | The main agent implementation. Runs prompts and coordinates tools autonomously. |
-| `BasicAgentAdapter`      | A basic agent for one-shot responses without tools or complex logic.            |
-| `OpenRouterModelAdapter` | An adapter for connecting to any model on the OpenRouter platform.              |
-| `SafeToolAdapter`        | A type-safe wrapper for creating tools with validation and error handling.      |
-| `SystemPromptAdapter`    | A simple adapter to generate a system prompt string from a prompt array.        |
-| `UserPromptAdapter`      | A simple adapter to generate a user prompt string from a prompt array.          |
-| `AIResponseParser`       | A utility to parse a model's string output into a typed object using Zod.       |
-| `PROMPT_LIBRARY`         | A frozen object containing the entire composable prompt library.                |
+- **Linting**: `npm run lint`
+- **Testing**: `npm run test`
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to open an issue or submit a pull request.
 
-## Author
+---
 
-- Jean-Baptiste Terrazzoni ([@jterrazz](https://github.com/jterrazz))
-- Email: contact@jterrazz.com
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
