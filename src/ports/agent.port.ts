@@ -1,12 +1,14 @@
 import type { PromptPort } from './prompt.port.js';
 
 /**
- * Port for chat agents
+ * Port for chat agents with generic input and output types
+ * @template TInput - The type of input parameters the agent accepts
+ * @template TOutput - The type of output the agent returns
  */
-export interface AgentPort {
+export interface AgentPort<TInput = PromptPort, TOutput = string> {
     /**
-     * Run the agent with optional user prompt and return optional response
-     * @param userPrompt - The user prompt to process
+     * Run the agent with optional input and return optional response
+     * @param input - The input to process
      */
-    run(userPrompt?: PromptPort): Promise<null | string>;
+    run(input?: TInput): Promise<null | TOutput>;
 }

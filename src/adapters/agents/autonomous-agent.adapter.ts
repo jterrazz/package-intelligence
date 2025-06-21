@@ -1,7 +1,7 @@
 import { type LoggerPort } from '@jterrazz/logger';
 import { ChatPromptTemplate } from '@langchain/core/prompts';
 import { AgentExecutor, createStructuredChatAgent } from 'langchain/agents';
-import { type z } from 'zod/v4';
+import { z } from 'zod/v4';
 
 import { type AgentPort } from '../../ports/agent.port.js';
 import type { ModelPort } from '../../ports/model.port.js';
@@ -12,10 +12,10 @@ import { AIResponseParser } from '../utils/ai-response-parser.js';
 
 import type { SystemPromptAdapter } from '../prompts/system-prompt.adapter.js';
 
-export interface AutonomousAgentOptions<T = unknown> {
+export interface AutonomousAgentOptions<TOutput = string> {
     logger?: LoggerPort;
     model: ModelPort;
-    schema?: z.ZodSchema<T>;
+    schema?: z.ZodSchema<TOutput>;
     systemPrompt: SystemPromptAdapter;
     tools: ToolPort[];
     verbose?: boolean;
@@ -26,7 +26,7 @@ const SYSTEM_PROMPT_TEMPLATE = `
 {mission_prompt}
 </OBJECTIVE>
 
-<OUTPUT_FORMAT>
+<GLOBAL_WRAPPER_OUTPUT_FORMAT>
 CRITICAL: The format instructions in this section are the ONLY valid way to structure your response. Your entire response MUST be a single JSON markdown code block. Any formatting guidelines within the <OBJECTIVE> section apply ONLY to the content inside the "RESPOND:" part of your final "action_input".
 
 REQUIRED: You have two ways to respond:
@@ -58,6 +58,8 @@ REQUIRED: You have two ways to respond:
       \`\`\`
 
     YOU MUST ALWAYS INCLUDE "RESPOND:" OR "SILENT:" IN YOUR FINAL ANSWER'S "action_input". FAILURE TO DO SO WILL CAUSE AN ERROR.
+
+{schema_format}
 </OUTPUT_FORMAT>
 
 <EXECUTION_CONTEXT>
@@ -77,19 +79,20 @@ This is your internal thought process and previous tool usage.
 /**
  * An autonomous agent that uses tools and a structured prompt to accomplish tasks.
  * It can decide whether to respond or remain silent and supports schema-validated responses.
+ * @template TOutput - The TypeScript type of the output
  */
-export class AutonomousAgentAdapter<T = unknown> implements AgentPort {
+export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<PromptPort, TOutput> {
     constructor(
         public readonly name: string,
-        private readonly options: AutonomousAgentOptions<T>,
+        private readonly options: AutonomousAgentOptions<TOutput>,
     ) {}
 
-    async run(userPrompt?: PromptPort): Promise<null | string> {
+    async run(input?: PromptPort): Promise<null | TOutput> {
         this.options.logger?.debug(`[${this.name}] Starting chat execution.`);
 
         try {
             const executor = await this.createExecutor();
-            const userInput = this.resolveUserInput(userPrompt);
+            const userInput = this.resolveUserInput(input);
 
             const result = await executor.invoke({ input: userInput });
 
@@ -117,15 +120,20 @@ export class AutonomousAgentAdapter<T = unknown> implements AgentPort {
             const message = agentResponse.message ?? '';
 
             if (this.options.schema) {
-                this.validateResponseContent(message, this.options.schema);
+                const validatedResponse = this.validateResponseContent(
+                    message,
+                    this.options.schema,
+                );
+
                 this.options.logger?.info(
                     `[${this.name}] Execution finished; response content validated.`,
                 );
+                return validatedResponse;
             } else {
                 this.options.logger?.info(`[${this.name}] Execution finished.`);
+                // When no schema is provided, we assume TOutput is string (default), so message is the result
+                return message as TOutput;
             }
-
-            return message;
         } catch (error) {
             this.options.logger?.error(`[${this.name}] Chat execution failed.`, {
                 error: error instanceof Error ? error.message : 'Unknown error',
@@ -138,13 +146,60 @@ export class AutonomousAgentAdapter<T = unknown> implements AgentPort {
         const model = this.options.model.getModel();
         const tools = this.options.tools.map((tool) => tool.getDynamicTool());
 
+        // Add schema format instructions if schema is provided
+        let schemaFormatInstructions = '';
+        if (this.options.schema) {
+            const jsonSchema = z.toJSONSchema(this.options.schema);
+            console.log(jsonSchema.type);
+            const isPrimitiveType = ['boolean', 'integer', 'number', 'string'].includes(
+                jsonSchema.type as string,
+            );
+
+            if (isPrimitiveType) {
+                schemaFormatInstructions = `
+
+SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be a ${jsonSchema.type} value that matches this schema:
+
+\`\`\`json
+${JSON.stringify(jsonSchema, null, 2)}
+\`\`\`
+
+Example format:
+\`\`\`json
+{{
+  "action": "Final Answer",
+  "action_input": "RESPOND: your ${jsonSchema.type} value here"
+}}
+\`\`\`
+
+Do not wrap the ${jsonSchema.type} value in JSON - just provide the raw value after "RESPOND: ".`;
+            } else {
+                schemaFormatInstructions = `
+
+SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be valid JSON that matches this exact schema:
+
+\`\`\`json
+${JSON.stringify(jsonSchema, null, 2).replace(/{/g, '{{').replace(/}/g, '}}')}
+\`\`\`
+
+Example format:
+\`\`\`json
+{{
+  "action": "Final Answer",
+  "action_input": "RESPOND: {{\\"field1\\": \\"value1\\", \\"field2\\": \\"value2\\"}}"
+}}
+\`\`\`
+`;
+            }
+        }
+
         const prompt = ChatPromptTemplate.fromMessages([
             [
                 'system',
                 SYSTEM_PROMPT_TEMPLATE.replace(
                     '{mission_prompt}',
                     this.options.systemPrompt.generate(),
-                ),
+                ).replace('{schema_format}', schemaFormatInstructions),
             ],
             ['human', '{input}'],
         ]);
@@ -187,9 +242,9 @@ export class AutonomousAgentAdapter<T = unknown> implements AgentPort {
         return null;
     }
 
-    private resolveUserInput(userPrompt?: PromptPort): string {
-        if (userPrompt) {
-            return userPrompt.generate();
+    private resolveUserInput(input?: PromptPort): string {
+        if (input) {
+            return input.generate();
         }
         return 'Proceed with your instructions.';
     }
@@ -197,9 +252,9 @@ export class AutonomousAgentAdapter<T = unknown> implements AgentPort {
     private validateResponseContent<TResponse>(
         content: string,
         schema: z.ZodSchema<TResponse>,
-    ): void {
+    ): TResponse {
         try {
-            new AIResponseParser(schema).parse(content);
+            return new AIResponseParser(schema).parse(content);
         } catch (error) {
             this.options.logger?.error(
                 `[${this.name}] Failed to validate response content against schema.`,

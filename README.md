@@ -56,15 +56,18 @@ console.log(response);
 // Output might be: "Hello, community! I'm here to help with any questions and keep the good vibes flowing. What's on your mind today?"
 ```
 
-## Usage Examples
+## Creating Domain-Specific Agents
 
-### 1. Basic Agent for Structured Data Extraction
+The most powerful feature of `@jterrazz/intelligence` is its ability to create specialized, reusable agents. By extending the base adapters, you can encapsulate an agent's logic, prompts, and tools into a clean, type-safe class.
 
-Use `BasicAgentAdapter` for simpler, one-shot tasks where you need a structured response but don't require complex tool use. This example extracts contact information from a string into a typed object.
+### 1. Data Extraction Agent (`BasicAgentAdapter`)
+
+Use `BasicAgentAdapter` for simpler, one-shot tasks where you need a structured response but don't require complex tool use. This example creates a reusable agent to extract contact information.
 
 ```typescript
 import {
   BasicAgentAdapter,
+  ModelPort,
   OpenRouterAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
@@ -72,28 +75,38 @@ import {
 } from '@jterrazz/intelligence';
 import { z } from 'zod';
 
+// 1. Define the output type for compile-time type-safety
+interface Contact {
+  name: string;
+  email: string;
+}
+
+// 2. Create a specialized agent by extending BasicAgentAdapter
+class ContactExtractorAgent extends BasicAgentAdapter<Contact> {
+  constructor(model: ModelPort) {
+    super('contact-extractor', {
+      model,
+      // Define the schema for runtime validation and type inference
+      schema: z.object({
+        name: z.string().describe('The full name of the person'),
+        email: z.string().email().describe('The email address'),
+      }),
+      // Compose the system prompt from the library
+      systemPrompt: new SystemPromptAdapter(
+        PROMPT_LIBRARY.FORMATS.JSON,
+        'You are an expert at extracting contact details from text.',
+      ),
+    });
+  }
+}
+
+// 3. Instantiate and use the agent
 const model = new OpenRouterAdapter({
   apiKey: process.env.OPENROUTER_API_KEY!,
   modelName: 'anthropic/claude-3.5-sonnet',
 });
+const agent = new ContactExtractorAgent(model);
 
-// 1. Define the schema for the structured response
-const contactSchema = z.object({
-  name: z.string().describe('The full name of the person'),
-  email: z.string().email().describe('The email address'),
-});
-
-// 2. Create an agent with the schema
-const agent = new BasicAgentAdapter('contact-extractor', {
-  model,
-  schema: contactSchema,
-  systemPrompt: new SystemPromptAdapter(
-    PROMPT_LIBRARY.FORMATS.JSON,
-    'You are an expert at extracting contact details from text.',
-  ),
-});
-
-// 3. Run the agent and get the parsed result
 const text = 'Say hi to John Doe, you can reach him at john.doe@example.com.';
 const contact = await agent.run(new UserPromptAdapter(text));
 
@@ -101,54 +114,82 @@ console.log(contact);
 // Output: { name: 'John Doe', email: 'john.doe@example.com' }
 ```
 
-### 2. Autonomous Agent with a Custom Tool
+### 2. Autonomous Agent with a Custom Tool (`AutonomousAgentAdapter`)
 
-Use `AutonomousAgentAdapter` when you need an agent that can reason and use tools to accomplish a task. This example creates a simple weather tool and an agent that can use it.
+Use `AutonomousAgentAdapter` when you need an agent that can reason and use tools to accomplish a task. This example creates a weather assistant that uses a tool and returns a structured JSON response.
 
 ```typescript
 import {
   AutonomousAgentAdapter,
+  ModelPort,
   OpenRouterAdapter,
   SafeToolAdapter,
   SystemPromptAdapter,
   UserPromptAdapter,
-  PROMPT_LIBRARY,
 } from '@jterrazz/intelligence';
 import { z } from 'zod';
 
-const model = new OpenRouterAdapter({
-  apiKey: process.env.OPENROUTER_API_KEY!,
-  modelName: 'anthropic/claude-3.5-sonnet',
-});
+// 1. Define the agent's final output type
+interface WeatherReport {
+  city: string;
+  temperature: number;
+  conditions: string;
+  forecast: string;
+}
 
-// 1. Define a tool with input validation
+// 2. Define a tool. Its `execute` function should return a string,
+// as the agent will process this output to formulate a final answer.
 const weatherTool = new SafeToolAdapter({
   name: 'get_weather',
   description: 'Gets the current weather for a specified city.',
-  schema: z.object({
-    city: z.string().describe('The name of the city'),
-  }),
+  schema: z.object({ city: z.string().describe('The name of the city') }),
   execute: async ({ city }) => {
-    // In a real app, you would call a weather API here
+    // In a real app, you would call a weather API here.
+    // The tool returns raw data, often as a JSON string.
     if (city.toLowerCase() === 'paris') {
-      return 'The weather in Paris is sunny and 25°C.';
+      return JSON.stringify({
+        city: 'Paris',
+        temperature: 25,
+        conditions: 'sunny',
+        forecast: 'clear skies for the next 24 hours',
+      });
     }
     return `Sorry, I don't have weather information for ${city}.`;
   },
 });
 
-// 2. Create an agent and provide it with the tool
-const agent = new AutonomousAgentAdapter('weather-assistant', {
-  model,
-  tools: [weatherTool],
-  systemPrompt: new SystemPromptAdapter('You are a helpful weather assistant.'),
-});
+// 3. Create a specialized agent that uses the tool and has a structured output
+class WeatherAssistantAgent extends AutonomousAgentAdapter<WeatherReport> {
+  constructor(model: ModelPort) {
+    super('weather-assistant', {
+      model,
+      tools: [weatherTool],
+      // This schema defines the agent's FINAL output structure
+      schema: z.object({
+        city: z.string(),
+        temperature: z.number(),
+        conditions: z.string(),
+        forecast: z.string(),
+      }),
+      systemPrompt: new SystemPromptAdapter(
+        'You are a helpful weather assistant.',
+        'You must use the provided tools to get weather information and then respond with a structured JSON object.',
+      ),
+    });
+  }
+}
 
-// 3. Run the agent
+// 4. Instantiate and use the agent
+const model = new OpenRouterAdapter({
+  apiKey: process.env.OPENROUTER_API_KEY!,
+  modelName: 'anthropic/claude-3.5-sonnet',
+});
+const agent = new WeatherAssistantAgent(model);
+
 const response = await agent.run(new UserPromptAdapter("What's the weather like in Paris?"));
 
 console.log(response);
-// Output: "The weather in Paris is sunny and 25°C."
+// Output: { city: 'Paris', temperature: 25, conditions: 'sunny', forecast: 'clear skies for the next 24 hours' }
 ```
 
 ## Development

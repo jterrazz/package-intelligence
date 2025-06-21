@@ -1,5 +1,11 @@
-export { AutonomousAgentAdapter } from './adapters/agents/autonomous-agent.adapter.js';
-export { BasicAgentAdapter } from './adapters/agents/basic-agent.adapter.js';
+export {
+    AutonomousAgentAdapter,
+    type AutonomousAgentOptions,
+} from './adapters/agents/autonomous-agent.adapter.js';
+export {
+    BasicAgentAdapter,
+    type BasicAgentOptions,
+} from './adapters/agents/basic-agent.adapter.js';
 export { OpenRouterModelAdapter as OpenRouterAdapter } from './adapters/models/openrouter-model.adapter.js';
 export { PROMPT_LIBRARY } from './adapters/prompts/library/index.js';
 export { SystemPromptAdapter } from './adapters/prompts/system-prompt.adapter.js';
