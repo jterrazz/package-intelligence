@@ -150,10 +150,12 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
         let schemaFormatInstructions = '';
         if (this.options.schema) {
             const jsonSchema = z.toJSONSchema(this.options.schema);
-            console.log(jsonSchema.type);
             const isPrimitiveType = ['boolean', 'integer', 'number', 'string'].includes(
                 jsonSchema.type as string,
             );
+            const jsonSchemaString = JSON.stringify(jsonSchema, null, 2)
+                .replace(/{/g, '{{')
+                .replace(/}/g, '}}');
 
             if (isPrimitiveType) {
                 schemaFormatInstructions = `
@@ -161,7 +163,7 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
 SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be a ${jsonSchema.type} value that matches this schema:
 
 \`\`\`json
-${JSON.stringify(jsonSchema, null, 2)}
+${jsonSchemaString}
 \`\`\`
 
 Example format:
@@ -179,7 +181,7 @@ Do not wrap the ${jsonSchema.type} value in JSON - just provide the raw value af
 SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be valid JSON that matches this exact schema:
 
 \`\`\`json
-${JSON.stringify(jsonSchema, null, 2).replace(/{/g, '{{').replace(/}/g, '}}')}
+${jsonSchemaString}
 \`\`\`
 
 Example format:
