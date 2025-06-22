@@ -3,6 +3,12 @@
  * These are the foundational principles that guide all other instructions.
  */
 export const FOUNDATIONS = {
+    CONTEXTUAL_ONLY: `
+<Foundation>
+You MUST ONLY use the information provided in the context to answer questions.
+You MUST NOT use any other information, including your own knowledge, to answer questions.
+</Foundation>`,
+
     CONTEXTUAL_REASONING: `
 <Foundation>
 You MUST synthesize information from the provided context, tools, and conversation history to form well-reasoned conclusions.

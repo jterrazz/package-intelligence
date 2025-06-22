@@ -1,7 +1,7 @@
 {
   "name": "@jterrazz/intelligence",
   "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
-  "version": "1.4.1",
+  "version": "1.4.3",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -18,7 +18,7 @@
     "lint": "code-standards"
   },
   "devDependencies": {
-    "@jterrazz/quality": "^2.2.6",
+    "@jterrazz/quality": "^2.2.7",
     "@jterrazz/test": "^3.0.0",
     "@jterrazz/typescript": "^2.4.3"
   },
@@ -27,6 +27,7 @@
     "@langchain/community": "^0.3.47",
     "@langchain/core": "^0.3.61",
     "@langchain/openai": "^0.5.15",
+    "jsonrepair": "^3.12.0",
     "zod": "^3.25.67"
   },
   "publishConfig": {

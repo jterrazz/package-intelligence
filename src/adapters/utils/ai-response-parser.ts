@@ -1,3 +1,4 @@
+import { jsonrepair } from 'jsonrepair';
 import { z } from 'zod/v4';
 
 import { AIResponseParserError } from './ai-response-parser-error.js';
@@ -85,7 +86,9 @@ export class AIResponseParser<T> {
             throw new AIResponseParserError('No array found in response', undefined, text);
         }
         try {
-            return JSON.parse(text.slice(arrayStart, arrayEnd + 1));
+            const raw = text.slice(arrayStart, arrayEnd + 1);
+            const repaired = this.repairJson(raw);
+            return JSON.parse(repaired);
         } catch (error) {
             throw new AIResponseParserError('Failed to parse array JSON', error, text);
         }
@@ -139,7 +142,9 @@ export class AIResponseParser<T> {
             throw new AIResponseParserError('No object found in response', undefined, text);
         }
         try {
-            return JSON.parse(text.slice(objectStart, objectEnd + 1));
+            const raw = text.slice(objectStart, objectEnd + 1);
+            const repaired = this.repairJson(raw);
+            return JSON.parse(repaired);
         } catch (error) {
             throw new AIResponseParserError('Failed to parse object JSON', error, text);
         }
@@ -199,6 +204,13 @@ export class AIResponseParser<T> {
             (largest, current) => (current.length > largest.length ? current : largest),
             strings[0],
         );
+    }
+
+    /**
+     * Repairs common JSON issues using jsonrepair library
+     */
+    private repairJson(jsonString: string): string {
+        return jsonrepair(jsonString);
     }
 
     /**

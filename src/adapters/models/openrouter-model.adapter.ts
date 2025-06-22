@@ -52,7 +52,10 @@ export class OpenRouterModelAdapter implements ModelPort {
             },
             maxTokens: config.maxTokens ?? 64_000,
             modelKwargs: {
-                reasoning: { effort: 'high', exclude: true },
+                reasoning: {
+                    effort: 'high',
+                    exclude: true,
+                },
             },
             modelName: config.modelName,
             openAIApiKey: config.apiKey,
