@@ -50,7 +50,7 @@ export class OpenRouterModelAdapter implements ModelPort {
                     ...(config.metadata?.application && { 'X-Title': config.metadata.application }),
                 },
             },
-            maxTokens: config.maxTokens ?? 64_000,
+            maxTokens: config.maxTokens ?? 256_000,
             modelKwargs: {
                 reasoning: {
                     effort: 'high',
