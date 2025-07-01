@@ -240,4 +240,4 @@ describe('RetryableAgentAdapter Integration Tests', () => {
         // Then - it should include both retryable and the wrapped agent name
         expect(agentName).toBe('Retryable(MyBasicAgent)');
     });
-}); 
+});

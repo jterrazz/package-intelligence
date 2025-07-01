@@ -109,7 +109,7 @@ describe('BasicAgentAdapter Integration Tests', () => {
         const expectedSystemPrompt = `You are a helpful AI assistant that responds with structured data.
 
 <OUTPUT_FORMAT>
-You must respond with valid JSON that matches this exact schema:
+You must respond with valid JSON that matches this JSON schema description:
 
 \`\`\`json
 {

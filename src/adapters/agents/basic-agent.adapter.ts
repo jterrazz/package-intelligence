@@ -74,7 +74,7 @@ Your response should be only the ${jsonSchema.type} value, without any JSON wrap
 </OUTPUT_FORMAT>`;
             } else {
                 systemMessage += `\n\n<OUTPUT_FORMAT>
-You must respond with valid JSON that matches this exact schema:
+You must respond with valid JSON that matches this JSON schema description:
 
 \`\`\`json
 ${JSON.stringify(jsonSchema, null, 2)}

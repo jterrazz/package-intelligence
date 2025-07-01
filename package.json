@@ -1,7 +1,7 @@
 {
   "name": "@jterrazz/intelligence",
   "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
-  "version": "1.4.3",
+  "version": "1.5.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -27,6 +27,7 @@
     "@langchain/community": "^0.3.47",
     "@langchain/core": "^0.3.61",
     "@langchain/openai": "^0.5.15",
+    "ai": "^4.3.16",
     "jsonrepair": "^3.12.0",
     "zod": "^3.25.67"
   },
