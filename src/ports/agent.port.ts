@@ -7,6 +7,11 @@ import type { PromptPort } from './prompt.port.js';
  */
 export interface AgentPort<TInput = PromptPort, TOutput = string> {
     /**
+     * A descriptive name for the agent, used for logging and identification.
+     */
+    readonly name: string;
+
+    /**
      * Run the agent with optional input and return optional response
      * @param input - The input to process
      */

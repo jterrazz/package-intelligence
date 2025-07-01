@@ -160,7 +160,7 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
             if (isPrimitiveType) {
                 schemaFormatInstructions = `
 
-SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be a ${jsonSchema.type} value that matches this schema:
+SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be a ${jsonSchema.type} value that matches this schema description:
 
 \`\`\`json
 ${jsonSchemaString}
@@ -178,7 +178,7 @@ Do not wrap the ${jsonSchema.type} value in JSON - just provide the raw value af
             } else {
                 schemaFormatInstructions = `
 
-SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be valid JSON that matches this exact schema:
+SCHEMA VALIDATION: When providing a "RESPOND:" answer, the content after "RESPOND: " must be valid JSON that matches this JSON schema description:
 
 \`\`\`json
 ${jsonSchemaString}
