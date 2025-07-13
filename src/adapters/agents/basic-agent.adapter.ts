@@ -36,7 +36,9 @@ export class BasicAgentAdapter<TOutput = string> implements AgentPort<PromptPort
 
             if (this.options.schema) {
                 const parsedResponse = this.parseResponse(content, this.options.schema);
-                this.options.logger?.debug('Execution finished and response parsed', { agent: this.name });
+                this.options.logger?.debug('Execution finished and response parsed', {
+                    agent: this.name,
+                });
                 return parsedResponse;
             } else {
                 this.options.logger?.debug('Execution finished', { agent: this.name });

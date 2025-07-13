@@ -39,11 +39,16 @@ export class RetryableAgentAdapter<TInput = PromptPort, TOutput = string>
                 const result = await this.agent.run(input);
 
                 if (result !== null) {
-                    this.logger?.debug(`Attempt ${attempt} of ${maxAttempts} succeeded`, { agent: this.name });
+                    this.logger?.debug(`Attempt ${attempt} of ${maxAttempts} succeeded`, {
+                        agent: this.name,
+                    });
                     return result;
                 }
 
-                this.logger?.debug(`Attempt ${attempt} of ${maxAttempts} failed: agent returned null`, { agent: this.name });
+                this.logger?.debug(
+                    `Attempt ${attempt} of ${maxAttempts} failed: agent returned null`,
+                    { agent: this.name },
+                );
             } catch (error) {
                 this.logger?.debug(`Attempt ${attempt} of ${maxAttempts} failed with an error`, {
                     agent: this.name,
