@@ -35,30 +35,24 @@ export class RetryableAgentAdapter<TInput = PromptPort, TOutput = string>
 
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
             try {
-                this.logger?.debug(`[${this.name}] Attempt ${attempt} of ${maxAttempts}.`);
+                this.logger?.debug(`Attempt ${attempt} of ${maxAttempts}`, { agent: this.name });
                 const result = await this.agent.run(input);
 
                 if (result !== null) {
-                    this.logger?.info(
-                        `[${this.name}] Attempt ${attempt} of ${maxAttempts} succeeded.`,
-                    );
+                    this.logger?.debug(`Attempt ${attempt} of ${maxAttempts} succeeded`, { agent: this.name });
                     return result;
                 }
 
-                this.logger?.warn(
-                    `[${this.name}] Attempt ${attempt} of ${maxAttempts} failed: agent returned null.`,
-                );
+                this.logger?.debug(`Attempt ${attempt} of ${maxAttempts} failed: agent returned null`, { agent: this.name });
             } catch (error) {
-                this.logger?.warn(
-                    `[${this.name}] Attempt ${attempt} of ${maxAttempts} failed with an error.`,
-                    {
-                        error: error instanceof Error ? error.message : 'Unknown error',
-                    },
-                );
+                this.logger?.debug(`Attempt ${attempt} of ${maxAttempts} failed with an error`, {
+                    agent: this.name,
+                    error: error instanceof Error ? error.message : 'Unknown error',
+                });
             }
         }
 
-        this.logger?.error(`[${this.name}] All ${maxAttempts} attempts failed.`);
+        this.logger?.error(`All ${maxAttempts} attempts failed`, { agent: this.name });
         return null;
     }
 }

@@ -1,7 +1,7 @@
 {
   "name": "@jterrazz/intelligence",
   "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",

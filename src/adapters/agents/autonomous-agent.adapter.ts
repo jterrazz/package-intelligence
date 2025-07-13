@@ -88,7 +88,7 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
     ) {}
 
     async run(input?: PromptPort): Promise<null | TOutput> {
-        this.options.logger?.debug(`[${this.name}] Starting chat execution.`);
+        this.options.logger?.debug('Starting chat execution', { agent: this.name });
 
         try {
             const executor = await this.createExecutor();
@@ -96,7 +96,8 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
 
             const result = await executor.invoke({ input: userInput });
 
-            this.options.logger?.debug(`[${this.name}] Agent execution completed.`, {
+            this.options.logger?.debug('Agent execution completed', {
+                agent: this.name,
                 hasOutput: 'output' in result,
             });
 
@@ -111,7 +112,8 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
             }
 
             if (!agentResponse.shouldRespond) {
-                this.options.logger?.info(`[${this.name}] Agent chose to remain silent.`, {
+                this.options.logger?.debug('Agent chose to remain silent', {
+                    agent: this.name,
                     reason: agentResponse.reason,
                 });
                 return null;
@@ -125,17 +127,18 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
                     this.options.schema,
                 );
 
-                this.options.logger?.info(
-                    `[${this.name}] Execution finished; response content validated.`,
-                );
+                this.options.logger?.debug('Execution finished; response content validated.', {
+                    agent: this.name,
+                });
                 return validatedResponse;
             } else {
-                this.options.logger?.info(`[${this.name}] Execution finished.`);
+                this.options.logger?.debug('Execution finished', { agent: this.name });
                 // When no schema is provided, we assume TOutput is string (default), so message is the result
                 return message as TOutput;
             }
         } catch (error) {
-            this.options.logger?.error(`[${this.name}] Chat execution failed.`, {
+            this.options.logger?.error('Chat execution failed', {
+                agent: this.name,
                 error: error instanceof Error ? error.message : 'Unknown error',
             });
             return null;
@@ -236,10 +239,10 @@ Example format:
             return { reason: silentMatch[1].trim(), shouldRespond: false };
         }
 
-        this.options.logger?.error(
-            `[${this.name}] Agent output was missing 'RESPOND:' or 'SILENT:' prefix.`,
-            { rawOutput: output },
-        );
+        this.options.logger?.error("Agent output was missing 'RESPOND:' or 'SILENT:' prefix.", {
+            agent: this.name,
+            rawOutput: output,
+        });
 
         return null;
     }
@@ -258,13 +261,11 @@ Example format:
         try {
             return new AIResponseParser(schema).parse(content);
         } catch (error) {
-            this.options.logger?.error(
-                `[${this.name}] Failed to validate response content against schema.`,
-                {
-                    error: error instanceof Error ? error.message : 'Unknown error',
-                    rawContent: content,
-                },
-            );
+            this.options.logger?.error('Failed to validate response content against schema.', {
+                agent: this.name,
+                error: error instanceof Error ? error.message : 'Unknown error',
+                rawContent: content,
+            });
             throw new Error('Invalid response content from model.');
         }
     }

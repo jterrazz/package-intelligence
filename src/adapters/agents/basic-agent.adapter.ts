@@ -29,22 +29,23 @@ export class BasicAgentAdapter<TOutput = string> implements AgentPort<PromptPort
     ) {}
 
     async run(input?: PromptPort): Promise<null | TOutput> {
-        this.options.logger?.debug(`[${this.name}] Starting query execution.`);
+        this.options.logger?.debug('Starting query execution', { agent: this.name });
 
         try {
             const content = await this.invokeModel(input);
 
             if (this.options.schema) {
                 const parsedResponse = this.parseResponse(content, this.options.schema);
-                this.options.logger?.info(`[${this.name}] Execution finished and response parsed.`);
+                this.options.logger?.debug('Execution finished and response parsed', { agent: this.name });
                 return parsedResponse;
             } else {
-                this.options.logger?.info(`[${this.name}] Execution finished.`);
+                this.options.logger?.debug('Execution finished', { agent: this.name });
                 // When no schema is provided, we assume TOutput is string (default), so content is the result
                 return content as TOutput;
             }
         } catch (error) {
-            this.options.logger?.error(`[${this.name}] Execution failed.`, {
+            this.options.logger?.error('Execution failed', {
+                agent: this.name,
                 error: error instanceof Error ? error.message : 'Unknown error',
             });
             return null;
@@ -90,12 +91,14 @@ Your response must be parseable JSON that validates against this schema. Do not 
             { content: userInput, role: 'user' as const },
         ];
 
-        this.options.logger?.debug(`[${this.name}] Invoking model...`, {
+        this.options.logger?.debug('Invoking model...', {
+            agent: this.name,
             hasSchema: !!this.options.schema,
         });
 
         if (this.options.verbose) {
-            this.options.logger?.info(`[${this.name}] Sending messages to model...`, {
+            this.options.logger?.debug('Sending messages to model...', {
+                agent: this.name,
                 messages,
             });
         }
@@ -114,7 +117,8 @@ Your response must be parseable JSON that validates against this schema. Do not 
         try {
             return new AIResponseParser(schema).parse(content);
         } catch (error) {
-            this.options.logger?.error(`[${this.name}] Failed to parse model response.`, {
+            this.options.logger?.error('Failed to parse model response.', {
+                agent: this.name,
                 error: error instanceof Error ? error.message : 'Unknown error',
                 rawContent: content,
             });
