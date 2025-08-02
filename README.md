@@ -56,7 +56,7 @@ const provider = new OpenRouterProvider({
 });
 
 // 2. Get a model instance
-const model = provider.getModel('anthropic/claude-3-5-sonnet-20241022');
+const model = provider.getModel('anthropic/claude-sonnet-4');
 
 // 3. Create a conversational agent
 const agent = new ChatAgent('helpful-assistant', {
@@ -101,7 +101,7 @@ type Contact = z.infer<typeof contactSchema>;
 // 2. Create a specialized agent by extending ChatAgent
 class ContactExtractorAgent extends ChatAgent<Contact> {
   constructor(provider: OpenRouterProvider) {
-    const model = provider.getModel('anthropic/claude-3-5-sonnet-20241022');
+    const model = provider.getModel('anthropic/claude-sonnet-4');
 
     super('contact-extractor', {
       model,
@@ -176,7 +176,7 @@ const weatherTool = new SafeTool({
 // 3. Create a specialized tool agent
 class WeatherAssistantAgent extends ToolAgent<WeatherReport> {
   constructor(provider: OpenRouterProvider) {
-    const model = provider.getModel('anthropic/claude-3-5-sonnet-20241022');
+    const model = provider.getModel('anthropic/claude-sonnet-4');
 
     super('weather-assistant', {
       model,
@@ -221,7 +221,7 @@ const provider = new OpenRouterProvider({
   apiKey: process.env.OPENROUTER_API_KEY!,
 });
 
-const model = provider.getModel('anthropic/claude-3-5-sonnet-20241022');
+const model = provider.getModel('anthropic/claude-sonnet-4');
 
 const baseAgent = new ChatAgent('sentiment-analyzer', {
   model,

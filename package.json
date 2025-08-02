@@ -13,9 +13,10 @@
   ],
   "type": "module",
   "scripts": {
-    "build": "ts-compile",
+    "build": "ts-build",
     "test": "vitest",
-    "lint": "code-standards"
+    "lint": "quality",
+    "lint:fix": "quality-fix"
   },
   "devDependencies": {
     "@jterrazz/quality": "^3.0.3",
