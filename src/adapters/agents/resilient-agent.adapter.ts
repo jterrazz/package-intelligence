@@ -3,17 +3,17 @@ import { type LoggerPort } from '@jterrazz/logger';
 import { type AgentPort } from '../../ports/agent.port.js';
 import type { PromptPort } from '../../ports/prompt.port.js';
 
-export interface RetryableAgentAdapterOptions {
+export interface ResilientAgentOptions {
     logger?: LoggerPort;
     retries?: number;
 }
 
 /**
- * A decorator agent that adds retry logic to an existing agent.
+ * A decorator agent that adds retry logic to an existing agent for resilient execution.
  * @template TInput - The TypeScript type of the input
  * @template TOutput - The TypeScript type of the output
  */
-export class RetryableAgentAdapter<TInput = PromptPort, TOutput = string>
+export class ResilientAgent<TInput = PromptPort, TOutput = string>
     implements AgentPort<TInput, TOutput>
 {
     public readonly name: string;
@@ -22,10 +22,10 @@ export class RetryableAgentAdapter<TInput = PromptPort, TOutput = string>
 
     constructor(
         private readonly agent: AgentPort<TInput, TOutput>,
-        options: RetryableAgentAdapterOptions = {},
+        options: ResilientAgentOptions = {},
     ) {
         const { logger, retries = 1 } = options;
-        this.name = `Retryable(${agent.name})`;
+        this.name = `Resilient(${agent.name})`;
         this.logger = logger;
         this.retries = retries;
     }

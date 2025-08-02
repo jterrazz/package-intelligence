@@ -3,11 +3,11 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { z } from 'zod/v4';
 
-import { BasicAgentAdapter } from '../src/adapters/agents/basic-agent.adapter.js';
-import { RetryableAgentAdapter } from '../src/adapters/agents/retryable-agent.adapter.js';
-import { OpenRouterModelAdapter } from '../src/adapters/models/openrouter-model.adapter.js';
-import { SystemPromptAdapter } from '../src/adapters/prompts/system-prompt.adapter.js';
-import { UserPromptAdapter } from '../src/adapters/prompts/user-prompt.adapter.js';
+import { ChatAgent } from '../src/adapters/agents/chat-agent.adapter.js';
+import { ResilientAgent } from '../src/adapters/agents/resilient-agent.adapter.js';
+import { SystemPrompt } from '../src/adapters/prompts/system-prompt.adapter.js';
+import { UserPrompt } from '../src/adapters/prompts/user-prompt.adapter.js';
+import { OpenRouterProvider } from '../src/adapters/providers/openrouter-provider.adapter.js';
 
 // Mock server setup
 const server = setupServer();
@@ -16,7 +16,7 @@ const server = setupServer();
 const mockApiKey = 'test-api-key';
 const mockModelName = 'google/gemini-2.5-flash-preview-05-20';
 
-describe('RetryableAgentAdapter Integration Tests', () => {
+describe('ResilientAgent Integration Tests', () => {
     beforeAll(() => {
         server.listen();
     });
@@ -36,6 +36,7 @@ describe('RetryableAgentAdapter Integration Tests', () => {
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'Success on first try!',
                                 role: 'assistant',
@@ -49,26 +50,26 @@ describe('RetryableAgentAdapter Integration Tests', () => {
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const basicAgent = new BasicAgentAdapter('TestAgent', {
+        const basicAgent = new ChatAgent('TestAgent', {
             model,
             systemPrompt,
         });
 
-        const retryableAgent = new RetryableAgentAdapter(basicAgent, {
+        const resilientAgent = new ResilientAgent(basicAgent, {
             retries: 3,
         });
 
-        const userPrompt = new UserPromptAdapter('Hello, how are you?');
+        const userPrompt = new UserPrompt('Hello, how are you?');
 
-        // When - running the retryable agent
-        const result = await retryableAgent.run(userPrompt);
+        // When - running the resilient agent
+        const result = await resilientAgent.run(userPrompt);
 
         // Then - it should return the expected response
         expect(result).toBe('Success on first try!');
@@ -86,6 +87,7 @@ describe('RetryableAgentAdapter Integration Tests', () => {
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'This will always fail parsing',
                                 role: 'assistant',
@@ -99,27 +101,27 @@ describe('RetryableAgentAdapter Integration Tests', () => {
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const basicAgent = new BasicAgentAdapter('ParseFailAgent', {
+        const basicAgent = new ChatAgent('ParseFailAgent', {
             model,
             schema: responseSchema,
             systemPrompt,
         });
 
-        const retryableAgent = new RetryableAgentAdapter(basicAgent, {
+        const resilientAgent = new ResilientAgent(basicAgent, {
             retries: 2,
         });
 
-        const userPrompt = new UserPromptAdapter('Generate a structured response.');
+        const userPrompt = new UserPrompt('Generate a structured response.');
 
-        // When - running the retryable agent
-        const result = await retryableAgent.run(userPrompt);
+        // When - running the resilient agent
+        const result = await resilientAgent.run(userPrompt);
 
         // Then - it should return null after all retries fail
         expect(result).toBeNull();
@@ -134,6 +136,7 @@ describe('RetryableAgentAdapter Integration Tests', () => {
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'Simple string response',
                                 role: 'assistant',
@@ -147,27 +150,27 @@ describe('RetryableAgentAdapter Integration Tests', () => {
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const basicAgent = new BasicAgentAdapter('StringAgent', {
+        const basicAgent = new ChatAgent('StringAgent', {
             model,
             schema: stringSchema,
             systemPrompt,
         });
 
-        const retryableAgent = new RetryableAgentAdapter(basicAgent, {
+        const resilientAgent = new ResilientAgent(basicAgent, {
             retries: 1,
         });
 
-        const userPrompt = new UserPromptAdapter('Give me a simple response.');
+        const userPrompt = new UserPrompt('Give me a simple response.');
 
-        // When - running the retryable agent
-        const result = await retryableAgent.run(userPrompt);
+        // When - running the resilient agent
+        const result = await resilientAgent.run(userPrompt);
 
         // Then - it should return the string value
         expect(result).toBe('Simple string response');
@@ -180,6 +183,7 @@ describe('RetryableAgentAdapter Integration Tests', () => {
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'Proceeding with default instructions.',
                                 role: 'assistant',
@@ -193,24 +197,24 @@ describe('RetryableAgentAdapter Integration Tests', () => {
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const basicAgent = new BasicAgentAdapter('NoInputAgent', {
+        const basicAgent = new ChatAgent('NoInputAgent', {
             model,
             systemPrompt,
         });
 
-        const retryableAgent = new RetryableAgentAdapter(basicAgent, {
+        const resilientAgent = new ResilientAgent(basicAgent, {
             retries: 2,
         });
 
-        // When - running the retryable agent without input
-        const result = await retryableAgent.run();
+        // When - running the resilient agent without input
+        const result = await resilientAgent.run();
 
         // Then - it should return the response for the default message
         expect(result).toBe('Proceeding with default instructions.');
@@ -218,26 +222,26 @@ describe('RetryableAgentAdapter Integration Tests', () => {
 
     it('should have a descriptive name that includes the wrapped agent name', async () => {
         // Given - a retryable agent wrapping a basic agent
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const basicAgent = new BasicAgentAdapter('MyBasicAgent', {
+        const basicAgent = new ChatAgent('MyChatAgent', {
             model,
             systemPrompt,
         });
 
-        const retryableAgent = new RetryableAgentAdapter(basicAgent, {
+        const resilientAgent = new ResilientAgent(basicAgent, {
             retries: 1,
         });
 
         // When - checking the agent name
-        const agentName = retryableAgent.name;
+        const agentName = resilientAgent.name;
 
         // Then - it should include both retryable and the wrapped agent name
-        expect(agentName).toBe('Retryable(MyBasicAgent)');
+        expect(agentName).toBe('Resilient(MyChatAgent)');
     });
 });

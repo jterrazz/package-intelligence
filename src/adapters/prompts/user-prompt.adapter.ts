@@ -1,9 +1,9 @@
 import type { PromptPort } from '../../ports/prompt.port.js';
 
 /**
- * User prompt adapter that generates a user prompt from a list of strings
+ * User prompt that generates a user prompt from a list of strings
  */
-export class UserPromptAdapter implements PromptPort {
+export class UserPrompt implements PromptPort {
     private readonly finalPrompt: string;
 
     constructor(...prompts: readonly (readonly string[] | string)[]) {

@@ -1,12 +1,12 @@
 import { jsonrepair } from 'jsonrepair';
 import { z } from 'zod/v4';
 
-import { AIResponseParserError } from './ai-response-parser-error.js';
+import { StructuredResponseParserError } from './structured-response-parser-error.js';
 
 /**
  * Parses AI response text into structured data based on Zod schema
  */
-export class AIResponseParser<T> {
+export class StructuredResponseParser<T> {
     constructor(private readonly schema: z.ZodSchema<T>) {}
 
     /**
@@ -20,7 +20,7 @@ export class AIResponseParser<T> {
             return this.schema.parse(unescapedJson);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                throw new AIResponseParserError(
+                throw new StructuredResponseParserError(
                     'Failed to validate response against schema',
                     error,
                     text,
@@ -83,14 +83,14 @@ export class AIResponseParser<T> {
         const arrayStart = text.indexOf('[');
         const arrayEnd = text.lastIndexOf(']');
         if (arrayStart === -1 || arrayEnd === -1) {
-            throw new AIResponseParserError('No array found in response', undefined, text);
+            throw new StructuredResponseParserError('No array found in response', undefined, text);
         }
         try {
             const raw = text.slice(arrayStart, arrayEnd + 1);
             const repaired = this.repairJson(raw);
             return JSON.parse(repaired);
         } catch (error) {
-            throw new AIResponseParserError('Failed to parse array JSON', error, text);
+            throw new StructuredResponseParserError('Failed to parse array JSON', error, text);
         }
     }
 
@@ -129,7 +129,7 @@ export class AIResponseParser<T> {
             return this.extractPrimitive(text, this.schema);
         }
 
-        throw new AIResponseParserError('Unsupported schema type', undefined, text);
+        throw new StructuredResponseParserError('Unsupported schema type', undefined, text);
     }
 
     /**
@@ -139,14 +139,14 @@ export class AIResponseParser<T> {
         const objectStart = text.indexOf('{');
         const objectEnd = text.lastIndexOf('}');
         if (objectStart === -1 || objectEnd === -1) {
-            throw new AIResponseParserError('No object found in response', undefined, text);
+            throw new StructuredResponseParserError('No object found in response', undefined, text);
         }
         try {
             const raw = text.slice(objectStart, objectEnd + 1);
             const repaired = this.repairJson(raw);
             return JSON.parse(repaired);
         } catch (error) {
-            throw new AIResponseParserError('Failed to parse object JSON', error, text);
+            throw new StructuredResponseParserError('Failed to parse object JSON', error, text);
         }
     }
 

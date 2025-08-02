@@ -8,15 +8,15 @@ import type { ModelPort } from '../../ports/model.port.js';
 import type { PromptPort } from '../../ports/prompt.port.js';
 import type { ToolPort } from '../../ports/tool.port.js';
 
-import { AIResponseParser } from '../utils/ai-response-parser.js';
+import { StructuredResponseParser } from '../utils/structured-response-parser.js';
 
-import type { SystemPromptAdapter } from '../prompts/system-prompt.adapter.js';
+import type { SystemPrompt } from '../prompts/system-prompt.adapter.js';
 
-export interface AutonomousAgentOptions<TOutput = string> {
+export interface ToolAgentOptions<TOutput = string> {
     logger?: LoggerPort;
     model: ModelPort;
     schema?: z.ZodSchema<TOutput>;
-    systemPrompt: SystemPromptAdapter;
+    systemPrompt: SystemPrompt;
     tools: ToolPort[];
     verbose?: boolean;
 }
@@ -77,14 +77,14 @@ This is your internal thought process and previous tool usage.
 `;
 
 /**
- * An autonomous agent that uses tools and a structured prompt to accomplish tasks.
+ * A tool-enabled agent that uses tools and a structured prompt to accomplish tasks.
  * It can decide whether to respond or remain silent and supports schema-validated responses.
  * @template TOutput - The TypeScript type of the output
  */
-export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<PromptPort, TOutput> {
+export class ToolAgent<TOutput = string> implements AgentPort<PromptPort, TOutput> {
     constructor(
         public readonly name: string,
-        private readonly options: AutonomousAgentOptions<TOutput>,
+        private readonly options: ToolAgentOptions<TOutput>,
     ) {}
 
     async run(input?: PromptPort): Promise<null | TOutput> {
@@ -146,7 +146,7 @@ export class AutonomousAgentAdapter<TOutput = string> implements AgentPort<Promp
     }
 
     private async createExecutor(): Promise<AgentExecutor> {
-        const model = this.options.model.getModel();
+        const model = this.options.model.getLangchainModel();
         const tools = this.options.tools.map((tool) => tool.getDynamicTool());
 
         // Add schema format instructions if schema is provided
@@ -259,7 +259,7 @@ Example format:
         schema: z.ZodSchema<TResponse>,
     ): TResponse {
         try {
-            return new AIResponseParser(schema).parse(content);
+            return new StructuredResponseParser(schema).parse(content);
         } catch (error) {
             this.options.logger?.error('Failed to validate response content against schema.', {
                 agent: this.name,

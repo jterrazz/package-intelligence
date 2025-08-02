@@ -20,9 +20,9 @@ export type ToolFunction<T = void> = T extends void
     : (args: T) => Promise<string>;
 
 /**
- * Safe tool adapter that provides error handling and logging for LangChain tools
+ * Safe tool that provides error handling and logging for LangChain tools
  */
-export class SafeToolAdapter<T = void> implements ToolPort {
+export class SafeTool<T = void> implements ToolPort {
     private readonly dynamicTool: DynamicStructuredTool<z.ZodSchema<T>> | DynamicTool;
 
     constructor(

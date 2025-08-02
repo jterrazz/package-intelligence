@@ -3,10 +3,10 @@ import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { z } from 'zod/v4';
 
-import { BasicAgentAdapter } from '../src/adapters/agents/basic-agent.adapter.js';
-import { OpenRouterModelAdapter } from '../src/adapters/models/openrouter-model.adapter.js';
-import { SystemPromptAdapter } from '../src/adapters/prompts/system-prompt.adapter.js';
-import { UserPromptAdapter } from '../src/adapters/prompts/user-prompt.adapter.js';
+import { ChatAgent } from '../src/adapters/agents/chat-agent.adapter.js';
+import { SystemPrompt } from '../src/adapters/prompts/system-prompt.adapter.js';
+import { UserPrompt } from '../src/adapters/prompts/user-prompt.adapter.js';
+import { OpenRouterProvider } from '../src/adapters/providers/openrouter-provider.adapter.js';
 
 // Type definitions for OpenAI chat completion requests
 interface ChatCompletionMessage {
@@ -19,7 +19,23 @@ interface ChatCompletionRequest {
     max_tokens?: number;
     messages: ChatCompletionMessage[];
     model: string;
+    response_format?: {
+        json_schema: {
+            name: string;
+            schema: JsonSchema;
+            strict: boolean;
+        };
+        type: string;
+    };
     temperature?: number;
+}
+
+interface JsonSchema {
+    [key: string]: unknown;
+    maxLength?: number;
+    minLength?: number;
+    properties?: Record<string, unknown>;
+    type: string;
 }
 
 // Mock server setup
@@ -29,7 +45,7 @@ const server = setupServer();
 const mockApiKey = 'test-api-key';
 const mockModelName = 'google/gemini-2.5-flash-preview-05-20';
 
-describe('BasicAgentAdapter Integration Tests', () => {
+describe('ChatAgent Integration Tests', () => {
     beforeAll(() => {
         server.listen();
     });
@@ -58,9 +74,13 @@ describe('BasicAgentAdapter Integration Tests', () => {
                 // Verify the system prompt is exactly what we expect (no schema additions)
                 expect(body.messages[0].content).toBe('You are a helpful AI assistant.');
 
+                // Verify structured outputs (response_format) is NOT present when no schema is provided
+                expect(body.response_format).toBeUndefined();
+
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'Hello! I am an AI assistant ready to help you.',
                                 role: 'assistant',
@@ -74,19 +94,19 @@ describe('BasicAgentAdapter Integration Tests', () => {
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const agent = new BasicAgentAdapter('TestAgent', {
+        const agent = new ChatAgent('TestAgent', {
             model,
             systemPrompt,
         });
 
-        const userPrompt = new UserPromptAdapter('Hello, how are you?');
+        const userPrompt = new UserPrompt('Hello, how are you?');
 
         // When - running the agent
         const result = await agent.run(userPrompt);
@@ -170,9 +190,36 @@ Your response must be parseable JSON that validates against this schema. Do not 
                 expect(body.messages[1].content).toBe('Generate a structured response.');
                 expect(body.model).toBe(mockModelName);
 
+                // NOTE: OpenRouter supports structured outputs via response_format parameter,
+                // but the current @openrouter/ai-sdk-provider (v0.7.3) doesn't pass through
+                // the responseFormat from Vercel AI SDK to the HTTP request.
+                // This means we rely on prompt-based schema instructions only.
+                // See: https://openrouter.ai/docs/features/structured-outputs
+
+                // Verify structured outputs (response_format) is NOT present yet due to provider limitation
+                expect(body.response_format).toBeUndefined();
+
+                // TODO: Once @openrouter/ai-sdk-provider supports responseFormat parameter,
+                // uncomment and use these assertions instead:
+                // expect(body.response_format).toBeDefined();
+                // if (body.response_format) {
+                //     expect(body.response_format.type).toBe('json_schema');
+                //     expect(body.response_format.json_schema).toBeDefined();
+                //     expect(body.response_format.json_schema.name).toBe('response');
+                //     expect(body.response_format.json_schema.strict).toBe(true);
+                //     expect(body.response_format.json_schema.schema).toBeDefined();
+                //     const schema = body.response_format.json_schema.schema;
+                //     expect(schema.type).toBe('object');
+                //     expect(schema.properties).toBeDefined();
+                //     expect(schema.properties.confidence).toBeDefined();
+                //     expect(schema.properties.message).toBeDefined();
+                //     expect(schema.properties.metadata).toBeDefined();
+                // }
+
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: JSON.stringify({
                                     confidence: 0.95,
@@ -193,22 +240,22 @@ Your response must be parseable JSON that validates against this schema. Do not 
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter(
+        const systemPrompt = new SystemPrompt(
             'You are a helpful AI assistant that responds with structured data.',
         );
 
-        const agent = new BasicAgentAdapter('SchemaAgent', {
+        const agent = new ChatAgent('SchemaAgent', {
             model,
             schema: responseSchema,
             systemPrompt,
         });
 
-        const userPrompt = new UserPromptAdapter('Generate a structured response.');
+        const userPrompt = new UserPrompt('Generate a structured response.');
 
         // When - running the agent
         const result = await agent.run(userPrompt);
@@ -259,9 +306,18 @@ Your response should be only the string value, without any JSON wrapping or addi
                 expect(body.messages[1].content).toBe('Give me a simple response.');
                 expect(body.model).toBe(mockModelName);
 
+                // NOTE: OpenRouter supports structured outputs via response_format parameter,
+                // but the current @openrouter/ai-sdk-provider (v0.7.3) doesn't pass through
+                // the responseFormat from Vercel AI SDK to the HTTP request.
+                // This means we rely on prompt-based schema instructions only.
+
+                // Verify structured outputs (response_format) is NOT present yet due to provider limitation
+                expect(body.response_format).toBeUndefined();
+
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'Simple string response',
                                 role: 'assistant',
@@ -275,20 +331,20 @@ Your response should be only the string value, without any JSON wrapping or addi
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const agent = new BasicAgentAdapter('StringAgent', {
+        const agent = new ChatAgent('StringAgent', {
             model,
             schema: stringSchema,
             systemPrompt,
         });
 
-        const userPrompt = new UserPromptAdapter('Give me a simple response.');
+        const userPrompt = new UserPrompt('Give me a simple response.');
 
         // When - running the agent
         const result = await agent.run(userPrompt);
@@ -310,12 +366,16 @@ Your response should be only the string value, without any JSON wrapping or addi
                 expect(body.messages[1].role).toBe('user');
                 expect(body.model).toBe(mockModelName);
 
+                // Verify structured outputs (response_format) is NOT present when no schema is provided
+                expect(body.response_format).toBeUndefined();
+
                 // Return different responses based on user input
                 if (userMessage.includes('weather')) {
                     expect(userMessage).toBe('What is the weather like?');
                     return HttpResponse.json({
                         choices: [
                             {
+                                index: 0,
                                 message: {
                                     content: 'The weather is sunny today!',
                                     role: 'assistant',
@@ -331,6 +391,7 @@ Your response should be only the string value, without any JSON wrapping or addi
                     return HttpResponse.json({
                         choices: [
                             {
+                                index: 0,
                                 message: {
                                     content: 'It is currently 3:00 PM.',
                                     role: 'assistant',
@@ -346,6 +407,7 @@ Your response should be only the string value, without any JSON wrapping or addi
                     return HttpResponse.json({
                         choices: [
                             {
+                                index: 0,
                                 message: {
                                     content: 'I can help with weather or time questions.',
                                     role: 'assistant',
@@ -360,34 +422,34 @@ Your response should be only the string value, without any JSON wrapping or addi
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const agent = new BasicAgentAdapter('ConditionalAgent', {
+        const agent = new ChatAgent('ConditionalAgent', {
             model,
             systemPrompt,
         });
 
         // When - testing weather question
-        const weatherPrompt = new UserPromptAdapter('What is the weather like?');
+        const weatherPrompt = new UserPrompt('What is the weather like?');
         const weatherResult = await agent.run(weatherPrompt);
 
         // Then - it should return weather response
         expect(weatherResult).toBe('The weather is sunny today!');
 
         // When - testing time question
-        const timePrompt = new UserPromptAdapter('What time is it?');
+        const timePrompt = new UserPrompt('What time is it?');
         const timeResult = await agent.run(timePrompt);
 
         // Then - it should return time response
         expect(timeResult).toBe('It is currently 3:00 PM.');
 
         // When - testing other question
-        const otherPrompt = new UserPromptAdapter('Tell me a joke.');
+        const otherPrompt = new UserPrompt('Tell me a joke.');
         const otherResult = await agent.run(otherPrompt);
 
         // Then - it should return default response
@@ -413,9 +475,18 @@ Your response should be only the string value, without any JSON wrapping or addi
                 expect(systemPrompt).toContain('OUTPUT_FORMAT');
                 expect(systemPrompt).toContain('valid JSON');
 
+                // NOTE: OpenRouter supports structured outputs via response_format parameter,
+                // but the current @openrouter/ai-sdk-provider (v0.7.3) doesn't pass through
+                // the responseFormat from Vercel AI SDK to the HTTP request.
+                // This means we rely on prompt-based schema instructions only.
+
+                // Verify structured outputs (response_format) is NOT present yet due to provider limitation
+                expect(body.response_format).toBeUndefined();
+
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'This is not valid JSON for the schema',
                                 role: 'assistant',
@@ -429,20 +500,20 @@ Your response should be only the string value, without any JSON wrapping or addi
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const agent = new BasicAgentAdapter('InvalidJsonAgent', {
+        const agent = new ChatAgent('InvalidJsonAgent', {
             model,
             schema: responseSchema,
             systemPrompt,
         });
 
-        const userPrompt = new UserPromptAdapter('Generate invalid response.');
+        const userPrompt = new UserPrompt('Generate invalid response.');
 
         // When - running the agent
         const result = await agent.run(userPrompt);
@@ -465,9 +536,13 @@ Your response should be only the string value, without any JSON wrapping or addi
                 expect(body.messages[1].content).toBe('Proceed with your instructions.');
                 expect(body.model).toBe(mockModelName);
 
+                // Verify structured outputs (response_format) is NOT present when no schema is provided
+                expect(body.response_format).toBeUndefined();
+
                 return HttpResponse.json({
                     choices: [
                         {
+                            index: 0,
                             message: {
                                 content: 'Proceeding with default instructions.',
                                 role: 'assistant',
@@ -481,14 +556,14 @@ Your response should be only the string value, without any JSON wrapping or addi
             }),
         );
 
-        const model = new OpenRouterModelAdapter({
+        const provider = new OpenRouterProvider({
             apiKey: mockApiKey,
-            modelName: mockModelName,
         });
+        const model = provider.getModel(mockModelName);
 
-        const systemPrompt = new SystemPromptAdapter('You are a helpful AI assistant.');
+        const systemPrompt = new SystemPrompt('You are a helpful AI assistant.');
 
-        const agent = new BasicAgentAdapter('NoInputAgent', {
+        const agent = new ChatAgent('NoInputAgent', {
             model,
             systemPrompt,
         });

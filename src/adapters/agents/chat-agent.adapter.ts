@@ -1,31 +1,32 @@
 import { type LoggerPort } from '@jterrazz/logger';
+import { generateText } from 'ai';
 import { z } from 'zod/v4';
 
 import { type AgentPort } from '../../ports/agent.port.js';
 import type { ModelPort } from '../../ports/model.port.js';
 import type { PromptPort } from '../../ports/prompt.port.js';
 
-import { AIResponseParser } from '../utils/ai-response-parser.js';
+import { StructuredResponseParser } from '../utils/structured-response-parser.js';
 
-import type { SystemPromptAdapter } from '../prompts/system-prompt.adapter.js';
+import type { SystemPrompt } from '../prompts/system-prompt.adapter.js';
 
-export interface BasicAgentOptions<TOutput = string> {
+export interface ChatAgentOptions<TOutput = string> {
     logger?: LoggerPort;
     model: ModelPort;
     schema?: z.ZodSchema<TOutput>;
-    systemPrompt: SystemPromptAdapter;
+    systemPrompt: SystemPrompt;
     verbose?: boolean;
 }
 
 /**
- * A basic agent for direct, one-shot interactions with a model.
+ * A conversational agent for direct, one-shot interactions with a model.
  * It supports optional response parsing against a Zod schema but does not use tools.
  * @template TOutput - The TypeScript type of the output
  */
-export class BasicAgentAdapter<TOutput = string> implements AgentPort<PromptPort, TOutput> {
+export class ChatAgent<TOutput = string> implements AgentPort<PromptPort, TOutput> {
     constructor(
         public readonly name: string,
-        private readonly options: BasicAgentOptions<TOutput>,
+        private readonly options: ChatAgentOptions<TOutput>,
     ) {}
 
     async run(input?: PromptPort): Promise<null | TOutput> {
@@ -36,19 +37,22 @@ export class BasicAgentAdapter<TOutput = string> implements AgentPort<PromptPort
 
             if (this.options.schema) {
                 const parsedResponse = this.parseResponse(content, this.options.schema);
+
                 this.options.logger?.debug('Execution finished and response parsed', {
                     agent: this.name,
                 });
+
                 return parsedResponse;
             } else {
                 this.options.logger?.debug('Execution finished', { agent: this.name });
-                // When no schema is provided, we assume TOutput is string (default), so content is the result
+
                 return content as TOutput;
             }
         } catch (error) {
             this.options.logger?.error('Execution failed', {
                 agent: this.name,
                 error: error instanceof Error ? error.message : 'Unknown error',
+                errorStack: error instanceof Error ? error.stack : undefined,
             });
             return null;
         }
@@ -58,7 +62,6 @@ export class BasicAgentAdapter<TOutput = string> implements AgentPort<PromptPort
         const userInput = this.resolveUserInput(input);
         let systemMessage = this.options.systemPrompt.generate();
 
-        // Add schema definition to system prompt if schema is provided
         if (this.options.schema) {
             const jsonSchema = z.toJSONSchema(this.options.schema);
             const isPrimitiveType = ['boolean', 'integer', 'number', 'string'].includes(
@@ -105,19 +108,37 @@ Your response must be parseable JSON that validates against this schema. Do not 
             });
         }
 
-        const response = await this.options.model.getModel().invoke(messages);
-        const { content } = response;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const generateConfig: any = {
+            messages,
+            model: this.options.model.getVercelModel(),
+        };
 
-        if (typeof content !== 'string') {
-            throw new Error('Model returned a non-string content type.');
+        // Prepare structured outputs configuration for better schema validation when schema is provided
+        // NOTE: OpenRouter supports structured outputs, but @openrouter/ai-sdk-provider (v0.7.3)
+        // doesn't pass through responseFormat parameter yet. Currently relies on prompt-based instructions.
+        // Once provider support is added, this will provide stronger guarantees than prompts alone.
+        // See: https://openrouter.ai/docs/features/structured-outputs
+        if (this.options.schema) {
+            const jsonSchema = z.toJSONSchema(this.options.schema);
+            generateConfig.responseFormat = {
+                json_schema: {
+                    name: 'response',
+                    schema: jsonSchema,
+                    strict: true,
+                },
+                type: 'json_schema',
+            };
         }
 
-        return content;
+        const { text } = await generateText(generateConfig);
+
+        return text;
     }
 
     private parseResponse<TResponse>(content: string, schema: z.ZodSchema<TResponse>): TResponse {
         try {
-            return new AIResponseParser(schema).parse(content);
+            return new StructuredResponseParser(schema).parse(content);
         } catch (error) {
             this.options.logger?.error('Failed to parse model response.', {
                 agent: this.name,
