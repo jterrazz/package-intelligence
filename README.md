@@ -1,4 +1,4 @@
-# @jterrazz/intelligence
+# Package Intelligence
 
 Composable AI-agent toolkit for TypeScript apps.
 
