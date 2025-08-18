@@ -1,11 +1,6 @@
 # @jterrazz/intelligence
 
-**A composable, type-safe, and framework-agnostic AI agent library for TypeScript.**
-
-[![NPM Version](https://img.shields.io/npm/v/@jterrazz/intelligence.svg)](https://www.npmjs.com/package/@jterrazz/intelligence)
-[![License](https://img.shields.io/npm/l/@jterrazz/intelligence.svg)](./LICENSE)
-
-`@jterrazz/intelligence` provides a clean, structured, and extensible foundation for building sophisticated AI agents. Built on the **Vercel AI SDK** with **OpenRouter** support, it's designed to help you create reliable and maintainable AI-powered applications by focusing on composability, type safety, and resilience.
+Composable AI-agent toolkit for TypeScript apps.
 
 ---
 
