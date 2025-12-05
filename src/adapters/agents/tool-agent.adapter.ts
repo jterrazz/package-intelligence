@@ -8,7 +8,7 @@ import type { ModelPort } from '../../ports/model.port.js';
 import type { PromptPort } from '../../ports/prompt.port.js';
 import type { ToolPort } from '../../ports/tool.port.js';
 
-import { StructuredResponseParser } from '../utils/structured-response-parser.js';
+import { parseObject } from '../utils/parse-object.js';
 
 import type { SystemPrompt } from '../prompts/system-prompt.adapter.js';
 
@@ -259,7 +259,7 @@ Example format:
         schema: z.ZodSchema<TResponse>,
     ): TResponse {
         try {
-            return new StructuredResponseParser(schema).parse(content);
+            return parseObject(content, schema);
         } catch (error) {
             this.options.logger?.error('Failed to validate response content against schema.', {
                 agent: this.name,

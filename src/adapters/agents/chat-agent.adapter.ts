@@ -6,7 +6,7 @@ import { type AgentPort } from '../../ports/agent.port.js';
 import type { ModelPort } from '../../ports/model.port.js';
 import type { PromptPort } from '../../ports/prompt.port.js';
 
-import { StructuredResponseParser } from '../utils/structured-response-parser.js';
+import { parseObject } from '../utils/parse-object.js';
 
 import type { SystemPrompt } from '../prompts/system-prompt.adapter.js';
 
@@ -138,7 +138,7 @@ Your response must be parseable JSON that validates against this schema. Do not 
 
     private parseResponse<TResponse>(content: string, schema: z.ZodSchema<TResponse>): TResponse {
         try {
-            return new StructuredResponseParser(schema).parse(content);
+            return parseObject(content, schema);
         } catch (error) {
             this.options.logger?.error('Failed to parse model response.', {
                 agent: this.name,
