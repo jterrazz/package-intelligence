@@ -67,4 +67,3 @@ export function parseText(text: string, options: ParseTextOptions = {}): string 
 
     return result;
 }
-

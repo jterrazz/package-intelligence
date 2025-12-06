@@ -213,7 +213,6 @@ function unescapeString(text: string): string {
         .replace(/\\t/g, '\t')
         .replace(/\\\\/g, '\\')
         .replace(/\\u([0-9a-fA-F]{4})/g, (_, code) =>
-            String.fromCharCode(parseInt(code, 16)),
+            String.fromCharCode(Number.parseInt(code, 16)),
         );
 }
-

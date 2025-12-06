@@ -112,7 +112,11 @@ describe('parseObject', () => {
         });
 
         it('throws ParseObjectError when schema validation fails', () => {
-            const text = JSON.stringify({ content: 'Test', tags: ['test'], title: 123 });
+            const text = JSON.stringify({
+                content: 'Test',
+                tags: ['test'],
+                title: 123,
+            });
             expect(() => parseObject(text, articleSchema)).toThrow(ParseObjectError);
         });
 
@@ -195,4 +199,3 @@ describe('parseObject', () => {
         });
     });
 });
-
