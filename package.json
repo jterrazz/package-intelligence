@@ -8,16 +8,18 @@
       "import": "./dist/index.js"
     }
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "type": "module",
   "scripts": {
     "build": "ts-build",
     "test": "vitest",
-    "lint": "quality",
-    "lint:fix": "quality-fix"
+    "lint": "ts-check",
+    "lint:fix": "ts-fix"
   },
   "devDependencies": {
-    "@jterrazz/quality": "^4.0.4",
+    "@jterrazz/quality": "^5.0.1",
     "@jterrazz/test": "^3.0.0",
     "@jterrazz/typescript": "^3.0.0"
   },

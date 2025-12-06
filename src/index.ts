@@ -2,7 +2,9 @@ export {
     createLoggingMiddleware,
     type LoggingMiddlewareOptions,
 } from './middleware/logging.middleware.js';
-
+export { createSchemaPrompt } from './parsing/create-schema-prompt.js';
+export { parseObject, ParseObjectError } from './parsing/parse-object.js';
+export { parseText, type ParseTextOptions } from './parsing/parse-text.js';
 export {
     createOpenRouterProvider,
     type ModelOptions,
@@ -10,7 +12,3 @@ export {
     type OpenRouterMetadata,
     type OpenRouterProvider,
 } from './providers/openrouter.provider.js';
-
-export { createSchemaPrompt } from './parsing/create-schema-prompt.js';
-export { parseObject, ParseObjectError } from './parsing/parse-object.js';
-export { parseText, type ParseTextOptions } from './parsing/parse-text.js';
