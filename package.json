@@ -14,21 +14,21 @@
   "type": "module",
   "scripts": {
     "build": "ts-build",
-    "test": "vitest",
     "lint": "ts-check",
-    "lint:fix": "ts-fix"
+    "lint:fix": "ts-fix",
+    "test": "vitest"
   },
   "devDependencies": {
     "@jterrazz/quality": "^5.0.1",
-    "@jterrazz/test": "^3.0.0",
-    "@jterrazz/typescript": "^3.0.0"
+    "@jterrazz/test": "^3.1.0",
+    "@jterrazz/typescript": "^3.1.0"
   },
   "peerDependencies": {
     "ai": ">=5.0.0",
     "zod": ">=4.0.0"
   },
   "dependencies": {
-    "@jterrazz/logger": "^1.4.2",
+    "@jterrazz/logger": "^1.5.0",
     "@openrouter/ai-sdk-provider": "^1.4.0",
     "jsonrepair": "^3.13.1"
   },
