@@ -10,12 +10,11 @@ const SPACE_LIKE_RE = /[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g;
 const MULTIPLE_SPACES_RE = / {2,}/g;
 const CR_RE = /\r\n?/g;
 const CITATION_RE = / *\(oaicite:\d+\)\{index=\d+\}/g;
-const EM_DASH_SEPARATOR_RE = /(?:\s+[—–―‒]\s*|\s*[—–―‒]\s+)/g;
+const EM_DASH_SEPARATOR_RE = /\s*[—–―‒]\s*/g;
 
 const TYPOGRAPHY_REPLACEMENTS: Array<{ pattern: RegExp; replacement: string }> = [
     { pattern: /[\u2018\u2019\u201A]/g, replacement: "'" },
     { pattern: /[\u201C\u201D\u201E]/g, replacement: '"' },
-    { pattern: /[\u2013\u2014]/g, replacement: '-' },
     { pattern: /\u2026/g, replacement: '...' },
     { pattern: /[\u2022\u25AA-\u25AB\u25B8-\u25B9\u25CF]/g, replacement: '-' },
 ];

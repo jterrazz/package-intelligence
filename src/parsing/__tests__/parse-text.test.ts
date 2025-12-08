@@ -108,10 +108,18 @@ describe('parseText', () => {
             expect(parseText('hello ‒ world')).toBe('hello, world');
         });
 
+        it('converts em dash without spaces to comma', () => {
+            expect(parseText('disparaître—ne laissant')).toBe('disparaître, ne laissant');
+        });
+
         it('can be disabled via options', () => {
             expect(parseText('hello — world', { normalizeEmDashesToCommas: false })).toBe(
-                'hello - world',
+                'hello — world',
             );
+        });
+
+        it('preserves em dash when disabled (no spaces)', () => {
+            expect(parseText('word—word', { normalizeEmDashesToCommas: false })).toBe('word—word');
         });
     });
 
@@ -146,12 +154,12 @@ describe('parseText', () => {
             expect(parseText('\u201CHello\u201D')).toBe('"Hello"');
         });
 
-        it('converts em dash to hyphen', () => {
-            expect(parseText('word\u2014word')).toBe('word-word');
+        it('converts em dash to comma', () => {
+            expect(parseText('word\u2014word')).toBe('word, word');
         });
 
-        it('converts en dash to hyphen', () => {
-            expect(parseText('2020\u20132021')).toBe('2020-2021');
+        it('converts en dash to comma', () => {
+            expect(parseText('2020\u20132021')).toBe('2020, 2021');
         });
 
         it('converts ellipsis to three dots', () => {
