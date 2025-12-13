@@ -56,10 +56,15 @@ Removes invisible characters, normalizes typography, and cleans common AI artifa
 ```typescript
 import { parseText } from '@jterrazz/intelligence';
 
-const clean = parseText(messyAiOutput, {
-    normalizeTypography: true, // Smart quotes → straight quotes
-    removeInvisibleChars: true, // Zero-width chars, etc.
-    trimWhitespace: true,
+const clean = parseText(messyAiOutput);
+// Removes: BOM, zero-width chars, AI citation markers
+// Normalizes: smart quotes → straight, em dashes → ", ", ellipsis → ...
+// Collapses multiple spaces and trims
+
+// Options
+parseText(text, {
+    normalizeEmDashesToCommas: true, // Convert em/en dashes to ", " (default: true)
+    collapseSpaces: true, // Collapse multiple spaces, trim (default: true)
 });
 ```
 
@@ -102,11 +107,13 @@ const model = wrapLanguageModel({
     model: provider.model('anthropic/claude-sonnet-4-20250514'),
     middleware: createLoggingMiddleware({
         logger, // Any logger with debug/error methods
-        verbose: false, // Include full request/response in logs
+        include: {
+            params: false, // Include request params (default: false)
+            content: false, // Include response content (default: false)
+            usage: true, // Include token usage (default: true)
+        },
     }),
 });
 ```
 
-## License
-
-MIT
+Happy coding! 🚀

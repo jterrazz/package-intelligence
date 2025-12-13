@@ -1,10 +1,19 @@
 import type { LoggerPort } from '@jterrazz/logger';
 import type { LanguageModelMiddleware } from 'ai';
 
+export interface LoggingMiddlewareInclude {
+    /** Include request params in logs */
+    params?: boolean;
+    /** Include response content in logs */
+    content?: boolean;
+    /** Include token usage in logs */
+    usage?: boolean;
+}
+
 export interface LoggingMiddlewareOptions {
     logger: LoggerPort;
-    /** Include request/response details in logs (default: false) */
-    verbose?: boolean;
+    /** Select which fields to include in logs (default: { usage: true }) */
+    include?: LoggingMiddlewareInclude;
 }
 
 /**
@@ -23,7 +32,8 @@ export interface LoggingMiddlewareOptions {
 export function createLoggingMiddleware(
     options: LoggingMiddlewareOptions,
 ): LanguageModelMiddleware {
-    const { logger, verbose = false } = options;
+    const { logger, include = {} } = options;
+    const { params: includeParams, content: includeContent, usage: includeUsage = true } = include;
 
     return {
         middlewareVersion: 'v2',
@@ -32,7 +42,7 @@ export function createLoggingMiddleware(
             const startTime = Date.now();
 
             logger.debug('Model request started', {
-                ...(verbose && { params }),
+                ...(includeParams && { params }),
             });
 
             try {
@@ -41,8 +51,8 @@ export function createLoggingMiddleware(
                 logger.debug('Model request completed', {
                     durationMs: Date.now() - startTime,
                     finishReason: result.finishReason,
-                    usage: result.usage,
-                    ...(verbose && { content: result.content }),
+                    ...(includeUsage && { usage: result.usage }),
+                    ...(includeContent && { content: result.content }),
                 });
 
                 return result;
@@ -59,7 +69,7 @@ export function createLoggingMiddleware(
             const startTime = Date.now();
 
             logger.debug('Model stream started', {
-                ...(verbose && { params }),
+                ...(includeParams && { params }),
             });
 
             try {

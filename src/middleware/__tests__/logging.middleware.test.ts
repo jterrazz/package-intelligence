@@ -83,9 +83,9 @@ describe('createLoggingMiddleware', () => {
             );
         });
 
-        it('includes params and content when verbose is true', async () => {
+        it('includes params when include.params is true', async () => {
             const logger = createMockLogger();
-            const middleware = createLoggingMiddleware({ logger, verbose: true });
+            const middleware = createLoggingMiddleware({ logger, include: { params: true } });
             const mockResult = createMockGenerateResult();
             const mockParams = { prompt: 'Hello' };
             const doGenerate = vi.fn().mockResolvedValue(mockResult);
@@ -102,10 +102,45 @@ describe('createLoggingMiddleware', () => {
                 'Model request started',
                 expect.objectContaining({ params: mockParams }),
             );
+        });
+
+        it('includes content when include.content is true', async () => {
+            const logger = createMockLogger();
+            const middleware = createLoggingMiddleware({ logger, include: { content: true } });
+            const mockResult = createMockGenerateResult();
+            const doGenerate = vi.fn().mockResolvedValue(mockResult);
+
+            await middleware.wrapGenerate?.({
+                doGenerate,
+                doStream: vi.fn(),
+                params: {} as never,
+                model: {} as never,
+            });
+
             expect(logger.debug).toHaveBeenNthCalledWith(
                 2,
                 'Model request completed',
                 expect.objectContaining({ content: mockResult.content }),
+            );
+        });
+
+        it('excludes usage when include.usage is false', async () => {
+            const logger = createMockLogger();
+            const middleware = createLoggingMiddleware({ logger, include: { usage: false } });
+            const mockResult = createMockGenerateResult();
+            const doGenerate = vi.fn().mockResolvedValue(mockResult);
+
+            await middleware.wrapGenerate?.({
+                doGenerate,
+                doStream: vi.fn(),
+                params: {} as never,
+                model: {} as never,
+            });
+
+            expect(logger.debug).toHaveBeenNthCalledWith(
+                2,
+                'Model request completed',
+                expect.not.objectContaining({ usage: expect.anything() }),
             );
         });
     });
@@ -152,9 +187,9 @@ describe('createLoggingMiddleware', () => {
             );
         });
 
-        it('includes params when verbose is true', async () => {
+        it('includes params when include.params is true', async () => {
             const logger = createMockLogger();
-            const middleware = createLoggingMiddleware({ logger, verbose: true });
+            const middleware = createLoggingMiddleware({ logger, include: { params: true } });
             const mockResult = createMockStreamResult();
             const mockParams = { prompt: 'Hello' };
             const doStream = vi.fn().mockResolvedValue(mockResult);
