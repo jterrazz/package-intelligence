@@ -99,6 +99,37 @@ function extractBySchemaType(text: string, schema: z.ZodType, originalText: stri
         return extractPrimitive(text, schema);
     }
 
+    // Handle union types - extract as object/array and let Zod validate which variant matches
+    if (schema instanceof z.ZodUnion || schema instanceof z.ZodDiscriminatedUnion) {
+        const objectStart = text.indexOf('{');
+        if (objectStart !== -1) {
+            return extractObject(text, originalText);
+        }
+        const arrayStart = text.indexOf('[');
+        if (arrayStart !== -1) {
+            return extractArray(text, originalText);
+        }
+        throw new ParseObjectError(
+            'No object or array found for union type',
+            undefined,
+            originalText,
+        );
+    }
+
+    // Handle wrapper types - unwrap and delegate to inner type
+    if (schema instanceof z.ZodOptional || schema instanceof z.ZodNullable) {
+        return extractBySchemaType(text, schema.unwrap() as z.ZodType, originalText);
+    }
+
+    if (schema instanceof z.ZodDefault) {
+        return extractBySchemaType(text, schema.def.innerType as z.ZodType, originalText);
+    }
+
+    // Handle .transform() which creates a ZodPipe in Zod v4
+    if (schema instanceof z.ZodPipe) {
+        return extractBySchemaType(text, schema.def.in as z.ZodType, originalText);
+    }
+
     throw new ParseObjectError('Unsupported schema type', undefined, originalText);
 }
 
