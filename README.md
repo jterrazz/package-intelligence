@@ -191,7 +191,7 @@ class AnthropicMetadataAdapter implements ProviderMetadataPort {
 
 Extracts and validates JSON from messy AI outputs (markdown blocks, malformed syntax).
 
-```typescript
+````typescript
 import { parseObject } from "@jterrazz/intelligence";
 import { z } from "zod";
 
@@ -203,7 +203,7 @@ const schema = z.object({
 const text = '```json\n{"title": "Hello", "tags": ["ai"]}\n```';
 const result = parseObject(text, schema);
 // { title: "Hello", tags: ["ai"] }
-```
+````
 
 ### `createSchemaPrompt` - Generate schema instructions
 
@@ -265,52 +265,52 @@ const reasoningModel = provider.model("anthropic/claude-sonnet-4-20250514", {
 
 ### Generation
 
-| Export | Description |
-|--------|-------------|
+| Export                        | Description                                            |
+| ----------------------------- | ------------------------------------------------------ |
 | `generateStructured(options)` | Generate and parse structured data with error handling |
 
 ### Result
 
-| Export | Description |
-|--------|-------------|
-| `GenerationResult<T>` | Discriminated union result type |
-| `generationSuccess(data)` | Create success result |
-| `generationFailure(code, message, cause?)` | Create failure result |
-| `isSuccess(result)` | Type guard for success |
-| `isFailure(result)` | Type guard for failure |
-| `unwrap(result)` | Extract data or throw |
-| `unwrapOr(result, default)` | Extract data or return default |
-| `classifyError(error)` | Classify error into error code |
-| `GenerationErrorCode` | Error codes: TIMEOUT, RATE_LIMITED, PARSING_FAILED, etc. |
+| Export                                     | Description                                              |
+| ------------------------------------------ | -------------------------------------------------------- |
+| `GenerationResult<T>`                      | Discriminated union result type                          |
+| `generationSuccess(data)`                  | Create success result                                    |
+| `generationFailure(code, message, cause?)` | Create failure result                                    |
+| `isSuccess(result)`                        | Type guard for success                                   |
+| `isFailure(result)`                        | Type guard for failure                                   |
+| `unwrap(result)`                           | Extract data or throw                                    |
+| `unwrapOr(result, default)`                | Extract data or return default                           |
+| `classifyError(error)`                     | Classify error into error code                           |
+| `GenerationErrorCode`                      | Error codes: TIMEOUT, RATE_LIMITED, PARSING_FAILED, etc. |
 
 ### Middleware
 
-| Export | Description |
-|--------|-------------|
-| `createLoggingMiddleware(options)` | Creates logging middleware |
-| `createObservabilityMiddleware(options)` | Creates observability middleware |
-| `withObservability(meta)` | Helper for type-safe observability metadata |
-| `LangfuseAdapter` | Langfuse implementation of ObservabilityPort |
-| `NoopObservabilityAdapter` | No-op adapter for testing/development |
-| `OpenRouterMetadataAdapter` | Extract usage/cost from OpenRouter |
+| Export                                   | Description                                  |
+| ---------------------------------------- | -------------------------------------------- |
+| `createLoggingMiddleware(options)`       | Creates logging middleware                   |
+| `createObservabilityMiddleware(options)` | Creates observability middleware             |
+| `withObservability(meta)`                | Helper for type-safe observability metadata  |
+| `LangfuseAdapter`                        | Langfuse implementation of ObservabilityPort |
+| `NoopObservabilityAdapter`               | No-op adapter for testing/development        |
+| `OpenRouterMetadataAdapter`              | Extract usage/cost from OpenRouter           |
 
 ### Ports
 
-| Export | Description |
-|--------|-------------|
-| `ObservabilityPort` | Interface for observability adapters |
+| Export                 | Description                                |
+| ---------------------- | ------------------------------------------ |
+| `ObservabilityPort`    | Interface for observability adapters       |
 | `ProviderMetadataPort` | Interface for provider metadata extraction |
 
 ### Parsing
 
-| Export | Description |
-|--------|-------------|
-| `parseObject(text, schema)` | Parse and validate JSON from AI output |
+| Export                       | Description                              |
+| ---------------------------- | ---------------------------------------- |
+| `parseObject(text, schema)`  | Parse and validate JSON from AI output   |
 | `createSchemaPrompt(schema)` | Generate schema instructions for prompts |
-| `parseText(text, options?)` | Sanitize AI-generated text |
+| `parseText(text, options?)`  | Sanitize AI-generated text               |
 
 ### Provider
 
-| Export | Description |
-|--------|-------------|
+| Export                             | Description                           |
+| ---------------------------------- | ------------------------------------- |
 | `createOpenRouterProvider(config)` | Create OpenRouter provider for AI SDK |

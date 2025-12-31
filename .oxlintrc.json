@@ -1,0 +1,3 @@
+{
+  "extends": ["node_modules/@jterrazz/codestyle/src/oxlint/node.json"]
+}

@@ -1,4 +1,4 @@
-import { z } from 'zod/v4';
+import { z } from "zod/v4";
 
 /**
  * Creates a system prompt that instructs the model to output structured data
@@ -27,15 +27,15 @@ import { z } from 'zod/v4';
  * ```
  */
 export function createSchemaPrompt<T>(schema: z.ZodType<T>): string {
-    const jsonSchema = z.toJSONSchema(schema);
-    const schemaJson = JSON.stringify(jsonSchema, null, 2);
+  const jsonSchema = z.toJSONSchema(schema);
+  const schemaJson = JSON.stringify(jsonSchema, null, 2);
 
-    const isPrimitive = ['boolean', 'integer', 'number', 'string'].includes(
-        jsonSchema.type as string,
-    );
+  const isPrimitive = ["boolean", "integer", "number", "string"].includes(
+    jsonSchema.type as string,
+  );
 
-    if (isPrimitive) {
-        return `<OUTPUT_FORMAT>
+  if (isPrimitive) {
+    return `<OUTPUT_FORMAT>
 You must respond with a ${jsonSchema.type} value that matches this schema:
 
 \`\`\`json
@@ -44,9 +44,9 @@ ${schemaJson}
 
 Your response should be only the ${jsonSchema.type} value, without any JSON wrapping or additional text.
 </OUTPUT_FORMAT>`;
-    }
+  }
 
-    return `<OUTPUT_FORMAT>
+  return `<OUTPUT_FORMAT>
 You must respond with valid JSON that matches this JSON schema:
 
 \`\`\`json
