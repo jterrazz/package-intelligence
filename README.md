@@ -1,11 +1,77 @@
 # @jterrazz/intelligence
 
-Lightweight, composable utilities for AI SDK apps - middleware for logging and observability, structured output parsing, and provider helpers.
+Lightweight, composable utilities for AI SDK apps - middleware for logging and observability, structured output parsing, result handling, and provider helpers.
 
 ## Installation
 
 ```bash
 npm install @jterrazz/intelligence ai zod
+```
+
+## Generation
+
+### `generateStructured` - Type-safe structured generation with error handling
+
+Combines `generateText` + `parseObject` + error classification into a single function that returns a discriminated union result.
+
+```typescript
+import { generateStructured, withObservability } from "@jterrazz/intelligence";
+import { z } from "zod";
+
+const schema = z.object({
+  sentiment: z.string(),
+  score: z.number(),
+});
+
+const result = await generateStructured({
+  model,
+  prompt: "Analyze this article...",
+  schema,
+  providerOptions: withObservability({ traceId: "trace-123" }),
+});
+
+if (result.success) {
+  console.log(result.data.sentiment, result.data.score);
+} else {
+  // Typed error with code: TIMEOUT | RATE_LIMITED | PARSING_FAILED | etc.
+  console.error(result.error.code, result.error.message);
+}
+```
+
+## Result Utilities
+
+Discriminated union result type for explicit error handling.
+
+```typescript
+import {
+  generationSuccess,
+  generationFailure,
+  isSuccess,
+  isFailure,
+  unwrap,
+  unwrapOr,
+  classifyError,
+  type GenerationResult,
+} from "@jterrazz/intelligence";
+
+// Create results
+const success = generationSuccess({ data: "value" });
+const failure = generationFailure("TIMEOUT", "Request timed out");
+
+// Type guards
+if (isSuccess(result)) {
+  console.log(result.data);
+}
+
+// Unwrap with default
+const value = unwrapOr(result, defaultValue);
+
+// Classify errors automatically
+try {
+  await someOperation();
+} catch (error) {
+  const code = classifyError(error); // TIMEOUT, RATE_LIMITED, PARSING_FAILED, etc.
+}
 ```
 
 ## Middleware
@@ -20,6 +86,7 @@ import {
   createLoggingMiddleware,
   createObservabilityMiddleware,
   LangfuseAdapter,
+  OpenRouterMetadataAdapter,
 } from "@jterrazz/intelligence";
 
 const model = wrapLanguageModel({
@@ -31,6 +98,7 @@ const model = wrapLanguageModel({
         secretKey: process.env.LANGFUSE_SECRET_KEY,
         publicKey: process.env.LANGFUSE_PUBLIC_KEY,
       }),
+      providerMetadata: new OpenRouterMetadataAdapter(),
     }),
   ],
 });
@@ -86,7 +154,7 @@ const model = wrapLanguageModel({
 await generateText({
   model,
   prompt: "Analyze this...",
-  experimental_providerMetadata: withObservability({
+  providerOptions: withObservability({
     traceId: "trace-123",
     name: "analyzer",
     metadata: { userId: "user-1" },
@@ -94,32 +162,27 @@ await generateText({
 });
 ```
 
-### Custom Observability Adapters
+### Custom Adapters
 
-Implement `ObservabilityPort` to integrate with any platform:
+Implement ports to integrate with any platform:
 
 ```typescript
-import type { ObservabilityPort } from "@jterrazz/intelligence";
+import type { ObservabilityPort, ProviderMetadataPort } from "@jterrazz/intelligence";
 
+// Observability adapter (Datadog, etc.)
 class DatadogAdapter implements ObservabilityPort {
   trace(params) { /* ... */ }
   generation(params) { /* ... */ }
   async flush() { /* ... */ }
   async shutdown() { /* ... */ }
 }
-```
 
-### OpenRouter Usage Extraction
-
-Extract usage and cost data from OpenRouter responses:
-
-```typescript
-import { extractOpenRouterData } from "@jterrazz/intelligence";
-
-const response = await generateText({ model, prompt: "Hello" });
-const { usage, cost } = extractOpenRouterData(response.providerMetadata);
-// usage: { input, output, total, reasoning, cacheRead }
-// cost: { total }
+// Provider metadata adapter (extract usage/cost)
+class AnthropicMetadataAdapter implements ProviderMetadataPort {
+  extract(metadata) {
+    return { usage: { ... }, cost: { ... } };
+  }
+}
 ```
 
 ## Parsing Utilities
@@ -200,6 +263,26 @@ const reasoningModel = provider.model("anthropic/claude-sonnet-4-20250514", {
 
 ## API Reference
 
+### Generation
+
+| Export | Description |
+|--------|-------------|
+| `generateStructured(options)` | Generate and parse structured data with error handling |
+
+### Result
+
+| Export | Description |
+|--------|-------------|
+| `GenerationResult<T>` | Discriminated union result type |
+| `generationSuccess(data)` | Create success result |
+| `generationFailure(code, message, cause?)` | Create failure result |
+| `isSuccess(result)` | Type guard for success |
+| `isFailure(result)` | Type guard for failure |
+| `unwrap(result)` | Extract data or throw |
+| `unwrapOr(result, default)` | Extract data or return default |
+| `classifyError(error)` | Classify error into error code |
+| `GenerationErrorCode` | Error codes: TIMEOUT, RATE_LIMITED, PARSING_FAILED, etc. |
+
 ### Middleware
 
 | Export | Description |
@@ -207,18 +290,16 @@ const reasoningModel = provider.model("anthropic/claude-sonnet-4-20250514", {
 | `createLoggingMiddleware(options)` | Creates logging middleware |
 | `createObservabilityMiddleware(options)` | Creates observability middleware |
 | `withObservability(meta)` | Helper for type-safe observability metadata |
-| `extractOpenRouterData(metadata)` | Extract usage/cost from OpenRouter |
 | `LangfuseAdapter` | Langfuse implementation of ObservabilityPort |
+| `NoopObservabilityAdapter` | No-op adapter for testing/development |
+| `OpenRouterMetadataAdapter` | Extract usage/cost from OpenRouter |
 
-### Types
+### Ports
 
 | Export | Description |
 |--------|-------------|
 | `ObservabilityPort` | Interface for observability adapters |
-| `ObservabilityMetadata` | Metadata for per-call tracing |
-| `UsageDetails` | Token usage details |
-| `CostDetails` | Cost details |
-| `GenerationParams` | Parameters for recording generations |
+| `ProviderMetadataPort` | Interface for provider metadata extraction |
 
 ### Parsing
 
