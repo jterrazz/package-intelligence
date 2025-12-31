@@ -1,7 +1,7 @@
 {
   "name": "@jterrazz/intelligence",
   "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
-  "version": "3.0.2",
+  "version": "4.0.0",
   "exports": {
     ".": {
       "require": "./dist/index.cjs",
@@ -21,7 +21,8 @@
   "devDependencies": {
     "@jterrazz/quality": "^5.0.1",
     "@jterrazz/test": "^3.1.0",
-    "@jterrazz/typescript": "^3.1.0"
+    "@jterrazz/typescript": "^3.1.0",
+    "@types/node": "^22.0.0"
   },
   "peerDependencies": {
     "ai": ">=5.0.0",
@@ -30,7 +31,8 @@
   "dependencies": {
     "@jterrazz/logger": "^1.5.0",
     "@openrouter/ai-sdk-provider": "^1.4.0",
-    "jsonrepair": "^3.13.1"
+    "jsonrepair": "^3.13.1",
+    "langfuse": "^3.38.6"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
