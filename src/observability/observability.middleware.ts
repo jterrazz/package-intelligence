@@ -1,4 +1,4 @@
-import type { LanguageModelV3StreamPart } from "@ai-sdk/provider";
+import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
 import type { LanguageModelMiddleware } from "ai";
 
 // Ports
@@ -37,7 +37,6 @@ export function createObservabilityMiddleware(
   const { observability, providerMetadata } = options;
 
   return {
-    specificationVersion: "v3",
     wrapGenerate: async ({ doGenerate, params, model }) => {
       const startTime = new Date();
       const meta = params.providerOptions?.observability as ObservabilityMetadata | undefined;
@@ -86,8 +85,8 @@ export function createObservabilityMiddleware(
       const chunks: string[] = [];
 
       const transformStream = new TransformStream<
-        LanguageModelV3StreamPart,
-        LanguageModelV3StreamPart
+        LanguageModelV2StreamPart,
+        LanguageModelV2StreamPart
       >({
         transform(chunk, controller) {
           if (chunk.type === "text-delta") {
