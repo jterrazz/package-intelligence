@@ -40,10 +40,6 @@ export function parseText(text: string, options: ParseTextOptions = {}): string 
 
   let result = text;
 
-  if (result.charCodeAt(0) === 0xFE_FF) {
-    result = result.slice(1);
-  }
-
   result = result.replace(CR_RE, "\n");
   result = result.replace(CITATION_RE, "");
   result = result.normalize("NFKC");
