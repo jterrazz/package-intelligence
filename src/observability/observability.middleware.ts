@@ -37,6 +37,7 @@ export function createObservabilityMiddleware(
   const { observability, providerMetadata } = options;
 
   return {
+    specificationVersion: "v3",
     wrapGenerate: async ({ doGenerate, params, model }) => {
       const startTime = new Date();
       const meta = params.providerOptions?.observability as ObservabilityMetadata | undefined;
@@ -111,6 +112,7 @@ export function createObservabilityMiddleware(
       });
 
       return {
+        specificationVersion: "v3",
         ...result,
         stream: result.stream.pipeThrough(transformStream),
       };

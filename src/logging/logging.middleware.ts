@@ -21,6 +21,7 @@ export function createLoggingMiddleware(
   const { params: includeParams, content: includeContent, usage: includeUsage = true } = include;
 
   return {
+    specificationVersion: "v3",
     wrapGenerate: async ({ doGenerate, params, model }) => {
       const startTime = Date.now();
 
@@ -90,6 +91,7 @@ export function createLoggingMiddleware(
         });
 
         return {
+          specificationVersion: "v3",
           ...result,
           stream: result.stream.pipeThrough(transformStream),
         };

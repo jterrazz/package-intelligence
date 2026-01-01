@@ -1,14 +1,14 @@
-import type { LanguageModelV2 } from "@ai-sdk/provider";
+import type { LanguageModelV3 } from "@ai-sdk/provider";
 import { describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 
 import { generateStructured } from "../generate-structured.js";
 
-function createMockModel(options: { text?: string; shouldThrow?: Error } = {}): LanguageModelV2 {
+function createMockModel(options: { text?: string; shouldThrow?: Error } = {}): LanguageModelV3 {
   const { text = "{}", shouldThrow } = options;
 
   return {
-    specificationVersion: "v2",
+    specificationVersion: "v3",
     provider: "mock",
     modelId: "mock-model",
     doGenerate: shouldThrow
@@ -16,9 +16,10 @@ function createMockModel(options: { text?: string; shouldThrow?: Error } = {}): 
       : vi.fn().mockResolvedValue({
           text,
           finishReason: "stop",
-          usage: { promptTokens: 10, completionTokens: 20 },
-          rawCall: { rawPrompt: null, rawSettings: {} },
+          usage: { inputTokens: { total: 10 }, outputTokens: { total: 20 } },
+
           content: [{ type: "text", text }],
+          warnings: [],
         }),
     supportedUrls: undefined as never,
     doStream: vi.fn(),
