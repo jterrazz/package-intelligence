@@ -23,18 +23,18 @@
   },
   "dependencies": {
     "@jterrazz/logger": "^1.5.0",
-    "@openrouter/ai-sdk-provider": "^1.4.0",
+    "@openrouter/ai-sdk-provider": "^1.5.4",
     "jsonrepair": "^3.13.1",
     "langfuse": "^3.38.6"
   },
   "devDependencies": {
     "@jterrazz/codestyle": "^1.2.4",
     "@jterrazz/test": "^3.1.0",
-    "@jterrazz/typescript": "^4.2.0",
+    "@jterrazz/typescript": "^4.2.1",
     "@types/node": "^25.0.0"
   },
   "peerDependencies": {
-    "ai": ">=6.0.0",
+    "ai": ">=5.0.0",
     "zod": ">=4.0.0"
   }
 }

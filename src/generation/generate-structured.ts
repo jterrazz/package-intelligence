@@ -11,43 +11,19 @@ import {
 } from "../result/result.js";
 
 export interface GenerateStructuredOptions<T> {
-  /** The language model to use */
   model: LanguageModelV2;
-  /** The prompt to send to the model */
   prompt: string;
-  /** Optional system prompt */
   system?: string;
-  /** Zod schema to validate and parse the response */
   schema: Schema<T>;
-  /** Optional provider options (for observability, etc.) */
   providerOptions?: SharedV2ProviderOptions;
-  /** Optional abort signal */
   abortSignal?: AbortSignal;
-  /** Optional max tokens */
   maxOutputTokens?: number;
-  /** Optional temperature */
   temperature?: number;
 }
 
 /**
  * Generate structured data from an AI model with automatic parsing and error handling.
- * Combines generateText + parseObject + error classification into a single function.
- *
- * @example
- * ```typescript
- * const result = await generateStructured({
- *   model,
- *   prompt: "Analyze this article...",
- *   schema: z.object({ sentiment: z.string(), score: z.number() }),
- *   providerOptions: withObservability({ traceId: "..." }),
- * });
- *
- * if (result.success) {
- *   console.log(result.data.sentiment);
- * } else {
- *   console.error(result.error.code, result.error.message);
- * }
- * ```
+ * Observability is handled by middleware - no metadata exposed to caller.
  */
 export async function generateStructured<T>(
   options: GenerateStructuredOptions<T>,
