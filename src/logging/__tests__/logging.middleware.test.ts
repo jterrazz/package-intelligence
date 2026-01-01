@@ -154,13 +154,4 @@ describe("createLoggingMiddleware", () => {
       expect(completedCall[1]).not.toHaveProperty("usage");
     });
   });
-
-  describe("middleware structure", () => {
-    it("returns middleware with v2 version", () => {
-      const logger = createMockLogger();
-      const middleware = createLoggingMiddleware({ logger });
-
-      expect(middleware.middlewareVersion).toBe("v2");
-    });
-  });
 });

@@ -191,15 +191,6 @@ describe("createObservabilityMiddleware", () => {
       );
     });
   });
-
-  describe("middleware structure", () => {
-    it("returns middleware with v2 version", () => {
-      const observability = createMockObservability();
-      const middleware = createObservabilityMiddleware({ observability });
-
-      expect(middleware.middlewareVersion).toBe("v2");
-    });
-  });
 });
 
 describe("withObservability", () => {

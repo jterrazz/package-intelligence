@@ -1,4 +1,4 @@
-import type { LanguageModelV2StreamPart } from "@ai-sdk/provider";
+import type { LanguageModelV3StreamPart } from "@ai-sdk/provider";
 import type { LoggerPort } from "@jterrazz/logger";
 import type { LanguageModelMiddleware } from "ai";
 
@@ -21,8 +21,7 @@ export function createLoggingMiddleware(
   const { params: includeParams, content: includeContent, usage: includeUsage = true } = include;
 
   return {
-    middlewareVersion: "v2",
-
+    specificationVersion: "v3",
     wrapGenerate: async ({ doGenerate, params, model }) => {
       const startTime = Date.now();
 
@@ -73,8 +72,8 @@ export function createLoggingMiddleware(
         const chunks: string[] = [];
 
         const transformStream = new TransformStream<
-          LanguageModelV2StreamPart,
-          LanguageModelV2StreamPart
+          LanguageModelV3StreamPart,
+          LanguageModelV3StreamPart
         >({
           transform(chunk, controller) {
             if (includeContent && chunk.type === "text-delta") {
