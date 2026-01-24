@@ -84,8 +84,6 @@ describe("middleware integration with wrapLanguageModel", () => {
       });
 
       await model.doGenerate({
-        inputFormat: "prompt",
-        mode: { type: "regular" },
         prompt: [{ role: "user", content: [{ type: "text", text: "Say hello" }] }],
       });
 
@@ -117,8 +115,6 @@ describe("middleware integration with wrapLanguageModel", () => {
       });
 
       await model.doGenerate({
-        inputFormat: "prompt",
-        mode: { type: "regular" },
         prompt: [{ role: "user", content: [{ type: "text", text: "Test" }] }],
       });
 
@@ -142,8 +138,6 @@ describe("middleware integration with wrapLanguageModel", () => {
       });
 
       await model.doGenerate({
-        inputFormat: "prompt",
-        mode: { type: "regular" },
         prompt: [{ role: "user", content: [{ type: "text", text: "Analyze this" }] }],
         providerOptions: withObservability({
           traceId: "trace-123",
@@ -174,8 +168,6 @@ describe("middleware integration with wrapLanguageModel", () => {
       });
 
       await model.doGenerate({
-        inputFormat: "prompt",
-        mode: { type: "regular" },
         prompt: [{ role: "user", content: [{ type: "text", text: "Hello" }] }],
       });
 
@@ -207,8 +199,6 @@ describe("middleware integration with wrapLanguageModel", () => {
       });
 
       await model.doGenerate({
-        inputFormat: "prompt",
-        mode: { type: "regular" },
         prompt: [{ role: "user", content: [{ type: "text", text: "Test" }] }],
         providerOptions: withObservability({ traceId: "trace-456" }),
       });
@@ -241,8 +231,6 @@ describe("middleware integration with wrapLanguageModel", () => {
       });
 
       await model.doGenerate({
-        inputFormat: "prompt",
-        mode: { type: "regular" },
         prompt: [{ role: "user", content: [{ type: "text", text: "Test composition" }] }],
         providerOptions: withObservability({
           traceId: "trace-789",

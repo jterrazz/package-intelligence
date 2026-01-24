@@ -117,9 +117,9 @@ const model = wrapLanguageModel({
   middleware: createLoggingMiddleware({
     logger,
     include: {
-      params: false,  // Log request params
+      params: false, // Log request params
       content: false, // Log response content
-      usage: true,    // Log token usage (default: true)
+      usage: true, // Log token usage (default: true)
     },
   }),
 });

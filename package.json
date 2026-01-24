@@ -16,26 +16,26 @@
     "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
-    "build": "ts-build --lib",
+    "build": "typescript build --lib",
     "lint": "codestyle",
     "lint:fix": "codestyle --fix",
     "test": "vitest --run"
   },
   "dependencies": {
     "@jterrazz/logger": "^1.5.0",
-    "@openrouter/ai-sdk-provider": "^1.5.4",
-    "jsonrepair": "^3.13.1",
+    "@openrouter/ai-sdk-provider": "^2.0.1",
+    "jsonrepair": "^3.13.2",
     "langfuse": "^3.38.6"
   },
   "devDependencies": {
-    "@ai-sdk/provider": "^3.0.1",
-    "@jterrazz/codestyle": "^1.2.5",
+    "@ai-sdk/provider": "^3.0.5",
+    "@jterrazz/codestyle": "^1.2.6",
     "@jterrazz/test": "^3.1.0",
-    "@jterrazz/typescript": "^4.2.1",
-    "@types/node": "^25.0.3",
-    "ai": "^6.0.5",
+    "@jterrazz/typescript": "^4.3.1",
+    "@types/node": "^25.0.10",
+    "ai": "^6.0.49",
     "eslint": "^9.39.2",
-    "vitest": "^4.0.16"
+    "vitest": "^4.0.18"
   },
   "peerDependencies": {
     "ai": ">=6.0.0",
