@@ -52,7 +52,7 @@ export { createSchemaPrompt } from "./parsing/create-schema-prompt.js";
 export { parseObject, ParseObjectError } from "./parsing/parse-object.js";
 export { parseText, type ParseTextOptions } from "./parsing/parse-text.js";
 
-// Provider
+// Provider - OpenRouter
 export {
   createOpenRouterProvider,
   type ModelOptions,
@@ -61,3 +61,11 @@ export {
   type OpenRouterProvider,
 } from "./provider/openrouter.provider.js";
 export { OpenRouterMetadataAdapter } from "./provider/openrouter-metadata.adapter.js";
+
+// Provider - OpenAI Compatible
+export {
+  createOpenAICompatibleProvider,
+  type OpenAICompatibleConfig,
+  type OpenAICompatibleModelOptions,
+  type OpenAICompatibleProvider,
+} from "./provider/openai-compatible.provider.js";

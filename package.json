@@ -22,6 +22,7 @@
     "test": "vitest --run"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.21",
     "@jterrazz/logger": "^1.5.0",
     "@openrouter/ai-sdk-provider": "^2.0.1",
     "jsonrepair": "^3.13.2",
