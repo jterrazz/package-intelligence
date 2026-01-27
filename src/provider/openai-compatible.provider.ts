@@ -23,33 +23,19 @@ export interface OpenAICompatibleProvider {
 /**
  * Creates a provider for OpenAI-compatible APIs.
  * Works with any API implementing the OpenAI chat completions spec.
- *
- * @example
- * ```ts
- * // Use with gateway-intelligence (Claude proxy)
- * const provider = createOpenAICompatibleProvider({
- *   apiKey: process.env.GATEWAY_API_KEY,
- *   baseURL: 'https://gateway.jterrazz.com/intelligence/v1',
- * });
- * const model = provider.model('claude-opus-4-5-20250514');
- * ```
  */
-export function createOpenAICompatibleProvider(config: OpenAICompatibleConfig): OpenAICompatibleProvider {
+export function createOpenAICompatibleProvider(
+  config: OpenAICompatibleConfig,
+): OpenAICompatibleProvider {
   const openai = createOpenAI({
     apiKey: config.apiKey,
     baseURL: config.baseURL,
   });
 
   return {
-    model(name: string, options: OpenAICompatibleModelOptions = {}): LanguageModel {
-      // Apply model name mapping if configured
+    model(name: string, _options: OpenAICompatibleModelOptions = {}): LanguageModel {
       const modelName = config.modelMapping?.[name] ?? name;
-
-      return openai(modelName, {
-        ...(options.maxTokens !== undefined && {
-          maxTokens: options.maxTokens,
-        }),
-      });
+      return openai(modelName);
     },
   };
 }
