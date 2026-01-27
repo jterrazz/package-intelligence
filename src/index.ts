@@ -69,3 +69,4 @@ export {
   type OpenAICompatibleModelOptions,
   type OpenAICompatibleProvider,
 } from "./provider/openai-compatible.provider.js";
+export { OpenAICompatibleMetadataAdapter } from "./provider/openai-compatible-metadata.adapter.js";
