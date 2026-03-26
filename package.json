@@ -35,7 +35,7 @@
     "@jterrazz/typescript": "^4.3.1",
     "@types/node": "^25.0.10",
     "ai": "^6.0.49",
-    "eslint": "^9.39.2",
+    "eslint": "^10.1.0",
     "vitest": "^4.0.18"
   },
   "peerDependencies": {
