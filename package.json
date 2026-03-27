@@ -18,7 +18,7 @@
   "scripts": {
     "build": "typescript bundle",
     "lint": "codestyle",
-    "lint:fix": "codestyle --fix",
+    "lint:fix": "codestyle fix",
     "test": "vitest --run"
   },
   "dependencies": {
