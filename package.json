@@ -17,7 +17,7 @@
   },
   "scripts": {
     "build": "typescript bundle",
-    "lint": "codestyle",
+    "lint": "codestyle check",
     "lint:fix": "codestyle fix",
     "test": "vitest --run"
   },
