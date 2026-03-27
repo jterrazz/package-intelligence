@@ -2,6 +2,10 @@
   "name": "@jterrazz/intelligence",
   "version": "4.0.3",
   "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jterrazz/package-intelligence"
+  },
   "files": [
     "dist"
   ],
