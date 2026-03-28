@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { OpenAICompatibleMetadataAdapter } from "../openai-compatible-metadata.adapter.js";
+import { OpenAICompatibleMetadataAdapter } from "./openai-compatible-metadata.adapter.js";
 
 describe("OpenAICompatibleMetadataAdapter", () => {
   const adapter = new OpenAICompatibleMetadataAdapter();

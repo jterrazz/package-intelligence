@@ -1,9 +1,9 @@
 import { describe, expect, test, vi } from "vitest";
 
 // Ports
-import type { ObservabilityPort } from "../../ports/observability.port.js";
-import type { ProviderMetadataPort } from "../../ports/provider-metadata.port.js";
-import { createObservabilityMiddleware, withObservability } from "../observability.middleware.js";
+import type { ObservabilityPort } from "../ports/observability.port.js";
+import type { ProviderMetadataPort } from "../ports/provider-metadata.port.js";
+import { createObservabilityMiddleware, withObservability } from "./observability.middleware.js";
 
 function createMockObservability() {
   return {

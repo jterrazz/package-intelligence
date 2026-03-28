@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { z } from "zod/v4";
 
-import { parseObject, ParseObjectError } from "../parse-object.js";
+import { parseObject, ParseObjectError } from "./parse-object.js";
 
 const articleSchema = z.object({
   content: z.string(),

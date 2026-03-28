@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { NoopObservabilityAdapter } from "../noop.adapter.js";
+import { NoopObservabilityAdapter } from "./noop.adapter.js";
 
 describe("NoopObservabilityAdapter", () => {
   const adapter = new NoopObservabilityAdapter();

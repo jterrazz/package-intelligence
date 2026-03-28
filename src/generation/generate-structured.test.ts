@@ -2,7 +2,7 @@ import type { LanguageModelV3 } from "@ai-sdk/provider";
 import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 
-import { generateStructured } from "../generate-structured.js";
+import { generateStructured } from "./generate-structured.js";
 
 function createMockModel(options: { text?: string; shouldThrow?: Error } = {}): LanguageModelV3 {
   const { text = "{}", shouldThrow } = options;

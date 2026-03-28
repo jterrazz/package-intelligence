@@ -1,7 +1,7 @@
 import { describe, expect, test } from "vitest";
 import { z } from "zod/v4";
 
-import { createSchemaPrompt } from "../create-schema-prompt.js";
+import { createSchemaPrompt } from "./create-schema-prompt.js";
 
 describe("createSchemaPrompt", () => {
   describe("object schemas", () => {

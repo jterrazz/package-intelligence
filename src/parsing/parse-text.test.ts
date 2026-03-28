@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { parseText } from "../parse-text.js";
+import { parseText } from "./parse-text.js";
 
 describe("parseText", () => {
   describe("empty and basic input", () => {

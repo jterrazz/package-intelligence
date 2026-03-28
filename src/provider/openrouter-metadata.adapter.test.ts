@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { OpenRouterMetadataAdapter } from "../openrouter-metadata.adapter.js";
+import { OpenRouterMetadataAdapter } from "./openrouter-metadata.adapter.js";
 
 describe("OpenRouterMetadataAdapter", () => {
   const adapter = new OpenRouterMetadataAdapter();

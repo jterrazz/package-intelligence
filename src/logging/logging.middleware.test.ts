@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from "vitest";
 
-import { createLoggingMiddleware } from "../logging.middleware.js";
+import { createLoggingMiddleware } from "./logging.middleware.js";
 
 function createMockLogger() {
   return {

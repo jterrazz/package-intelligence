@@ -8,7 +8,7 @@ import {
   isSuccess,
   unwrap,
   unwrapOr,
-} from "../result.js";
+} from "./result.js";
 
 describe("generationSuccess", () => {
   test("creates a success result", () => {
