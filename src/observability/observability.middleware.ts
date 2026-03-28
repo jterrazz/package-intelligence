@@ -1,5 +1,6 @@
 import type { LanguageModelV3StreamPart, SharedV3ProviderOptions } from "@ai-sdk/provider";
 import type { LanguageModelMiddleware } from "ai";
+
 // Ports
 import type { ObservabilityPort } from "../ports/observability.port.js";
 import type { ProviderMetadataPort } from "../ports/provider-metadata.port.js";

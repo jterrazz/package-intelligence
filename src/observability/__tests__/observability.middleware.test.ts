@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 // Ports
 import type { ObservabilityPort } from "../../ports/observability.port.js";
@@ -62,7 +62,8 @@ function createMockGenerateResult() {
 
 describe("createObservabilityMiddleware", () => {
   describe("wrapGenerate", () => {
-    it("records generation when traceId is provided", async () => {
+    test("records generation when traceId is provided", async () => {
+      // Given -- an observability middleware with traceId in provider options
       const observability = createMockObservability();
       const providerMetadata = createMockProviderMetadata();
       const middleware = createObservabilityMiddleware({ observability, providerMetadata });
@@ -86,6 +87,7 @@ describe("createObservabilityMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- generation is recorded with correct details
       expect(observability.generation).toHaveBeenCalledTimes(1);
       expect(observability.generation).toHaveBeenCalledWith(
         expect.objectContaining({
@@ -106,7 +108,8 @@ describe("createObservabilityMiddleware", () => {
       );
     });
 
-    it("does not record generation when traceId is missing", async () => {
+    test("does not record generation when traceId is missing", async () => {
+      // Given -- an observability middleware with no traceId in params
       const observability = createMockObservability();
       const middleware = createObservabilityMiddleware({ observability });
       const mockResult = createMockGenerateResult();
@@ -120,10 +123,12 @@ describe("createObservabilityMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- generation is not recorded
       expect(observability.generation).not.toHaveBeenCalled();
     });
 
-    it("uses default name when not provided", async () => {
+    test("uses default name when not provided", async () => {
+      // Given -- an observability middleware with traceId but no name
       const observability = createMockObservability();
       const middleware = createObservabilityMiddleware({ observability });
       const mockResult = createMockGenerateResult();
@@ -142,12 +147,14 @@ describe("createObservabilityMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- the default name "generation" is used
       expect(observability.generation).toHaveBeenCalledWith(
         expect.objectContaining({ name: "generation" }),
       );
     });
 
-    it("passes through the result unchanged", async () => {
+    test("passes through the result unchanged", async () => {
+      // Given -- an observability middleware wrapping a generate call
       const observability = createMockObservability();
       const middleware = createObservabilityMiddleware({ observability });
       const mockResult = createMockGenerateResult();
@@ -161,10 +168,12 @@ describe("createObservabilityMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- the original result is returned unchanged
       expect(result).toBe(mockResult);
     });
 
-    it("works without providerMetadata adapter", async () => {
+    test("works without providerMetadata adapter", async () => {
+      // Given -- an observability middleware without a provider metadata adapter
       const observability = createMockObservability();
       const middleware = createObservabilityMiddleware({ observability });
       const mockResult = createMockGenerateResult();
@@ -183,6 +192,7 @@ describe("createObservabilityMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- usage and cost are undefined
       expect(observability.generation).toHaveBeenCalledWith(
         expect.objectContaining({
           usage: undefined,
@@ -194,13 +204,15 @@ describe("createObservabilityMiddleware", () => {
 });
 
 describe("withObservability", () => {
-  it("creates properly structured metadata", () => {
+  test("creates properly structured metadata", () => {
+    // Given -- observability options with traceId, name, and metadata
     const result = withObservability({
       traceId: "trace-123",
       name: "test",
       metadata: { key: "value" },
     });
 
+    // Then -- the metadata is properly structured under the observability key
     expect(result).toEqual({
       observability: {
         traceId: "trace-123",

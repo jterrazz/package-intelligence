@@ -1,5 +1,5 @@
 import type { LanguageModelV3 } from "@ai-sdk/provider";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { z } from "zod";
 
 import { generateStructured } from "../generate-structured.js";
@@ -32,7 +32,8 @@ describe("generateStructured", () => {
     score: z.number(),
   });
 
-  it("returns success with parsed data on valid response", async () => {
+  test("returns success with parsed data on valid response", async () => {
+    // Given -- a mock model returning valid JSON matching the schema
     const model = createMockModel({
       text: JSON.stringify({ name: "test", score: 42 }),
     });
@@ -43,13 +44,15 @@ describe("generateStructured", () => {
       schema,
     });
 
+    // Then -- the result is a success with the parsed data
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data).toEqual({ name: "test", score: 42 });
     }
   });
 
-  it("parses JSON from markdown code blocks", async () => {
+  test("parses JSON from markdown code blocks", async () => {
+    // Given -- a mock model returning JSON inside a markdown code block
     const jsonBlock = '```json\n{"name": "test", "score": 100}\n```';
     const model = createMockModel({ text: jsonBlock });
 
@@ -59,13 +62,15 @@ describe("generateStructured", () => {
       schema,
     });
 
+    // Then -- the JSON is extracted from the code block and parsed
     expect(result.success).toBe(true);
     if (result.success) {
       expect(result.data).toEqual({ name: "test", score: 100 });
     }
   });
 
-  it("returns EMPTY_RESULT for empty response", async () => {
+  test("returns EMPTY_RESULT for empty response", async () => {
+    // Given -- a mock model returning an empty response
     const model = createMockModel({ text: "" });
 
     const result = await generateStructured({
@@ -74,13 +79,15 @@ describe("generateStructured", () => {
       schema,
     });
 
+    // Then -- the result is a failure with EMPTY_RESULT code
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.code).toBe("EMPTY_RESULT");
     }
   });
 
-  it("returns PARSING_FAILED for invalid JSON", async () => {
+  test("returns PARSING_FAILED for invalid JSON", async () => {
+    // Given -- a mock model returning invalid JSON
     const model = createMockModel({ text: "not valid json" });
 
     const result = await generateStructured({
@@ -89,13 +96,15 @@ describe("generateStructured", () => {
       schema,
     });
 
+    // Then -- the result is a failure with PARSING_FAILED code
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.code).toBe("PARSING_FAILED");
     }
   });
 
-  it("returns TIMEOUT for timeout errors", async () => {
+  test("returns TIMEOUT for timeout errors", async () => {
+    // Given -- a mock model that throws a timeout error
     const model = createMockModel({
       shouldThrow: new Error("Request timed out"),
     });
@@ -106,13 +115,15 @@ describe("generateStructured", () => {
       schema,
     });
 
+    // Then -- the result is a failure with TIMEOUT code
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.code).toBe("TIMEOUT");
     }
   });
 
-  it("returns RATE_LIMITED for rate limit errors", async () => {
+  test("returns RATE_LIMITED for rate limit errors", async () => {
+    // Given -- a mock model that throws a rate limit error
     const model = createMockModel({
       shouldThrow: new Error("Rate limit exceeded"),
     });
@@ -123,13 +134,15 @@ describe("generateStructured", () => {
       schema,
     });
 
+    // Then -- the result is a failure with RATE_LIMITED code
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error.code).toBe("RATE_LIMITED");
     }
   });
 
-  it("passes provider options to generateText", async () => {
+  test("passes provider options to generateText", async () => {
+    // Given -- a mock model and provider options with observability trace
     const model = createMockModel({
       text: JSON.stringify({ name: "test", score: 1 }),
     });
@@ -141,6 +154,7 @@ describe("generateStructured", () => {
       providerOptions: { observability: { traceId: "trace-123" } },
     });
 
+    // Then -- provider options are forwarded to the model
     expect(model.doGenerate).toHaveBeenCalledWith(
       expect.objectContaining({
         providerOptions: { observability: { traceId: "trace-123" } },

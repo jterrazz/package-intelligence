@@ -1,11 +1,12 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, test } from "vitest";
 
 import { OpenRouterMetadataAdapter } from "../openrouter-metadata.adapter.js";
 
 describe("OpenRouterMetadataAdapter", () => {
   const adapter = new OpenRouterMetadataAdapter();
 
-  it("extracts usage and cost from OpenRouter metadata", () => {
+  test("extracts usage and cost from OpenRouter metadata", () => {
+    // Given -- metadata with usage tokens and cost
     const metadata = {
       openrouter: {
         usage: {
@@ -19,6 +20,7 @@ describe("OpenRouterMetadataAdapter", () => {
 
     const result = adapter.extract(metadata);
 
+    // Then -- usage and cost are correctly extracted
     expect(result).toEqual({
       usage: {
         input: 100,
@@ -31,7 +33,8 @@ describe("OpenRouterMetadataAdapter", () => {
     });
   });
 
-  it("extracts reasoning tokens when present", () => {
+  test("extracts reasoning tokens when present", () => {
+    // Given -- metadata with reasoning token details
     const metadata = {
       openrouter: {
         usage: {
@@ -45,10 +48,12 @@ describe("OpenRouterMetadataAdapter", () => {
 
     const result = adapter.extract(metadata);
 
+    // Then -- reasoning tokens are extracted
     expect(result.usage?.reasoning).toBe(30);
   });
 
-  it("extracts cached tokens when present", () => {
+  test("extracts cached tokens when present", () => {
+    // Given -- metadata with cached token details
     const metadata = {
       openrouter: {
         usage: {
@@ -62,20 +67,28 @@ describe("OpenRouterMetadataAdapter", () => {
 
     const result = adapter.extract(metadata);
 
+    // Then -- cached tokens are extracted
     expect(result.usage?.cacheRead).toBe(80);
   });
 
-  it("returns empty object when no openrouter metadata", () => {
+  test("returns empty object when no openrouter metadata", () => {
+    // Given -- undefined metadata
     const result = adapter.extract(undefined);
+
+    // Then -- returns empty object
     expect(result).toEqual({});
   });
 
-  it("returns empty object when no usage in metadata", () => {
+  test("returns empty object when no usage in metadata", () => {
+    // Given -- metadata without usage field
     const result = adapter.extract({ openrouter: {} });
+
+    // Then -- returns empty object
     expect(result).toEqual({});
   });
 
-  it("defaults to 0 for missing token counts", () => {
+  test("defaults to 0 for missing token counts", () => {
+    // Given -- metadata with only totalTokens
     const metadata = {
       openrouter: {
         usage: {
@@ -86,12 +99,14 @@ describe("OpenRouterMetadataAdapter", () => {
 
     const result = adapter.extract(metadata);
 
+    // Then -- missing token counts default to 0
     expect(result.usage?.input).toBe(0);
     expect(result.usage?.output).toBe(0);
     expect(result.usage?.total).toBe(100);
   });
 
-  it("omits cost when not present", () => {
+  test("omits cost when not present", () => {
+    // Given -- metadata with usage but no cost
     const metadata = {
       openrouter: {
         usage: {
@@ -103,6 +118,7 @@ describe("OpenRouterMetadataAdapter", () => {
 
     const result = adapter.extract(metadata);
 
+    // Then -- cost is undefined
     expect(result.cost).toBeUndefined();
   });
 });

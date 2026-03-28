@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import { createLoggingMiddleware } from "../logging.middleware.js";
 
@@ -35,7 +35,8 @@ function createMockGenerateResult() {
 
 describe("createLoggingMiddleware", () => {
   describe("wrapGenerate", () => {
-    it("logs start and completion on success", async () => {
+    test("logs start and completion on success", async () => {
+      // Given -- a logging middleware with a mock logger and successful generation
       const logger = createMockLogger();
       const middleware = createLoggingMiddleware({ logger });
       const mockResult = createMockGenerateResult();
@@ -49,6 +50,7 @@ describe("createLoggingMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- debug is called for start and completion with correct details
       expect(logger.debug).toHaveBeenCalledTimes(2);
       expect(logger.debug).toHaveBeenNthCalledWith(1, "ai.generate.start", {
         model: "test-model",
@@ -66,13 +68,15 @@ describe("createLoggingMiddleware", () => {
       expect(result).toBe(mockResult);
     });
 
-    it("logs error on failure", async () => {
+    test("logs error on failure", async () => {
+      // Given -- a logging middleware with a mock logger and a failing generation
       const logger = createMockLogger();
       const middleware = createLoggingMiddleware({ logger });
       const error = new Error("API error");
       const doGenerate = vi.fn().mockRejectedValue(error);
       const model = createMockModel();
 
+      // Then -- the error is re-thrown and logged
       await expect(
         middleware.wrapGenerate?.({
           doGenerate,
@@ -93,7 +97,8 @@ describe("createLoggingMiddleware", () => {
       );
     });
 
-    it("includes params when include.params is true", async () => {
+    test("includes params when include.params is true", async () => {
+      // Given -- a logging middleware configured to include params
       const logger = createMockLogger();
       const middleware = createLoggingMiddleware({ logger, include: { params: true } });
       const mockResult = createMockGenerateResult();
@@ -108,6 +113,7 @@ describe("createLoggingMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- the start log includes params
       expect(logger.debug).toHaveBeenNthCalledWith(
         1,
         "ai.generate.start",
@@ -115,7 +121,8 @@ describe("createLoggingMiddleware", () => {
       );
     });
 
-    it("includes content when include.content is true", async () => {
+    test("includes content when include.content is true", async () => {
+      // Given -- a logging middleware configured to include content
       const logger = createMockLogger();
       const middleware = createLoggingMiddleware({ logger, include: { content: true } });
       const mockResult = createMockGenerateResult();
@@ -129,6 +136,7 @@ describe("createLoggingMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- the completion log includes content
       expect(logger.debug).toHaveBeenNthCalledWith(
         2,
         "ai.generate.complete",
@@ -136,7 +144,8 @@ describe("createLoggingMiddleware", () => {
       );
     });
 
-    it("excludes usage when include.usage is false", async () => {
+    test("excludes usage when include.usage is false", async () => {
+      // Given -- a logging middleware configured to exclude usage
       const logger = createMockLogger();
       const middleware = createLoggingMiddleware({ logger, include: { usage: false } });
       const mockResult = createMockGenerateResult();
@@ -150,6 +159,7 @@ describe("createLoggingMiddleware", () => {
         model: model as never,
       });
 
+      // Then -- the completion log does not include usage
       const completedCall = logger.debug.mock.calls[1];
       expect(completedCall[1]).not.toHaveProperty("usage");
     });

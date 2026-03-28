@@ -1,6 +1,6 @@
 import type { LanguageModelV1 } from "@ai-sdk/provider";
 import { wrapLanguageModel } from "ai";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 
 import {
   createLoggingMiddleware,
@@ -72,7 +72,8 @@ function createMockLanguageModel(
 
 describe("middleware integration with wrapLanguageModel", () => {
   describe("logging middleware", () => {
-    it("logs generate calls with timing and usage", async () => {
+    test("logs generate calls with timing and usage", async () => {
+      // Given -- a wrapped model with logging middleware
       const logger = createMockLogger();
       const baseModel = createMockLanguageModel({
         usage: { promptTokens: 10, completionTokens: 20 },
@@ -87,6 +88,7 @@ describe("middleware integration with wrapLanguageModel", () => {
         prompt: [{ role: "user", content: [{ type: "text", text: "Say hello" }] }],
       });
 
+      // Then -- start and completion are logged with timing and usage
       expect(logger.debug).toHaveBeenCalledWith(
         "ai.generate.start",
         expect.objectContaining({
@@ -105,7 +107,8 @@ describe("middleware integration with wrapLanguageModel", () => {
       );
     });
 
-    it("logs content when include.content is true", async () => {
+    test("logs content when include.content is true", async () => {
+      // Given -- a wrapped model with logging middleware configured to include content
       const logger = createMockLogger();
       const baseModel = createMockLanguageModel({ text: "Response text" });
 
@@ -118,6 +121,7 @@ describe("middleware integration with wrapLanguageModel", () => {
         prompt: [{ role: "user", content: [{ type: "text", text: "Test" }] }],
       });
 
+      // Then -- the completion log includes the response content
       expect(logger.debug).toHaveBeenCalledWith(
         "ai.generate.complete",
         expect.objectContaining({
@@ -128,7 +132,8 @@ describe("middleware integration with wrapLanguageModel", () => {
   });
 
   describe("observability middleware", () => {
-    it("records generation with trace metadata", async () => {
+    test("records generation with trace metadata", async () => {
+      // Given -- a wrapped model with observability middleware and trace options
       const observability = createMockObservability();
       const baseModel = createMockLanguageModel({ text: "AI response" });
 
@@ -146,6 +151,7 @@ describe("middleware integration with wrapLanguageModel", () => {
         }),
       });
 
+      // Then -- generation is recorded with trace metadata
       expect(observability.generation).toHaveBeenCalledWith(
         expect.objectContaining({
           traceId: "trace-123",
@@ -158,7 +164,8 @@ describe("middleware integration with wrapLanguageModel", () => {
       );
     });
 
-    it("does not record when traceId is missing", async () => {
+    test("does not record when traceId is missing", async () => {
+      // Given -- a wrapped model with observability middleware but no traceId
       const observability = createMockObservability();
       const baseModel = createMockLanguageModel();
 
@@ -171,10 +178,12 @@ describe("middleware integration with wrapLanguageModel", () => {
         prompt: [{ role: "user", content: [{ type: "text", text: "Hello" }] }],
       });
 
+      // Then -- generation is not recorded
       expect(observability.generation).not.toHaveBeenCalled();
     });
 
-    it("extracts usage and cost with provider metadata adapter", async () => {
+    test("extracts usage and cost with provider metadata adapter", async () => {
+      // Given -- a wrapped model with observability and OpenRouter metadata adapter
       const observability = createMockObservability();
       const baseModel = createMockLanguageModel({
         text: "Response",
@@ -203,6 +212,7 @@ describe("middleware integration with wrapLanguageModel", () => {
         providerOptions: withObservability({ traceId: "trace-456" }),
       });
 
+      // Then -- usage and cost are extracted from provider metadata
       expect(observability.generation).toHaveBeenCalledWith(
         expect.objectContaining({
           usage: expect.objectContaining({
@@ -217,7 +227,8 @@ describe("middleware integration with wrapLanguageModel", () => {
   });
 
   describe("middleware composition", () => {
-    it("both middlewares execute when composed", async () => {
+    test("both middlewares execute when composed", async () => {
+      // Given -- a model wrapped with both logging and observability middleware
       const logger = createMockLogger();
       const observability = createMockObservability();
       const baseModel = createMockLanguageModel({ text: "Combined response" });
@@ -238,11 +249,10 @@ describe("middleware integration with wrapLanguageModel", () => {
         }),
       });
 
-      // Logging middleware executed
+      // Then -- both logging and observability middleware executed
       expect(logger.debug).toHaveBeenCalledWith("ai.generate.start", expect.any(Object));
       expect(logger.debug).toHaveBeenCalledWith("ai.generate.complete", expect.any(Object));
 
-      // Observability middleware executed
       expect(observability.generation).toHaveBeenCalledWith(
         expect.objectContaining({
           traceId: "trace-789",
