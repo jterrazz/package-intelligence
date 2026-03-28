@@ -8,7 +8,7 @@ import {
   type ObservabilityPort,
   OpenRouterMetadataAdapter,
   withObservability,
-} from "../src/index.js";
+} from "../../src/index.js";
 
 function createMockLogger() {
   const logger = {
