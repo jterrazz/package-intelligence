@@ -9,13 +9,13 @@ const MARKDOWN_CODE_BLOCK_RE = /```(?:json)?\r?\n([^`]*?)\r?\n```/g;
  */
 class ParseObjectError extends Error {
   public readonly name = "ParseObjectError";
+  public readonly cause?: unknown;
+  public readonly text?: string;
 
-  constructor(
-    message: string,
-    public readonly cause?: unknown,
-    public readonly text?: string,
-  ) {
+  constructor(message: string, cause?: unknown, text?: string) {
     super(message);
+    this.cause = cause;
+    this.text = text;
   }
 }
 
