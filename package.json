@@ -35,7 +35,7 @@
     "devDependencies": {
         "@ai-sdk/provider": "^3.0.8",
         "@jterrazz/codestyle": "^3.0.9",
-        "@jterrazz/test": "^5.0.0",
+        "@jterrazz/test": "^5.3.2",
         "@jterrazz/typescript": "^5.2.0",
         "@types/node": "^25.5.0",
         "ai": "^6.0.140",
