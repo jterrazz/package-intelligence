@@ -1,17 +1,17 @@
 import type {
-  ExtractedProviderMetadata,
-  ProviderMetadataPort,
-} from "../ports/provider-metadata.port.js";
+    ExtractedProviderMetadata,
+    ProviderMetadataPort,
+} from '../ports/provider-metadata.port.js';
 
 interface OpenAIUsage {
-  promptTokens?: number;
-  completionTokens?: number;
-  totalTokens?: number;
+    promptTokens?: number;
+    completionTokens?: number;
+    totalTokens?: number;
 }
 
 interface OpenAIProviderMetadata {
-  responseId?: string;
-  usage?: OpenAIUsage;
+    responseId?: string;
+    usage?: OpenAIUsage;
 }
 
 /**
@@ -19,21 +19,21 @@ interface OpenAIProviderMetadata {
  * Extracts usage data from the standardized OpenAI response format.
  */
 export class OpenAICompatibleMetadataAdapter implements ProviderMetadataPort {
-  extract(providerMetadata: Record<string, unknown> | undefined): ExtractedProviderMetadata {
-    const meta = providerMetadata?.openai as OpenAIProviderMetadata | undefined;
+    extract(providerMetadata: Record<string, unknown> | undefined): ExtractedProviderMetadata {
+        const meta = providerMetadata?.openai as OpenAIProviderMetadata | undefined;
 
-    if (!meta?.usage) {
-      return {};
+        if (!meta?.usage) {
+            return {};
+        }
+
+        const usage = meta.usage;
+
+        return {
+            usage: {
+                input: usage.promptTokens ?? 0,
+                output: usage.completionTokens ?? 0,
+                total: usage.totalTokens,
+            },
+        };
     }
-
-    const usage = meta.usage;
-
-    return {
-      usage: {
-        input: usage.promptTokens ?? 0,
-        output: usage.completionTokens ?? 0,
-        total: usage.totalTokens,
-      },
-    };
-  }
 }

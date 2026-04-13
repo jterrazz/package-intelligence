@@ -15,26 +15,26 @@ npm install @jterrazz/intelligence ai zod
 Combines `generateText` + `parseObject` + error classification into a single function that returns a discriminated union result.
 
 ```typescript
-import { generateStructured, withObservability } from "@jterrazz/intelligence";
-import { z } from "zod";
+import { generateStructured, withObservability } from '@jterrazz/intelligence';
+import { z } from 'zod';
 
 const schema = z.object({
-  sentiment: z.string(),
-  score: z.number(),
+    sentiment: z.string(),
+    score: z.number(),
 });
 
 const result = await generateStructured({
-  model,
-  prompt: "Analyze this article...",
-  schema,
-  providerOptions: withObservability({ traceId: "trace-123" }),
+    model,
+    prompt: 'Analyze this article...',
+    schema,
+    providerOptions: withObservability({ traceId: 'trace-123' }),
 });
 
 if (result.success) {
-  console.log(result.data.sentiment, result.data.score);
+    console.log(result.data.sentiment, result.data.score);
 } else {
-  // Typed error with code: TIMEOUT | RATE_LIMITED | PARSING_FAILED | etc.
-  console.error(result.error.code, result.error.message);
+    // Typed error with code: TIMEOUT | RATE_LIMITED | PARSING_FAILED | etc.
+    console.error(result.error.code, result.error.message);
 }
 ```
 
@@ -44,23 +44,23 @@ Discriminated union result type for explicit error handling.
 
 ```typescript
 import {
-  generationSuccess,
-  generationFailure,
-  isSuccess,
-  isFailure,
-  unwrap,
-  unwrapOr,
-  classifyError,
-  type GenerationResult,
-} from "@jterrazz/intelligence";
+    generationSuccess,
+    generationFailure,
+    isSuccess,
+    isFailure,
+    unwrap,
+    unwrapOr,
+    classifyError,
+    type GenerationResult,
+} from '@jterrazz/intelligence';
 
 // Create results
-const success = generationSuccess({ data: "value" });
-const failure = generationFailure("TIMEOUT", "Request timed out");
+const success = generationSuccess({ data: 'value' });
+const failure = generationFailure('TIMEOUT', 'Request timed out');
 
 // Type guards
 if (isSuccess(result)) {
-  console.log(result.data);
+    console.log(result.data);
 }
 
 // Unwrap with default
@@ -68,9 +68,9 @@ const value = unwrapOr(result, defaultValue);
 
 // Classify errors automatically
 try {
-  await someOperation();
+    await someOperation();
 } catch (error) {
-  const code = classifyError(error); // TIMEOUT, RATE_LIMITED, PARSING_FAILED, etc.
+    const code = classifyError(error); // TIMEOUT, RATE_LIMITED, PARSING_FAILED, etc.
 }
 ```
 
@@ -81,26 +81,26 @@ Composable middlewares that wrap AI SDK models. Stack them together for logging,
 ### Composing Middlewares
 
 ```typescript
-import { wrapLanguageModel } from "ai";
+import { wrapLanguageModel } from 'ai';
 import {
-  createLoggingMiddleware,
-  createObservabilityMiddleware,
-  LangfuseAdapter,
-  OpenRouterMetadataAdapter,
-} from "@jterrazz/intelligence";
+    createLoggingMiddleware,
+    createObservabilityMiddleware,
+    LangfuseAdapter,
+    OpenRouterMetadataAdapter,
+} from '@jterrazz/intelligence';
 
 const model = wrapLanguageModel({
-  model: provider.model("anthropic/claude-sonnet-4-20250514"),
-  middleware: [
-    createLoggingMiddleware({ logger, include: { usage: true } }),
-    createObservabilityMiddleware({
-      observability: new LangfuseAdapter({
-        secretKey: process.env.LANGFUSE_SECRET_KEY,
-        publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-      }),
-      providerMetadata: new OpenRouterMetadataAdapter(),
-    }),
-  ],
+    model: provider.model('anthropic/claude-sonnet-4-20250514'),
+    middleware: [
+        createLoggingMiddleware({ logger, include: { usage: true } }),
+        createObservabilityMiddleware({
+            observability: new LangfuseAdapter({
+                secretKey: process.env.LANGFUSE_SECRET_KEY,
+                publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+            }),
+            providerMetadata: new OpenRouterMetadataAdapter(),
+        }),
+    ],
 });
 ```
 
@@ -109,22 +109,22 @@ const model = wrapLanguageModel({
 Logs AI SDK requests with timing, usage, and optional content.
 
 ```typescript
-import { wrapLanguageModel, generateText } from "ai";
-import { createLoggingMiddleware } from "@jterrazz/intelligence";
+import { wrapLanguageModel, generateText } from 'ai';
+import { createLoggingMiddleware } from '@jterrazz/intelligence';
 
 const model = wrapLanguageModel({
-  model: provider.model("anthropic/claude-sonnet-4-20250514"),
-  middleware: createLoggingMiddleware({
-    logger,
-    include: {
-      params: false, // Log request params
-      content: false, // Log response content
-      usage: true, // Log token usage (default: true)
-    },
-  }),
+    model: provider.model('anthropic/claude-sonnet-4-20250514'),
+    middleware: createLoggingMiddleware({
+        logger,
+        include: {
+            params: false, // Log request params
+            content: false, // Log response content
+            usage: true, // Log token usage (default: true)
+        },
+    }),
 });
 
-await generateText({ model, prompt: "Hello!" });
+await generateText({ model, prompt: 'Hello!' });
 // Logs: ai.generate.start, ai.generate.complete (with durationMs, usage, etc.)
 ```
 
@@ -133,32 +133,32 @@ await generateText({ model, prompt: "Hello!" });
 Sends generation data to observability platforms (Langfuse, etc.).
 
 ```typescript
-import { wrapLanguageModel, generateText } from "ai";
+import { wrapLanguageModel, generateText } from 'ai';
 import {
-  createObservabilityMiddleware,
-  withObservability,
-  LangfuseAdapter,
-} from "@jterrazz/intelligence";
+    createObservabilityMiddleware,
+    withObservability,
+    LangfuseAdapter,
+} from '@jterrazz/intelligence';
 
 const observability = new LangfuseAdapter({
-  secretKey: process.env.LANGFUSE_SECRET_KEY,
-  publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+    secretKey: process.env.LANGFUSE_SECRET_KEY,
+    publicKey: process.env.LANGFUSE_PUBLIC_KEY,
 });
 
 const model = wrapLanguageModel({
-  model: provider.model("anthropic/claude-sonnet-4-20250514"),
-  middleware: createObservabilityMiddleware({ observability }),
+    model: provider.model('anthropic/claude-sonnet-4-20250514'),
+    middleware: createObservabilityMiddleware({ observability }),
 });
 
 // Use withObservability() helper for type-safe metadata
 await generateText({
-  model,
-  prompt: "Analyze this...",
-  providerOptions: withObservability({
-    traceId: "trace-123",
-    name: "analyzer",
-    metadata: { userId: "user-1" },
-  }),
+    model,
+    prompt: 'Analyze this...',
+    providerOptions: withObservability({
+        traceId: 'trace-123',
+        name: 'analyzer',
+        metadata: { userId: 'user-1' },
+    }),
 });
 ```
 
@@ -192,12 +192,12 @@ class AnthropicMetadataAdapter implements ProviderMetadataPort {
 Extracts and validates JSON from messy AI outputs (markdown blocks, malformed syntax).
 
 ````typescript
-import { parseObject } from "@jterrazz/intelligence";
-import { z } from "zod";
+import { parseObject } from '@jterrazz/intelligence';
+import { z } from 'zod';
 
 const schema = z.object({
-  title: z.string(),
-  tags: z.array(z.string()),
+    title: z.string(),
+    tags: z.array(z.string()),
 });
 
 const text = '```json\n{"title": "Hello", "tags": ["ai"]}\n```';
@@ -210,16 +210,16 @@ const result = parseObject(text, schema);
 Creates system prompt instructions for models without native structured output.
 
 ```typescript
-import { generateText } from "ai";
-import { createSchemaPrompt, parseObject } from "@jterrazz/intelligence";
-import { z } from "zod";
+import { generateText } from 'ai';
+import { createSchemaPrompt, parseObject } from '@jterrazz/intelligence';
+import { z } from 'zod';
 
 const schema = z.object({ summary: z.string(), score: z.number() });
 
 const { text } = await generateText({
-  model,
-  prompt: "Analyze this article...",
-  system: createSchemaPrompt(schema),
+    model,
+    prompt: 'Analyze this article...',
+    system: createSchemaPrompt(schema),
 });
 
 const result = parseObject(text, schema);
@@ -230,7 +230,7 @@ const result = parseObject(text, schema);
 Removes invisible characters, normalizes typography, cleans AI artifacts.
 
 ```typescript
-import { parseText } from "@jterrazz/intelligence";
+import { parseText } from '@jterrazz/intelligence';
 
 const clean = parseText(messyAiOutput);
 // Removes: BOM, zero-width chars, citation markers
@@ -242,22 +242,22 @@ const clean = parseText(messyAiOutput);
 ### `createOpenRouterProvider` - OpenRouter for AI SDK
 
 ```typescript
-import { generateText } from "ai";
-import { createOpenRouterProvider } from "@jterrazz/intelligence";
+import { generateText } from 'ai';
+import { createOpenRouterProvider } from '@jterrazz/intelligence';
 
 const provider = createOpenRouterProvider({
-  apiKey: process.env.OPENROUTER_API_KEY,
+    apiKey: process.env.OPENROUTER_API_KEY,
 });
 
 const { text } = await generateText({
-  model: provider.model("anthropic/claude-sonnet-4-20250514"),
-  prompt: "Hello!",
+    model: provider.model('anthropic/claude-sonnet-4-20250514'),
+    prompt: 'Hello!',
 });
 
 // With reasoning models
-const reasoningModel = provider.model("anthropic/claude-sonnet-4-20250514", {
-  maxTokens: 16000,
-  reasoning: { effort: "high" },
+const reasoningModel = provider.model('anthropic/claude-sonnet-4-20250514', {
+    maxTokens: 16000,
+    reasoning: { effort: 'high' },
 });
 ```
 
