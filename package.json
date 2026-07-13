@@ -1,6 +1,6 @@
 {
     "name": "@jterrazz/intelligence",
-    "version": "4.0.4",
+    "version": "4.1.0",
     "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
     "repository": {
         "type": "git",
@@ -10,17 +10,22 @@
         "dist"
     ],
     "type": "module",
+    "sideEffects": false,
     "exports": {
         ".": {
             "require": "./dist/index.cjs",
             "import": "./dist/index.js"
+        },
+        "./text": {
+            "require": "./dist/text.cjs",
+            "import": "./dist/text.js"
         }
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },
     "scripts": {
-        "build": "typescript bundle",
+        "build": "tsdown --config tsdown.config.ts",
         "lint": "typescript check",
         "lint:fix": "typescript fix",
         "test": "vitest --run"
@@ -38,10 +43,20 @@
         "@jterrazz/typescript": "^6.0.0",
         "@types/node": "^25.5.0",
         "ai": "^6.0.140",
-        "vitest": "^4.1.2"
+        "tsdown": "^0.21.5",
+        "vitest": "^4.1.2",
+        "zod": "^4.1.11"
     },
     "peerDependencies": {
         "ai": ">=6.0.0",
         "zod": ">=4.0.0"
+    },
+    "peerDependenciesMeta": {
+        "ai": {
+            "optional": true
+        },
+        "zod": {
+            "optional": true
+        }
     }
 }
