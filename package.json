@@ -21,8 +21,8 @@
     },
     "scripts": {
         "build": "typescript bundle",
-        "lint": "codestyle check",
-        "lint:fix": "codestyle fix",
+        "lint": "typescript check",
+        "lint:fix": "typescript fix",
         "test": "vitest --run"
     },
     "dependencies": {
@@ -34,9 +34,8 @@
     },
     "devDependencies": {
         "@ai-sdk/provider": "^3.0.8",
-        "@jterrazz/codestyle": "^3.0.9",
         "@jterrazz/test": "^5.3.2",
-        "@jterrazz/typescript": "^5.2.0",
+        "@jterrazz/typescript": "^6.0.0",
         "@types/node": "^25.5.0",
         "ai": "^6.0.140",
         "vitest": "^4.1.2"
