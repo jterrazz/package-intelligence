@@ -1,4 +1,4 @@
-import type { LanguageModelV3StreamPart, SharedV3ProviderOptions } from '@ai-sdk/provider';
+import type { LanguageModelV4StreamPart, SharedV4ProviderOptions } from '@ai-sdk/provider';
 import type { LanguageModelMiddleware } from 'ai';
 
 // Ports
@@ -19,8 +19,8 @@ export interface ObservabilityMiddlewareOptions {
 /**
  * Helper to create type-safe observability metadata for providerOptions
  */
-export function withObservability(meta: ObservabilityMetadata): SharedV3ProviderOptions {
-    return { observability: meta } as unknown as SharedV3ProviderOptions;
+export function withObservability(meta: ObservabilityMetadata): SharedV4ProviderOptions {
+    return { observability: meta } as unknown as SharedV4ProviderOptions;
 }
 /**
  * Creates middleware that sends generation data to an observability platform.
@@ -30,7 +30,7 @@ export function createObservabilityMiddleware(
 ): LanguageModelMiddleware {
     const { observability, providerMetadata } = options;
     return {
-        specificationVersion: 'v3',
+        specificationVersion: 'v4',
         wrapGenerate: async ({ doGenerate, params, model }) => {
             const startTime = new Date();
             const meta = params.providerOptions?.observability as ObservabilityMetadata | undefined;
@@ -69,8 +69,8 @@ export function createObservabilityMiddleware(
             }
             const chunks: string[] = [];
             const transformStream = new TransformStream<
-                LanguageModelV3StreamPart,
-                LanguageModelV3StreamPart
+                LanguageModelV4StreamPart,
+                LanguageModelV4StreamPart
             >({
                 transform(chunk, controller) {
                     if (chunk.type === 'text-delta') {
@@ -93,7 +93,7 @@ export function createObservabilityMiddleware(
                 },
             });
             return {
-                specificationVersion: 'v3',
+                specificationVersion: 'v4',
                 ...result,
                 stream: result.stream.pipeThrough(transformStream),
             };

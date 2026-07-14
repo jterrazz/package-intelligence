@@ -1,4 +1,4 @@
-import type { LanguageModelV3StreamPart } from '@ai-sdk/provider';
+import type { LanguageModelV4StreamPart } from '@ai-sdk/provider';
 import type { LoggerPort } from '@jterrazz/telemetry';
 import type { LanguageModelMiddleware } from 'ai';
 
@@ -21,7 +21,7 @@ export function createLoggingMiddleware(
     const { params: includeParams, content: includeContent, usage: includeUsage = true } = include;
 
     return {
-        specificationVersion: 'v3',
+        specificationVersion: 'v4',
         wrapGenerate: async ({ doGenerate, params, model }) => {
             const startTime = Date.now();
 
@@ -72,8 +72,8 @@ export function createLoggingMiddleware(
                 const chunks: string[] = [];
 
                 const transformStream = new TransformStream<
-                    LanguageModelV3StreamPart,
-                    LanguageModelV3StreamPart
+                    LanguageModelV4StreamPart,
+                    LanguageModelV4StreamPart
                 >({
                     transform(chunk, controller) {
                         if (includeContent && chunk.type === 'text-delta') {
@@ -91,7 +91,7 @@ export function createLoggingMiddleware(
                 });
 
                 return {
-                    specificationVersion: 'v3',
+                    specificationVersion: 'v4',
                     ...result,
                     stream: result.stream.pipeThrough(transformStream),
                 };

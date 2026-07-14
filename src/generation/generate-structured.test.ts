@@ -1,14 +1,14 @@
-import type { LanguageModelV3 } from '@ai-sdk/provider';
+import type { LanguageModelV4 } from '@ai-sdk/provider';
 import { describe, expect, test, vi } from 'vitest';
 import { z } from 'zod';
 
 import { generateStructured } from './generate-structured.js';
 
-function createMockModel(options: { text?: string; shouldThrow?: Error } = {}): LanguageModelV3 {
+function createMockModel(options: { text?: string; shouldThrow?: Error } = {}): LanguageModelV4 {
     const { text = '{}', shouldThrow } = options;
 
     return {
-        specificationVersion: 'v3',
+        specificationVersion: 'v4',
         provider: 'mock',
         modelId: 'mock-model',
         doGenerate: shouldThrow

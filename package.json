@@ -1,6 +1,6 @@
 {
     "name": "@jterrazz/intelligence",
-    "version": "4.2.0",
+    "version": "5.0.0",
     "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
     "repository": {
         "type": "git",
@@ -31,24 +31,24 @@
         "test": "vitest --run"
     },
     "dependencies": {
-        "@ai-sdk/openai": "^3.0.48",
-        "@jterrazz/telemetry": "^1.0.0",
-        "@openrouter/ai-sdk-provider": "^2.3.3",
-        "jsonrepair": "^3.13.3",
-        "langfuse": "^3.38.6"
+        "@ai-sdk/openai": "^4.0.14",
+        "@jterrazz/telemetry": "^1.1.0",
+        "@openrouter/ai-sdk-provider": "^3.0.0",
+        "jsonrepair": "^3.15.0",
+        "langfuse": "^3.38.20"
     },
     "devDependencies": {
-        "@ai-sdk/provider": "^3.0.8",
-        "@jterrazz/test": "^5.3.2",
-        "@jterrazz/typescript": "^6.0.0",
-        "@types/node": "^25.5.0",
-        "ai": "^6.0.140",
-        "tsdown": "^0.21.5",
-        "vitest": "^4.1.2",
-        "zod": "^4.1.11"
+        "@ai-sdk/provider": "^4.0.3",
+        "@jterrazz/test": "^8.0.0",
+        "@jterrazz/typescript": "^6.0.1",
+        "@types/node": "^26.1.1",
+        "ai": "^7.0.28",
+        "tsdown": "^0.22.7",
+        "vitest": "^4.1.10",
+        "zod": "^4.4.3"
     },
     "peerDependencies": {
-        "ai": ">=6.0.0",
+        "ai": ">=7.0.0",
         "zod": ">=4.0.0"
     },
     "peerDependenciesMeta": {

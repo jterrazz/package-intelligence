@@ -1,4 +1,4 @@
-import type { LanguageModelV3, SharedV3ProviderOptions } from '@ai-sdk/provider';
+import type { LanguageModelV4, SharedV4ProviderOptions } from '@ai-sdk/provider';
 import { generateText } from 'ai';
 import type { Schema } from 'zod';
 
@@ -11,11 +11,11 @@ import {
 } from '../result/result.js';
 
 export interface GenerateStructuredOptions<T> {
-    model: LanguageModelV3;
+    model: LanguageModelV4;
     prompt: string;
     system?: string;
     schema: Schema<T>;
-    providerOptions?: SharedV3ProviderOptions;
+    providerOptions?: SharedV4ProviderOptions;
     abortSignal?: AbortSignal;
     maxOutputTokens?: number;
     temperature?: number;
