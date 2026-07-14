@@ -1,6 +1,6 @@
 {
     "name": "@jterrazz/intelligence",
-    "version": "4.1.0",
+    "version": "4.2.0",
     "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
     "repository": {
         "type": "git",
@@ -32,7 +32,7 @@
     },
     "dependencies": {
         "@ai-sdk/openai": "^3.0.48",
-        "@jterrazz/logger": "^1.5.0",
+        "@jterrazz/telemetry": "^1.0.0",
         "@openrouter/ai-sdk-provider": "^2.3.3",
         "jsonrepair": "^3.13.3",
         "langfuse": "^3.38.6"

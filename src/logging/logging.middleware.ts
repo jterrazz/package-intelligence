@@ -1,5 +1,5 @@
 import type { LanguageModelV3StreamPart } from '@ai-sdk/provider';
-import type { LoggerPort } from '@jterrazz/logger';
+import type { LoggerPort } from '@jterrazz/telemetry';
 import type { LanguageModelMiddleware } from 'ai';
 
 export interface LoggingMiddlewareOptions {
