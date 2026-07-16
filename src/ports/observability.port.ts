@@ -48,8 +48,8 @@ export interface GenerationParams {
  * Port for observability integrations (Langfuse, Datadog, etc.)
  */
 export interface ObservabilityPort {
-    trace(params: TraceParams): void;
-    generation(params: GenerationParams): void;
-    flush(): Promise<void>;
-    shutdown(): Promise<void>;
+    trace: (params: TraceParams) => void;
+    generation: (params: GenerationParams) => void;
+    flush: () => Promise<void>;
+    shutdown: () => Promise<void>;
 }

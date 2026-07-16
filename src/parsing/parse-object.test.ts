@@ -214,18 +214,18 @@ describe('parseObject', () => {
     describe('complex scenarios', () => {
         test('parses complex nested JSON with escaped quotes', () => {
             // Given -- a complex nested schema and JSON with escaped quotes
+            const tagsSchema = z.object({
+                type: z.string(),
+                stance: z.string(),
+            });
+            const perspectiveSchema = z.object({
+                digest: z.string(),
+                tags: tagsSchema,
+            });
             const schema = z.object({
                 category: z.string(),
                 countries: z.array(z.string()),
-                perspectives: z.array(
-                    z.object({
-                        digest: z.string(),
-                        tags: z.object({
-                            type: z.string(),
-                            stance: z.string(),
-                        }),
-                    }),
-                ),
+                perspectives: z.array(perspectiveSchema),
                 synopsis: z.string(),
             });
 

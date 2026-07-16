@@ -18,5 +18,5 @@ export interface ProviderMetadataPort {
      * @param metadata - The raw provider metadata from AI SDK response
      * @returns Extracted usage and cost details, or undefined values if not available
      */
-    extract(metadata: Record<string, unknown> | undefined): ExtractedProviderMetadata;
+    extract: (metadata: Record<string, unknown> | undefined) => ExtractedProviderMetadata;
 }

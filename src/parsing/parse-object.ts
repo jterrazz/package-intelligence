@@ -1,7 +1,7 @@
 import { jsonrepair } from 'jsonrepair';
 import { z } from 'zod/v4';
 
-const MARKDOWN_CODE_BLOCK_RE = /```(?:json)?\r?\n([^`]*?)\r?\n```/g;
+const MARKDOWN_CODE_BLOCK_RE = /```(?:json)?\r?\n(?<content>[^`]*?)\r?\n```/g;
 
 /**
  * Error thrown when object parsing fails.
@@ -129,7 +129,9 @@ function extractBySchemaType(text: string, schema: z.ZodType, originalText: stri
 }
 
 function extractJsonFromCodeBlock(block: string): null | string {
-    const content = block.replace(/```(?:json)?\r?\n([^`]*?)\r?\n```/, '$1').trim();
+    const content = block
+        .replace(/```(?:json)?\r?\n(?<content>[^`]*?)\r?\n```/, '$<content>')
+        .trim();
     try {
         JSON.parse(content);
         return content;
@@ -200,7 +202,7 @@ function unescapeString(text: string): string {
         .replace(/\\r/g, '\r')
         .replace(/\\t/g, '\t')
         .replace(/\\\\/g, '\\')
-        .replace(/\\u([0-9a-fA-F]{4})/g, (_, code) =>
+        .replace(/\\u(?<code>[0-9a-fA-F]{4})/g, (_, code: string) =>
             String.fromCharCode(Number.parseInt(code, 16)),
         );
 }
