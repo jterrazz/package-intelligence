@@ -39,7 +39,6 @@
     },
     "devDependencies": {
         "@ai-sdk/provider": "^4.0.3",
-        "@jterrazz/test": "^8.0.0",
         "@jterrazz/typescript": "^6.0.1",
         "@types/node": "^26.1.1",
         "ai": "^7.0.28",
