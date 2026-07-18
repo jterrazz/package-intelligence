@@ -330,3 +330,8 @@ Each rule is deliberately best-effort where full static verification isn't possi
 | -------------------------------- | -------------------------------------------------------------------------- |
 | `cleanAiText(text, options?)`    | Sanitize AI-generated text (also at `/formatting`)                         |
 | `toSentenceCase(text, options?)` | Normalize Title Case overuse back to sentence case (also at `/formatting`) |
+
+> **Next.js consumers**: `toSentenceCase` lazy-loads hunspell dictionaries from
+> disk (`require.resolve` + `readFileSync`), which breaks when bundled. Add
+> `serverExternalPackages: ['@jterrazz/intelligence']` to `next.config.ts` so
+> the package stays a native server require.
