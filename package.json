@@ -1,6 +1,6 @@
 {
     "name": "@jterrazz/intelligence",
-    "version": "5.0.0",
+    "version": "6.0.0",
     "author": "Jean-Baptiste Terrazzoni <contact@jterrazz.com>",
     "repository": {
         "type": "git",
@@ -16,9 +16,13 @@
             "require": "./dist/index.cjs",
             "import": "./dist/index.js"
         },
-        "./text": {
-            "require": "./dist/text.cjs",
-            "import": "./dist/text.js"
+        "./formatting": {
+            "require": "./dist/formatting.cjs",
+            "import": "./dist/formatting.js"
+        },
+        "./oxlint": {
+            "require": "./dist/oxlint.cjs",
+            "import": "./dist/oxlint.js"
         }
     },
     "publishConfig": {
@@ -26,35 +30,38 @@
     },
     "scripts": {
         "build": "tsdown --config tsdown.config.ts",
+        "generate:terms": "node scripts/generate-preserved-terms.ts && oxfmt src/formatting/preserved-terms.generated.ts",
         "lint": "typescript check",
         "lint:fix": "typescript fix",
         "test": "vitest --run"
     },
     "dependencies": {
         "@ai-sdk/openai": "^4.0.14",
+        "@ai-sdk/otel": "^1.0.31",
         "@jterrazz/telemetry": "^1.1.0",
         "@openrouter/ai-sdk-provider": "^3.0.0",
-        "jsonrepair": "^3.15.0",
-        "langfuse": "^3.38.20"
+        "@opentelemetry/api": "^1.9.1",
+        "dictionary-en": "^4.0.0",
+        "dictionary-fr": "^3.0.0",
+        "nspell": "^2.1.5"
     },
     "devDependencies": {
         "@ai-sdk/provider": "^4.0.3",
+        "@cspell/dict-companies": "^3.2.12",
+        "@cspell/dict-software-terms": "^5.2.4",
         "@jterrazz/typescript": "^6.1.0",
         "@types/node": "^26.1.1",
+        "@types/nspell": "^2.1.6",
         "ai": "^7.0.28",
+        "oxlint": "^1.74.0",
         "tsdown": "^0.22.7",
-        "vitest": "^4.1.10",
-        "zod": "^4.4.3"
+        "vitest": "^4.1.10"
     },
     "peerDependencies": {
-        "ai": ">=7.0.0",
-        "zod": ">=4.0.0"
+        "ai": ">=7.0.0"
     },
     "peerDependenciesMeta": {
         "ai": {
-            "optional": true
-        },
-        "zod": {
             "optional": true
         }
     }

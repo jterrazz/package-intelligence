@@ -1,0 +1,9 @@
+{
+    "$schema": "https://unpkg.com/knip@6/schema.json",
+    "ignoreDependencies": [
+        "@cspell/dict-companies",
+        "@cspell/dict-software-terms",
+        "dictionary-en",
+        "dictionary-fr"
+    ]
+}

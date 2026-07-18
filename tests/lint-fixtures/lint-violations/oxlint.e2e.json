@@ -1,0 +1,14 @@
+{
+    "categories": {
+        "correctness": "off"
+    },
+    "jsPlugins": ["../../../dist/oxlint.js"],
+    "rules": {
+        "intelligence/g1-agent-class-shape": "error",
+        "intelligence/m1-model-resolution-in-container": "error",
+        "intelligence/m2w-no-hardcoded-model-id": "warn",
+        "intelligence/p1-prose-in-prompt-files": "error",
+        "intelligence/p2-prompt-file-exports": "error",
+        "intelligence/p3-agent-prompt-sibling": "error"
+    }
+}

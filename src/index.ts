@@ -1,72 +1,38 @@
-// Logging
+// Factory
+export {
+    type AgentConfig,
+    createIntelligence,
+    type Intelligence,
+    type IntelligenceConfig,
+    type ProviderConfig,
+} from './factory/create-intelligence.js';
+
+// Middleware
+export {
+    type CostMiddlewareOptions,
+    type CostPricing,
+    createCostMiddleware,
+} from './middleware/cost.middleware.js';
 export {
     createLoggingMiddleware,
     type LoggingMiddlewareOptions,
-} from './logging/logging.middleware.js';
+} from './middleware/logging.middleware.js';
+export { createSchemaInstructionMiddleware } from './middleware/schema-instruction.middleware.js';
 
-// Observability
-export {
-    createObservabilityMiddleware,
-    type ObservabilityMetadata,
-    type ObservabilityMiddlewareOptions,
-    withObservability,
-} from './observability/observability.middleware.js';
-export { LangfuseAdapter, type LangfuseConfig } from './observability/langfuse.adapter.js';
-export { NoopObservabilityAdapter } from './observability/noop.adapter.js';
-
-// Ports
-export {
-    type CostDetails,
-    type GenerationParams,
-    type ObservabilityPort,
-    type TraceParams,
-    type UsageDetails,
-} from './ports/observability.port.js';
-export {
-    type ExtractedProviderMetadata,
-    type ProviderMetadataPort,
-} from './ports/provider-metadata.port.js';
-
-// Result
-export {
-    classifyError,
-    type GenerationError,
-    type GenerationErrorCode,
-    generationFailure,
-    type GenerationResult,
-    generationSuccess,
-    isFailure,
-    isSuccess,
-    unwrap,
-    unwrapOr,
-} from './result/result.js';
-
-// Generation
-export {
-    generateStructured,
-    type GenerateStructuredOptions,
-} from './generation/generate-structured.js';
-
-// Parsing
-export { createSchemaPrompt } from './parsing/create-schema-prompt.js';
-export { parseObject, ParseObjectError } from './parsing/parse-object.js';
-export { parseText, type ParseTextOptions } from './parsing/parse-text.js';
+// Model
+export { createFallbackModel, type FallbackModelOptions } from './model/fallback-model.js';
 
 // Provider - OpenRouter
 export {
     createOpenRouterProvider,
-    type ModelOptions,
     type OpenRouterConfig,
     type OpenRouterMetadata,
     type OpenRouterProvider,
 } from './provider/openrouter.provider.js';
-export { OpenRouterMetadataAdapter } from './provider/openrouter-metadata.adapter.js';
 
-// Provider - OpenAI Compatible
+// Provider - Gateway
 export {
-    createOpenAICompatibleProvider,
-    type OpenAICompatibleConfig,
-    type OpenAICompatibleModelOptions,
-    type OpenAICompatibleProvider,
-} from './provider/openai-compatible.provider.js';
-export { OpenAICompatibleMetadataAdapter } from './provider/openai-compatible-metadata.adapter.js';
+    createGatewayProvider,
+    type GatewayConfig,
+    type GatewayProvider,
+} from './provider/gateway.provider.js';
