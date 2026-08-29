@@ -62,9 +62,10 @@ Each agent has a `provider` (a key into `providers`) and a `model` (the technica
 For each resolved model reference:
 
 1. The provider's base model (via `createOpenRouterProvider` or `createGatewayProvider`).
-2. `createCostMiddleware` — records the generation's USD cost on the active OpenTelemetry span.
-3. If the agent has a `fallback`, `createFallbackModel` wraps primary + fallback with automatic retry-on-failure.
-4. If a `logger` is configured, `createLoggingMiddleware` wraps the whole thing.
+2. `createAgentMiddleware` — names the AI SDK's inference span after the agent (`gen_ai.agent.name`), so a trace backend that only reads that span (Langfuse) still knows which agent generated.
+3. `createCostMiddleware` — records the generation's USD cost on the same span.
+4. If the agent has a `fallback`, `createFallbackModel` wraps primary + fallback with automatic retry-on-failure.
+5. If a `logger` is configured, `createLoggingMiddleware` wraps the whole thing.
 
 On first use, `createIntelligence` registers the AI SDK's OpenTelemetry integration (`@ai-sdk/otel`) globally. This is idempotent and best-effort — if the host app hasn't set up an OpenTelemetry SDK, this is a no-op rather than an error.
 
@@ -112,7 +113,6 @@ const model = wrapLanguageModel({
     model: provider.model('google/gemini-2.5-flash-lite'),
     middleware: [
         createCostMiddleware({
-            modelRef: 'openrouter/google/gemini-2.5-flash-lite',
             // Only used as a fallback when the provider doesn't report actual cost
             pricing: { input: 0.1, output: 0.4 }, // USD per million tokens
         }),
@@ -125,7 +125,7 @@ Cost resolution order:
 1. Actual cost reported by the provider (currently: OpenRouter's `providerMetadata.openrouter.usage.cost`), when present and greater than zero.
 2. Otherwise, an estimate from `pricing` and the reported token usage.
 
-When a cost is determined, it's set as the `gen_ai.usage.cost` attribute on `trace.getActiveSpan()`. This is the attribute Langfuse's OpenTelemetry ingestion prioritizes over its own cost inference — `langfuse.observation.cost_details` is buggy on ingestion, so this package deliberately avoids it. All enrichment is best-effort: it never throws, even with no active span or a broken telemetry backend.
+When a cost is determined, it's set as the `gen_ai.usage.cost` attribute on `trace.getActiveSpan()` — the AI SDK's inference span, which it activates for the provider call. Langfuse prioritizes that attribute over its own cost inference. When no cost is known nothing is written, and `gen_ai.request.model` is left as the bare model id so Langfuse can price it from its catalogue (a provider-prefixed id like `gateway/claude-…` matches nothing there). All enrichment is best-effort: it never throws, even with no active span or a broken telemetry backend.
 
 ### Fallback model
 
@@ -308,7 +308,8 @@ Each rule is deliberately best-effort where full static verification isn't possi
 
 | Export                             | Description                                   |
 | ---------------------------------- | --------------------------------------------- |
-| `createCostMiddleware(options)`    | Records USD cost on the active OTel span      |
+| `createAgentMiddleware(options)`   | Names the active OTel span after the agent    |
+| `createCostMiddleware(options?)`   | Records USD cost on the active OTel span      |
 | `createLoggingMiddleware(options)` | Logs requests/responses with timing and usage |
 
 ### Model

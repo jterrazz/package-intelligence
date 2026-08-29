@@ -3,6 +3,7 @@ import type { LanguageModelV4 } from '@ai-sdk/provider';
 import type { LoggerPort } from '@jterrazz/telemetry';
 import { type LanguageModel, registerTelemetry, wrapLanguageModel } from 'ai';
 
+import { createAgentMiddleware } from '../middleware/agent.middleware.js';
 import { createCostMiddleware } from '../middleware/cost.middleware.js';
 import { createLoggingMiddleware } from '../middleware/logging.middleware.js';
 import { createFallbackModel } from '../model/fallback-model.js';
@@ -142,17 +143,17 @@ export function createIntelligence(config: IntelligenceConfig): Intelligence {
         return provider;
     }
 
-    function buildModel(ref: ModelRef): LanguageModel {
+    function buildModel(ref: ModelRef, agentName: string): LanguageModel {
         assertProviderExists(ref.provider, providers);
 
         const provider = resolveProvider(ref.provider);
         const baseModel = provider.model(ref.model) as LanguageModelV4;
-        const pricingKey = `${ref.provider}/${ref.model}`;
 
         return wrapLanguageModel({
             model: baseModel,
             middleware: [
-                createCostMiddleware({ modelRef: pricingKey, pricing: pricing?.[pricingKey] }),
+                createAgentMiddleware({ agentName }),
+                createCostMiddleware({ pricing: pricing?.[`${ref.provider}/${ref.model}`] }),
             ],
         });
     }
@@ -164,10 +165,13 @@ export function createIntelligence(config: IntelligenceConfig): Intelligence {
             throw new Error(`Unknown agent "${agentName}". Available agents: ${available}.`);
         }
 
-        const primary = buildModel({ model: agentConfig.model, provider: agentConfig.provider });
+        const primary = buildModel(
+            { model: agentConfig.model, provider: agentConfig.provider },
+            agentName,
+        );
         const composed = agentConfig.fallback
             ? createFallbackModel({
-                  fallback: buildModel(agentConfig.fallback),
+                  fallback: buildModel(agentConfig.fallback, agentName),
                   logger,
                   primary,
               })

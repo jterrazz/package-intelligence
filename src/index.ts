@@ -9,6 +9,10 @@ export {
 
 // Middleware
 export {
+    type AgentMiddlewareOptions,
+    createAgentMiddleware,
+} from './middleware/agent.middleware.js';
+export {
     type CostMiddlewareOptions,
     type CostPricing,
     createCostMiddleware,

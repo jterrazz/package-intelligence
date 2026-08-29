@@ -48,7 +48,6 @@ describe('createCostMiddleware', () => {
             vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span as never);
 
             const middleware = createCostMiddleware({
-                modelRef: 'openrouter/test-model',
                 pricing: { input: 100, output: 100 },
             });
             const result = createMockGenerateResult({
@@ -74,7 +73,6 @@ describe('createCostMiddleware', () => {
             vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span as never);
 
             const middleware = createCostMiddleware({
-                modelRef: 'openrouter/test-model',
                 pricing: { input: 1, output: 2 },
             });
             const doGenerate = vi.fn().mockResolvedValue(createMockGenerateResult());
@@ -97,7 +95,6 @@ describe('createCostMiddleware', () => {
             vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span as never);
 
             const middleware = createCostMiddleware({
-                modelRef: 'openrouter/test-model',
                 pricing: { input: 1, output: 2 },
             });
             const result = createMockGenerateResult({
@@ -117,12 +114,12 @@ describe('createCostMiddleware', () => {
             expect(span.setAttribute).toHaveBeenCalledWith('gen_ai.usage.cost', 2);
         });
 
-        test('sets only the model attribute when no cost can be determined', async () => {
+        test('writes nothing when no cost can be determined', async () => {
             // Given -- no actual cost and no pricing configured
             const span = createMockSpan();
             vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span as never);
 
-            const middleware = createCostMiddleware({ modelRef: 'openrouter/test-model' });
+            const middleware = createCostMiddleware();
             const doGenerate = vi.fn().mockResolvedValue(createMockGenerateResult());
 
             // When
@@ -133,11 +130,8 @@ describe('createCostMiddleware', () => {
                 model: createMockModel() as never,
             });
 
-            // Then
-            expect(span.setAttribute).toHaveBeenCalledExactlyOnceWith(
-                'gen_ai.request.model',
-                'openrouter/test-model',
-            );
+            // Then -- gen_ai.request.model stays the AI SDK's bare model id
+            expect(span.setAttribute).not.toHaveBeenCalled();
         });
 
         test('never throws when there is no active span', async () => {
@@ -145,7 +139,6 @@ describe('createCostMiddleware', () => {
             vi.spyOn(trace, 'getActiveSpan').mockReturnValue(undefined);
 
             const middleware = createCostMiddleware({
-                modelRef: 'openrouter/test-model',
                 pricing: { input: 1, output: 2 },
             });
             const doGenerate = vi.fn().mockResolvedValue(createMockGenerateResult());
@@ -167,7 +160,6 @@ describe('createCostMiddleware', () => {
             vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span as never);
 
             const middleware = createCostMiddleware({
-                modelRef: 'openrouter/test-model',
                 pricing: { input: 1, output: 2 },
             });
             const doGenerate = vi.fn().mockResolvedValue(createMockGenerateResult());
@@ -191,7 +183,6 @@ describe('createCostMiddleware', () => {
             vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span as never);
 
             const middleware = createCostMiddleware({
-                modelRef: 'openrouter/test-model',
                 pricing: { input: 1, output: 2 },
             });
 

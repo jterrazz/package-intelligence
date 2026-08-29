@@ -3,7 +3,6 @@ import { trace } from '@opentelemetry/api';
 import type { LanguageModelMiddleware } from 'ai';
 
 const COST_ATTRIBUTE = 'gen_ai.usage.cost';
-const MODEL_ATTRIBUTE = 'gen_ai.request.model';
 
 interface OpenRouterCostMetadata {
     openrouter?: {
@@ -42,30 +41,25 @@ function resolveCost(
     return undefined;
 }
 
-function recordGeneration(modelRef: string, cost: number | undefined): void {
-    const span = trace.getActiveSpan();
-    if (!span) {
+function recordCost(cost: number | undefined): void {
+    if (cost === undefined) {
         return;
     }
-    span.setAttribute(MODEL_ATTRIBUTE, modelRef);
-    if (cost !== undefined) {
-        span.setAttribute(COST_ATTRIBUTE, cost);
-    }
+    trace.getActiveSpan()?.setAttribute(COST_ATTRIBUTE, cost);
 }
 
 export type { CostPricing };
 
 export interface CostMiddlewareOptions {
-    /** Full model reference, e.g. `'openrouter/google/gemini-2.5-flash-lite'` */
-    modelRef: string;
     /** Fallback USD-per-million-token pricing, used when the provider doesn't report actual cost */
     pricing?: CostPricing;
 }
 
 /**
- * Creates middleware that enriches the active OpenTelemetry span with the
- * model reference (`gen_ai.request.model`) and the USD cost
- * (`gen_ai.usage.cost`) of a generation.
+ * Creates middleware that records the USD cost of a generation as
+ * `gen_ai.usage.cost` on the active OpenTelemetry span — the AI SDK's own
+ * inference span (`gen_ai.operation.name = chat`), which is what Langfuse
+ * ingests as a generation.
  *
  * Resolution order:
  * 1. Actual cost reported by the provider (currently: OpenRouter's
@@ -73,9 +67,10 @@ export interface CostMiddlewareOptions {
  * 2. Estimated cost from `pricing` (USD per million input/output tokens),
  *    computed from the reported token usage.
  *
- * The `gen_ai.usage.cost` attribute is set on `trace.getActiveSpan()` because
- * that's the attribute Langfuse's OTel ingestion prioritizes over its own
- * cost inference (`langfuse.observation.cost_details` is buggy on ingestion).
+ * When neither is available nothing is written: `gen_ai.request.model` is
+ * left to the AI SDK (the bare model id), so Langfuse can still price the
+ * generation from its own model catalogue. Langfuse prioritizes
+ * `gen_ai.usage.cost` over that inference when both exist.
  *
  * Never throws: all enrichment is best-effort.
  *
@@ -83,17 +78,12 @@ export interface CostMiddlewareOptions {
  * ```ts
  * const model = wrapLanguageModel({
  *   model: provider.model('google/gemini-2.5-flash-lite'),
- *   middleware: [
- *     createCostMiddleware({
- *       modelRef: 'openrouter/google/gemini-2.5-flash-lite',
- *       pricing: { input: 0.1, output: 0.4 },
- *     }),
- *   ],
+ *   middleware: [createCostMiddleware({ pricing: { input: 0.1, output: 0.4 } })],
  * });
  * ```
  */
-export function createCostMiddleware(options: CostMiddlewareOptions): LanguageModelMiddleware {
-    const { modelRef, pricing } = options;
+export function createCostMiddleware(options: CostMiddlewareOptions = {}): LanguageModelMiddleware {
+    const { pricing } = options;
 
     return {
         specificationVersion: 'v4',
@@ -101,8 +91,7 @@ export function createCostMiddleware(options: CostMiddlewareOptions): LanguageMo
             const result = await doGenerate();
 
             try {
-                recordGeneration(
-                    modelRef,
+                recordCost(
                     resolveCost(
                         result.providerMetadata as Record<string, unknown> | undefined,
                         result.usage,
@@ -137,10 +126,7 @@ export function createCostMiddleware(options: CostMiddlewareOptions): LanguageMo
                 },
                 flush() {
                     try {
-                        recordGeneration(
-                            modelRef,
-                            resolveCost(finishProviderMetadata, finishUsage, pricing),
-                        );
+                        recordCost(resolveCost(finishProviderMetadata, finishUsage, pricing));
                     } catch {
                         // Best-effort: telemetry enrichment must never break generation.
                     }
