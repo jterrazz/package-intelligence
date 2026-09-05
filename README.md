@@ -336,3 +336,7 @@ Each rule is deliberately best-effort where full static verification isn't possi
 > disk (`require.resolve` + `readFileSync`), which breaks when bundled. Add
 > `serverExternalPackages: ['@jterrazz/intelligence']` to `next.config.ts` so
 > the package stays a native server require.
+
+## Decisions
+
+Why this package looks the way it does is recorded in [`docs/decisions/`](docs/decisions/).
