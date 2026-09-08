@@ -1,9 +1,19 @@
-# @jterrazz/intelligence — documentation
+# @jterrazz/intelligence — the corpus
 
-A thin composition layer over the AI SDK: provider factories, cost, fallback and logging middleware, and a config-driven factory that wires them together. Every factory returns the AI SDK's own `LanguageModel`, so a consumer passes the result straight into `generateText` and friends.
+The manual of this repository: what the package is, how it is changed, what
+proves a change, how it ships, and its two product subjects. The vitrine —
+install, quick start — is the root `README.md`, not this map.
 
-The manual is still the [README](../README.md) — install, the `createIntelligence` factory, the provider types, the middleware, and the prompt conventions. Splitting it into numbered chapters is owed; until then, this file is the map and the README is the one chapter.
+| Chapter                                  | Holds                                                                                                                                  |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| [01-architecture.md](01-architecture.md) | The building blocks and how `createIntelligence` wires them, the model and formatting layers, the lint plugin's shape, the exports map |
+| [02-developing.md](02-developing.md)     | The toolchain, where a new provider/middleware/rule goes, the preserved-terms generator, what a change owes                            |
+| [03-testing.md](03-testing.md)           | The unit and integration suites, the lint plugin's fixture-driven E2E, the manifest completeness meta-test                             |
+| [04-operating.md](04-operating.md)       | What is published, what a GitHub Release triggers, and why a merge to `main` ships nothing                                             |
+| [05-providers.md](05-providers.md)       | The OpenRouter and gateway providers                                                                                                   |
+| [06-middleware.md](06-middleware.md)     | The agent, cost, logging and schema-instruction middleware                                                                             |
 
-## Decisions
-
-The records of decisions this package alone took are in [`decisions/`](decisions/), numbered in the order they were taken. A decision spanning several repositories is recorded by the corpus that spans them.
+The decisions this package alone took stand in [decisions/](decisions/),
+numbered and chronological, the mold `_template.md` beside them. A decision
+spanning several repositories is not one of them — it belongs to the corpus
+that spans them.

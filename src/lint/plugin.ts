@@ -8,8 +8,9 @@ import type { LintPlugin } from './types.js';
 
 /**
  * The `@jterrazz/intelligence` oxlint plugin — formalizes the agent/prompt
- * folder convention documented in the README's "Agent & prompt conventions"
- * section as statically-checkable rules, mirroring `@jterrazz/test`'s
+ * folder convention documented in `docs/01-architecture.md`'s "The lint
+ * plugin — the agent/prompt convention" section as statically-checkable
+ * rules, mirroring `@jterrazz/test`'s
  * `src/lint/plugin.ts` (same composable-fragment architecture, same
  * `RuleTester` test layer, same manifest/docs-as-code pattern).
  *
