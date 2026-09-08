@@ -49,10 +49,11 @@
         "@ai-sdk/provider": "^4.0.3",
         "@cspell/dict-companies": "^3.2.12",
         "@cspell/dict-software-terms": "^5.2.4",
-        "@jterrazz/typescript": "^9.0.0",
+        "@jterrazz/typescript": "^9.2.0",
         "@types/node": "^26.1.1",
         "@types/nspell": "^2.1.6",
         "ai": "^7.0.28",
+        "oxfmt": "^0.59.0",
         "oxlint": "^1.74.0",
         "tsdown": "^0.22.7",
         "vitest": "^4.1.10"
