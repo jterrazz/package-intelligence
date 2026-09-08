@@ -7,8 +7,9 @@ import type { RuleDoc } from './types.js';
  * NEXT TO the rule it documents, attached as `meta.docs`, instead of drifting
  * apart in a hand-maintained doc).
  *
- * The README's "Agent & prompt conventions" section is the human-facing
- * explanation of *why* this shape exists; this manifest is the machine-facing
+ * `docs/01-architecture.md`'s "The lint plugin — the agent/prompt convention"
+ * section is the human-facing explanation of *why* this shape exists; this
+ * manifest is the machine-facing
  * "what exactly is checked" — `plugin.test.ts` asserts every shipped rule
  * carries its entry and that no entry is orphaned.
  */

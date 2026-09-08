@@ -110,8 +110,9 @@ function isNode(value: unknown): value is AstNode {
  * CONVENTIONS P2 — a `*.prompt.ts` file's export surface is closed: const
  * arrow functions returning a string (the builders), and types/interfaces.
  * No default export, no class, no non-function const, no plain `function`
- * declaration (the convention is arrow consts specifically — see the
- * README's "Agent & prompt conventions" section).
+ * declaration (the convention is arrow consts specifically — see
+ * `docs/01-architecture.md`'s "The lint plugin — the agent/prompt
+ * convention" section).
  */
 export const p2PromptFileExports: LintRule = {
     create(context: RuleContext): Visitor {

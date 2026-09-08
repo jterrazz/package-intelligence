@@ -4,8 +4,9 @@ import { segments } from './ast.js';
 
 /**
  * Shared "is this file an agent file / a prompt file?" detection for
- * P1/P3/G1 — the folder-per-agent convention documented in the README's
- * "Agent & prompt conventions" section:
+ * P1/P3/G1 — the folder-per-agent convention documented in
+ * `docs/01-architecture.md`'s "The lint plugin — the agent/prompt
+ * convention" section:
  *
  * ```
  * agents/<name>/<name>.ts          # the agent file
