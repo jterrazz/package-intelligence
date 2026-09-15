@@ -21,6 +21,7 @@ const intelligence = createIntelligence({
             metadata: { application: 'my-app', website: 'https://example.com' },
         },
     },
+
     agents: {
         summarizer: {
             provider: 'openrouter',
@@ -28,6 +29,7 @@ const intelligence = createIntelligence({
             fallback: { provider: 'openrouter', model: 'openai/gpt-4o-mini' },
         },
     },
+
     pricing: {
         'openrouter/openai/gpt-4o-mini': { input: 0.15, output: 0.6 }, // USD/1M tokens
     },
