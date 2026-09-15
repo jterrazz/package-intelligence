@@ -1,9 +1,18 @@
 {
     "$schema": "https://unpkg.com/knip@6/schema.json",
     "ignoreDependencies": [
+        // Read straight out of node_modules by scripts/generate-preserved-terms.ts rather
+        // than imported, so knip's static analysis cannot see the use.
         "@cspell/dict-companies",
         "@cspell/dict-software-terms",
         "dictionary-en",
-        "dictionary-fr"
+        "dictionary-fr",
+        // `oxlint/plugins-dev` (RuleTester) and the `oxlint` binary are the SUBJECT of
+        // src/lint/, not a second toolchain opinion: the one copy that answers is
+        // @jterrazz/typescript's own, so this package never declares a range of its own.
+        "oxlint",
+        // Referenced by the generated dist/*.d.ts through the AI SDK's own types; a
+        // consumer resolves it transitively with `ai`.
+        "@types/json-schema"
     ]
 }

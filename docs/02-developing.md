@@ -10,24 +10,35 @@ once written is [03-testing.md](03-testing.md).
 ```bash
 npm ci             # or `make install`
 npm run build      # tsdown — three entries: index, formatting, oxlint
-npm run lint       # typescript check — tsc, oxlint, oxfmt, gitignore, knip, docs
+npm run lint       # typescript check — the eleven passes of @jterrazz/typescript
 npm run lint:fix   # typescript fix
 npm test           # vitest --run
 ```
 
 `Makefile` mirrors the same four as `install`/`build`/`lint`/`test`, each
 depending on `node_modules/.install` (a `npm ci` gated on `package-lock.json`
-so a repeat run is a no-op). `tsconfig.json`, `oxlint.config.ts` and
-`oxfmt.config.ts` extend `@jterrazz/typescript`'s `node` presets and add
-nothing project-specific beyond `skipLibCheck` and the `scripts/` include —
-the presets and the gates they run are that package's own
+so a repeat run is a no-op). **`npm run build` precedes `npm run lint`**: the
+lint config loads this package's own plugin from `dist/`, so a tree that has
+never been built has no rulebook to lint itself with.
+
+`tsconfig.json`, `oxlint.config.ts` and `oxfmt.config.ts` name
+`@jterrazz/typescript`'s `library` profile and nothing else — no local
+`compilerOptions`, no `include` of its own. The presets, the passes they run
+and the `oxlint.baseline.json` ratchet are that package's own
 (`@jterrazz/typescript`'s `docs/06-quality-checks.md`), not restated here.
 
-`knip.json` ignores `dictionary-en`, `dictionary-fr`,
-`@cspell/dict-companies` and `@cspell/dict-software-terms`: all four are read
-straight out of `node_modules` by `scripts/generate-preserved-terms.ts`
-rather than imported, so knip's static analysis cannot see the use and would
-otherwise flag them as unused.
+The one rule this project turns off is `intelligence/m1-model-resolution-in-container`,
+and `oxlint.config.ts` carries the reason beside it: M1 gates a CONSUMER's composition root, and this
+package defines the factories M1 names, so every call in this tree is that
+definition or its own test. Everything else the rulebook still finds is
+recorded in `oxlint.baseline.json` — a ratchet that may only shrink.
+
+`knip.json` ignores six dependencies, each with its reason beside it: the
+four dictionaries `scripts/generate-preserved-terms.ts` reads straight out of
+`node_modules` (never imports, so knip cannot see the use), `oxlint` — whose
+`plugins-dev` `RuleTester` and binary are the SUBJECT of `src/lint/`, answered
+by the one copy `@jterrazz/typescript` installs — and `@types/json-schema`,
+which the generated `dist/*.d.ts` reaches through the AI SDK's own types.
 
 ## Where a new file goes
 
@@ -80,10 +91,11 @@ drift is a diff a reviewer sees, not a silent runtime difference.
   `docs/01-architecture.md` in the same commit — the manifest's
   `RULE_DOCS` is the machine-facing text, the chapter is the human-facing
   one, and neither restates the other's wording.
-- The lint plugin's E2E suite (`tests/lint/oxlint-rules.e2e.test.ts`) loads
-  the BUILT plugin (`dist/oxlint.js`), never `src/lint/plugin.ts` directly —
-  run `npm run build` before it after touching a rule, or trust `npm test`
-  which does not rebuild for you.
+- The lint plugin's E2E suite (`tests/lint/oxlint-rules.e2e.test.ts`) and
+  `oxlint.config.ts` both load the BUILT plugin (`dist/oxlint.js`), never
+  `src/lint/plugin.ts` directly — run `npm run build` after touching a rule,
+  before either `npm test` or `npm run lint`, neither of which rebuilds for
+  you.
 - A change to the public API (`src/index.ts`, `src/formatting.ts`, or the
   lint plugin's exports) updates `README.md`'s quick-start and the export it
   touched in [01-architecture.md](01-architecture.md).

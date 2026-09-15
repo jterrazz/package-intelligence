@@ -23,7 +23,7 @@ One Claude Code skill routes into this corpus: [`skills/jterrazz-intelligence/`]
 
 ```bash
 npm ci
-npm run build   # tsdown — required before the lint plugin's E2E suite can run
+npm run build   # tsdown — required before `npm run lint` and the plugin's E2E suite
 ```
 
 ## Commands
