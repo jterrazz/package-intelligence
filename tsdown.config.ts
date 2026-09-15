@@ -1,10 +1,10 @@
-import { defineConfig } from 'tsdown';
+import { defineConfig, type UserConfig } from 'tsdown';
 
 // Mirrors @jterrazz/typescript's `bundle` preset, with two extra dependency-free
 // Entries: `formatting` (text formatting without the AI peer dependencies) and
 // `oxlint` (the agent/prompt convention plugin — imports nothing from the `ai`/
 // `@ai-sdk/*` runtime, so it stays free of that dependency graph too).
-export default defineConfig({
+const config: UserConfig = defineConfig({
     clean: true,
     dts: true,
     entry: {
@@ -19,3 +19,5 @@ export default defineConfig({
     }),
     sourcemap: true,
 });
+
+export default config;
