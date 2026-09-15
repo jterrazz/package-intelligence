@@ -1,6 +1,6 @@
 import { detectAgentFile } from '../agents.js';
 import { RULE_DOCS } from '../manifest.js';
-import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
+import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
 
 /** Unwrap `private readonly model: T` (TSParameterProperty) / defaults to the bare identifier. */
 function parameterName(param: AstNode | undefined): string | undefined {
@@ -56,7 +56,8 @@ export const g1AgentClassShape: LintRule = {
                 }
             },
             'Program:exit'(node: AstNode) {
-                if (exportedClasses.length === 0) {
+                const target = exportedClasses[0];
+                if (target === undefined) {
                     context.report({ messageId: 'noExportedClass', node });
                     return;
                 }
@@ -66,7 +67,6 @@ export const g1AgentClassShape: LintRule = {
                     }
                 }
 
-                const target = exportedClasses[0];
                 const members = classBody(target);
 
                 const hasSchema = members.some((member) => {

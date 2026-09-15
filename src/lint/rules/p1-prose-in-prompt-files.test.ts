@@ -43,7 +43,7 @@ ruleTester.run('p1-prose-in-prompt-files', p1ProseInPromptFiles as unknown as Ox
         // Interpolated data inside a multi-line prose literal still counts (the
         // Static quasis carry the prose; the hole is just a value).
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const prompt = `Summarize this article about ${topic}.\nFocus on the key facts and events.\nKeep it neutral and factual.`;',
             errors: [{ messageId: 'moveProse' }],
             filename: AGENT_FILE,
@@ -67,13 +67,13 @@ ruleTester.run('p1-prose-in-prompt-files', p1ProseInPromptFiles as unknown as Ox
         },
         // Single-line literal — never reaches the 3-line threshold.
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const label = `Composing article for ${eventId}`;',
             filename: AGENT_FILE,
         },
         // Multi-line but not prose (JSON-ish data interpolation, short lines).
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const json = `{\n  "id": ${id},\n  "ok": true\n}`;',
             filename: AGENT_FILE,
         },

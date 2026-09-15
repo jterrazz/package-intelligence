@@ -1,28 +1,28 @@
 const INVISIBLE_CHARS_RE =
-    /[\u00AD\u180E\u200B-\u200C\u200E-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]/g;
+    /[\u00AD\u180E\u200B-\u200C\u200E-\u200F\u202A-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]/gu;
 
 // oxlint-disable-next-line no-control-regex -- Intentionally matching control characters for sanitization
-const ASCII_CTRL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/g;
+const ASCII_CTRL_RE = /[\u0000-\u0008\u000B\u000C\u000E-\u001F\u007F]/gu;
 
-const SPACE_LIKE_RE = /[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/g;
-const MULTIPLE_SPACES_RE = / {2,}/g;
-const CR_RE = /\r\n?/g;
-const CITATION_RE = / *\(oaicite:\d+\)\{index=\d+\}/g;
-const EM_DASH_SEPARATOR_RE = /\s*[—–―‒]\s*/g;
+const SPACE_LIKE_RE = /[\u00A0\u1680\u2000-\u200A\u202F\u205F\u3000]/gu;
+const MULTIPLE_SPACES_RE = / {2,}/gu;
+const CR_RE = /\r\n?/gu;
+const CITATION_RE = / *\(oaicite:\d+\)\{index=\d+\}/gu;
+const EM_DASH_SEPARATOR_RE = /\s*[—–―‒]\s*/gu;
 
-const TYPOGRAPHY_REPLACEMENTS: Array<{ pattern: RegExp; replacement: string }> = [
-    { pattern: /[\u2018\u2019\u201A]/g, replacement: "'" },
-    { pattern: /[\u201C\u201D\u201E]/g, replacement: '"' },
-    { pattern: /\u2026/g, replacement: '...' },
-    { pattern: /[\u2022\u25AA-\u25AB\u25B8-\u25B9\u25CF]/g, replacement: '-' },
+const TYPOGRAPHY_REPLACEMENTS: { pattern: RegExp; replacement: string }[] = [
+    { pattern: /[\u2018\u2019\u201A]/gu, replacement: "'" },
+    { pattern: /[\u201C\u201D\u201E]/gu, replacement: '"' },
+    { pattern: /\u2026/gu, replacement: '...' },
+    { pattern: /[\u2022\u25AA-\u25AB\u25B8-\u25B9\u25CF]/gu, replacement: '-' },
 ];
 
-export interface CleanAiTextOptions {
+export type CleanAiTextOptions = {
     /** Collapse multiple spaces into one (default: true) */
     collapseSpaces?: boolean;
     /** Convert em/en dashes with spaces to commas (default: true) */
     normalizeEmDashesToCommas?: boolean;
-}
+};
 
 /**
  * Cleans AI-generated text by removing AI artifacts and normalizing typography.

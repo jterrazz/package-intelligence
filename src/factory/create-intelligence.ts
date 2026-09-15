@@ -1,6 +1,6 @@
 import { OpenTelemetry } from '@ai-sdk/otel';
-import type { LanguageModelV4 } from '@ai-sdk/provider';
-import type { LoggerPort } from '@jterrazz/telemetry';
+import { type LanguageModelV4 } from '@ai-sdk/provider';
+import { type LoggerPort } from '@jterrazz/telemetry';
 import { type LanguageModel, registerTelemetry, wrapLanguageModel } from 'ai';
 
 import { createAgentMiddleware } from '../middleware/agent.middleware.js';
@@ -17,9 +17,9 @@ type ProviderConfig =
     | (GatewayConfig & { type: 'gateway' })
     | (OpenRouterConfig & { type: 'openrouter' });
 
-interface ResolvedProvider {
+type ResolvedProvider = {
     model: (id: string) => LanguageModel;
-}
+};
 
 let telemetryRegistered = false;
 
@@ -49,15 +49,19 @@ function createProvider(config: ProviderConfig): ResolvedProvider {
         case 'openrouter': {
             return createOpenRouterProvider(config);
         }
+        default: {
+            throw new Error(`Unknown provider type "${String(config)}".`);
+        }
     }
 }
 
-function assertProviderExists(
+function requireProviderConfig(
     providerKey: string,
     providers: Record<string, ProviderConfig>,
-): void {
-    if (providers[providerKey]) {
-        return;
+): ProviderConfig {
+    const config = providers[providerKey];
+    if (config) {
+        return config;
     }
     const available = Object.keys(providers).join(', ') || '(none configured)';
     throw new Error(`Unknown provider "${providerKey}". Available providers: ${available}.`);
@@ -65,19 +69,19 @@ function assertProviderExists(
 
 export type { ProviderConfig };
 
-export interface ModelRef {
+export type ModelRef = {
     /** Key into `providers` */
     provider: string;
     /** Technical model id passed through to the provider as-is */
     model: string;
-}
+};
 
-export interface AgentConfig extends ModelRef {
+export type AgentConfig = ModelRef & {
     /** Model used when the primary `provider`/`model` fails with a retryable error */
     fallback?: ModelRef;
-}
+};
 
-export interface IntelligenceConfig {
+export type IntelligenceConfig = {
     providers: Record<string, ProviderConfig>;
     agents: Record<string, AgentConfig>;
     /**
@@ -87,12 +91,12 @@ export interface IntelligenceConfig {
      */
     pricing?: Record<string, { input: number; output: number }>;
     logger?: LoggerPort;
-}
+};
 
-export interface Intelligence {
+export type Intelligence = {
     /** Get the composed language model for the given agent name */
     model: (agentName: string) => LanguageModel;
-}
+};
 
 /**
  * Creates a composition root over AI SDK v7: resolves each agent's
@@ -137,23 +141,22 @@ export function createIntelligence(config: IntelligenceConfig): Intelligence {
     function resolveProvider(providerKey: string): ResolvedProvider {
         let provider = providerCache.get(providerKey);
         if (!provider) {
-            provider = createProvider(providers[providerKey]);
+            provider = createProvider(requireProviderConfig(providerKey, providers));
             providerCache.set(providerKey, provider);
         }
         return provider;
     }
 
     function buildModel(ref: ModelRef, agentName: string): LanguageModel {
-        assertProviderExists(ref.provider, providers);
-
         const provider = resolveProvider(ref.provider);
         const baseModel = provider.model(ref.model) as LanguageModelV4;
+        const modelPricing = pricing?.[`${ref.provider}/${ref.model}`];
 
         return wrapLanguageModel({
             model: baseModel,
             middleware: [
                 createAgentMiddleware({ agentName }),
-                createCostMiddleware({ pricing: pricing?.[`${ref.provider}/${ref.model}`] }),
+                createCostMiddleware(modelPricing ? { pricing: modelPricing } : {}),
             ],
         });
     }
@@ -172,8 +175,8 @@ export function createIntelligence(config: IntelligenceConfig): Intelligence {
         const composed = agentConfig.fallback
             ? createFallbackModel({
                   fallback: buildModel(agentConfig.fallback, agentName),
-                  logger,
                   primary,
+                  ...(logger ? { logger } : {}),
               })
             : primary;
 
@@ -190,7 +193,7 @@ export function createIntelligence(config: IntelligenceConfig): Intelligence {
     return {
         model(agentName: string): LanguageModel {
             let model = modelCache.get(agentName);
-            if (!model) {
+            if (model === undefined) {
                 model = buildAgentModel(agentName);
                 modelCache.set(agentName, model);
             }

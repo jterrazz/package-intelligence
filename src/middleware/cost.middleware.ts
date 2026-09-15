@@ -1,23 +1,23 @@
-import type { LanguageModelV4StreamPart, LanguageModelV4Usage } from '@ai-sdk/provider';
+import { type LanguageModelV4StreamPart, type LanguageModelV4Usage } from '@ai-sdk/provider';
 import { trace } from '@opentelemetry/api';
-import type { LanguageModelMiddleware } from 'ai';
+import { type LanguageModelMiddleware } from 'ai';
 
 const COST_ATTRIBUTE = 'gen_ai.usage.cost';
 
-interface OpenRouterCostMetadata {
+type OpenRouterCostMetadata = {
     openrouter?: {
         usage?: {
             cost?: number;
         };
     };
-}
+};
 
-interface CostPricing {
+type CostPricing = {
     /** USD per million input tokens */
     input: number;
     /** USD per million output tokens */
     output: number;
-}
+};
 
 function resolveCost(
     providerMetadata: Record<string, unknown> | undefined,
@@ -50,10 +50,10 @@ function recordCost(cost: number | undefined): void {
 
 export type { CostPricing };
 
-export interface CostMiddlewareOptions {
+export type CostMiddlewareOptions = {
     /** Fallback USD-per-million-token pricing, used when the provider doesn't report actual cost */
     pricing?: CostPricing;
-}
+};
 
 /**
  * Creates middleware that records the USD cost of a generation as
@@ -91,13 +91,7 @@ export function createCostMiddleware(options: CostMiddlewareOptions = {}): Langu
             const result = await doGenerate();
 
             try {
-                recordCost(
-                    resolveCost(
-                        result.providerMetadata as Record<string, unknown> | undefined,
-                        result.usage,
-                        pricing,
-                    ),
-                );
+                recordCost(resolveCost(result.providerMetadata, result.usage, pricing));
             } catch {
                 // Best-effort: telemetry enrichment must never break generation.
             }
@@ -118,9 +112,7 @@ export function createCostMiddleware(options: CostMiddlewareOptions = {}): Langu
                 transform(chunk, controller) {
                     if (chunk.type === 'finish') {
                         finishUsage = chunk.usage;
-                        finishProviderMetadata = chunk.providerMetadata as
-                            | Record<string, unknown>
-                            | undefined;
+                        finishProviderMetadata = chunk.providerMetadata;
                     }
                     controller.enqueue(chunk);
                 },

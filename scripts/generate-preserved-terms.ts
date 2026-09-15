@@ -34,25 +34,24 @@
  */
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import { gunzipSync } from 'node:zlib';
 
-const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url));
+const SCRIPT_DIR = import.meta.dirname;
 const ROOT_DIR = path.resolve(SCRIPT_DIR, '..');
 const NODE_MODULES_DIR = path.join(ROOT_DIR, 'node_modules');
 const OUTPUT_PATH = path.join(ROOT_DIR, 'src/formatting/preserved-terms.generated.ts');
 
 /** Compound/prefix/suffix flag characters used by cspell word lists. */
-const CSPELL_FLAG_CHARS = /[!+*~]/;
+const CSPELL_FLAG_CHARS = /[!+*~]/u;
 /** A single "word" entry: letters/digits plus the punctuation real terms use (Coca-Cola, 2FA, AT&T-style). */
-const VALID_TERM_PATTERN = /^[A-Za-z0-9&'.-]+$/;
+const VALID_TERM_PATTERN = /^[A-Za-z0-9&'.-]+$/u;
 
-interface Source {
+type Source = {
     /** Specificity rank used for dedup precedence: lower wins. */
     readonly rank: number;
     readonly label: string;
     readonly terms: readonly string[];
-}
+};
 
 function readTextFile(relativePath: string): string {
     return readFileSync(path.join(NODE_MODULES_DIR, relativePath), 'utf8');
@@ -65,7 +64,7 @@ function readGzipTextFile(relativePath: string): string {
 
 /** Single-quoted string literal, matching this repo's formatting style. */
 function quote(term: string): string {
-    return `'${term.replace(/\\/g, String.raw`\\`).replace(/'/g, String.raw`\'`)}'`;
+    return `'${term.replaceAll('\\', String.raw`\\`).replaceAll("'", String.raw`\'`)}'`;
 }
 
 /**
@@ -74,15 +73,19 @@ function quote(term: string): string {
  * "api", "git-commit") have nothing worth preserving, so they're dropped too.
  */
 function parseWordListCandidates(raw: string): string[] {
-    return raw
-        .split('\n')
-        .map((line) => line.trim())
-        .filter((line) => line.length > 0)
-        .filter((line) => !line.startsWith('#'))
-        .filter((line) => !/\s/.test(line)) // (a) multi-word entries
-        .filter((line) => !CSPELL_FLAG_CHARS.test(line)) // (a) cspell flag syntax
-        .filter((line) => VALID_TERM_PATTERN.test(line))
-        .filter((line) => /[A-Z]/.test(line)); // (b) must have a capital to preserve
+    return (
+        raw
+            .split('\n')
+            .map((line) => line.trim())
+            .filter((line) => line.length > 0)
+            .filter((line) => !line.startsWith('#'))
+            // (a) multi-word entries, then cspell flag syntax
+            .filter((line) => !/\s/u.test(line))
+            .filter((line) => !CSPELL_FLAG_CHARS.test(line))
+            .filter((line) => VALID_TERM_PATTERN.test(line))
+            // (b) must have a capital to preserve
+            .filter((line) => /[A-Z]/u.test(line))
+    );
 }
 
 /**
@@ -94,11 +97,12 @@ function parseWordListCandidates(raw: string): string[] {
  */
 function buildCommonWordSet(): Set<string> {
     const raw = readTextFile('dictionary-en/index.dic');
-    const lines = raw.split('\n').slice(1); // Skip the leading word-count line
+    // The first line of a Hunspell .dic is the word count, not a headword.
+    const lines = raw.split('\n').slice(1);
     const common = new Set<string>();
     for (const line of lines) {
         const headword = line.split('/')[0]?.trim();
-        if (headword && /^[a-z]/.test(headword)) {
+        if (headword !== undefined && /^[a-z]/u.test(headword)) {
             common.add(headword.toLowerCase());
         }
     }
@@ -132,12 +136,13 @@ function main(): void {
         },
     ];
 
-    const kept = new Map<string, string>(); // Lowercase -> canonical casing
+    // Lowercase -> canonical casing.
+    const kept = new Map<string, string>();
     const excludedAsAmbiguous: { source: string; term: string }[] = [];
     let candidateCount = 0;
 
     // Most specific source first so it wins dedup ties (filter d).
-    for (const source of [...sources].sort((a, b) => a.rank - b.rank)) {
+    for (const source of sources.toSorted((a, b) => a.rank - b.rank)) {
         for (const term of source.terms) {
             candidateCount += 1;
             const lower = term.toLowerCase();
@@ -155,7 +160,7 @@ function main(): void {
         }
     }
 
-    const finalTerms = [...kept.values()].sort((a, b) => a.localeCompare(b));
+    const finalTerms = [...kept.values()].toSorted((a, b) => a.localeCompare(b));
 
     const exampleExclusions = excludedAsAmbiguous.slice(0, 12).map(({ source, term }) => {
         const lower = term.toLowerCase();

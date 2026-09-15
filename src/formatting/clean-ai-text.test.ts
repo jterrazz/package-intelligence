@@ -29,7 +29,7 @@ describe('cleanAiText', () => {
         });
     });
 
-    describe('BOM handling', () => {
+    describe('bOM handling', () => {
         test('removes BOM character at start', () => {
             // Given -- a string with BOM at the start
             const input = '\uFEFFhello';
@@ -65,7 +65,7 @@ describe('cleanAiText', () => {
         });
     });
 
-    describe('AI citation removal', () => {
+    describe('aI citation removal', () => {
         test('removes oaicite markers', () => {
             // Given -- text with an oaicite marker
             const input = 'Some text (oaicite:0){index=0} more text';
@@ -125,10 +125,10 @@ describe('cleanAiText', () => {
         });
     });
 
-    describe('ASCII control character removal', () => {
+    describe('aSCII control character removal', () => {
         test('removes null character', () => {
             // Given -- a string with null character
-            const input = 'hello\x00world';
+            const input = 'hello\u0000world';
 
             // Then -- the null character is removed
             expect(cleanAiText(input)).toBe('helloworld');
@@ -136,7 +136,7 @@ describe('cleanAiText', () => {
 
         test('removes bell character', () => {
             // Given -- a string with bell character
-            const input = 'hello\x07world';
+            const input = 'hello\u0007world';
 
             // Then -- the bell character is removed
             expect(cleanAiText(input)).toBe('helloworld');
@@ -144,7 +144,7 @@ describe('cleanAiText', () => {
 
         test('removes delete character', () => {
             // Given -- a string with delete character
-            const input = 'hello\x7Fworld';
+            const input = 'hello\u007Fworld';
 
             // Then -- the delete character is removed
             expect(cleanAiText(input)).toBe('helloworld');
@@ -335,7 +335,7 @@ describe('cleanAiText', () => {
         });
     });
 
-    describe('NFKC normalization', () => {
+    describe('nFKC normalization', () => {
         test('normalizes fullwidth characters', () => {
             // Given -- fullwidth ASCII characters
             const input = '\uFF21\uFF22\uFF23';

@@ -51,8 +51,8 @@ describe('createFallbackModel', () => {
         const logger = createMockLogger();
 
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
             logger,
         });
 
@@ -78,8 +78,8 @@ describe('createFallbackModel', () => {
         const logger = createMockLogger();
 
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
             logger,
         });
 
@@ -90,7 +90,7 @@ describe('createFallbackModel', () => {
 
         // Then -- the fallback model is used and a warning is logged
         expect(result).toBe(successResult);
-        expect(fallback.doGenerate).toHaveBeenCalledTimes(1);
+        expect(fallback.doGenerate).toHaveBeenCalledOnce();
         expect(logger.warn).toHaveBeenCalledWith(
             'ai.fallback.triggered',
             expect.objectContaining({ modelIds: ['primary', 'fallback'] }),
@@ -107,8 +107,8 @@ describe('createFallbackModel', () => {
         });
 
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
         });
 
         // When
@@ -118,7 +118,7 @@ describe('createFallbackModel', () => {
 
         // Then
         expect(result).toBe(successResult);
-        expect(fallback.doGenerate).toHaveBeenCalledTimes(1);
+        expect(fallback.doGenerate).toHaveBeenCalledOnce();
     });
 
     test('falls back on a network error', async () => {
@@ -132,8 +132,8 @@ describe('createFallbackModel', () => {
         });
 
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
         });
 
         // When
@@ -143,7 +143,7 @@ describe('createFallbackModel', () => {
 
         // Then
         expect(result).toBe(successResult);
-        expect(fallback.doGenerate).toHaveBeenCalledTimes(1);
+        expect(fallback.doGenerate).toHaveBeenCalledOnce();
     });
 
     test('does not fall back on a 400 error', async () => {
@@ -156,8 +156,8 @@ describe('createFallbackModel', () => {
         const logger = createMockLogger();
 
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
             logger,
         });
 
@@ -178,8 +178,8 @@ describe('createFallbackModel', () => {
         const fallback = createMockModel('fallback', { doGenerate: vi.fn() });
 
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
         });
 
         // Then
@@ -200,8 +200,8 @@ describe('createFallbackModel', () => {
         });
 
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
         });
 
         // When
@@ -211,7 +211,7 @@ describe('createFallbackModel', () => {
 
         // Then
         expect(result).toBe(streamResult);
-        expect(fallback.doStream).toHaveBeenCalledTimes(1);
+        expect(fallback.doStream).toHaveBeenCalledOnce();
     });
 
     test('delegates static properties to the primary model', () => {
@@ -221,8 +221,8 @@ describe('createFallbackModel', () => {
 
         // When
         const model = createFallbackModel({
-            primary: primary as never,
-            fallback: fallback as never,
+            primary,
+            fallback,
         });
 
         // Then -- static properties mirror the primary model

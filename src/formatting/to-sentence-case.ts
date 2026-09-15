@@ -95,7 +95,7 @@ const HAS_LOWER_THEN_UPPER = /\p{Ll}\p{Lu}/u;
 const HAS_UPPER = /\p{Lu}/u;
 const HAS_LOWER = /\p{Ll}/u;
 const HAS_LETTER = /\p{L}/u;
-const SENTENCE_END_PATTERN = /[.!?]/;
+const SENTENCE_END_PATTERN = /[.!?]/u;
 
 /**
  * Languages supported for the spelling-dictionary fallback. Publicly
@@ -208,7 +208,7 @@ function isKnownInAnyLanguage(word: string, languages: readonly Language[]): boo
     return false;
 }
 
-export interface ToSentenceCaseOptions {
+export type ToSentenceCaseOptions = {
     /**
      * Extra terms whose exact casing should be preserved (e.g. brand names).
      * Appended to the default tech-oriented list unless `replacePreserved` is set.
@@ -242,7 +242,7 @@ export interface ToSentenceCaseOptions {
      * know you'll never need, not as a per-call performance knob.
      */
     languages?: Language[];
-}
+};
 
 /**
  * Normalizes Title Case overuse back to sentence case.
@@ -266,7 +266,7 @@ export function toSentenceCase(text: string, options: ToSentenceCaseOptions = {}
     for (const term of options.preservedTerms ?? []) {
         localPreservedMap.set(term.toLowerCase(), term);
     }
-    const defaultMap = options.replacePreserved ? null : getDefaultPreservedMap();
+    const defaultMap = options.replacePreserved === true ? null : getDefaultPreservedMap();
     const lookupPreserved = (lower: string): string | undefined =>
         localPreservedMap.get(lower) ?? defaultMap?.get(lower);
 
@@ -315,7 +315,7 @@ export function toSentenceCase(text: string, options: ToSentenceCaseOptions = {}
              * "Iphone").
              */
             const preserved = lookupPreserved(tok.toLowerCase());
-            if (preserved) {
+            if (preserved !== undefined) {
                 return preserved;
             }
 
@@ -334,7 +334,7 @@ export function toSentenceCase(text: string, options: ToSentenceCaseOptions = {}
              * capitalized regardless of what any dictionary says about it.
              */
             if (startsNewSentence) {
-                return tok[0].toUpperCase() + tok.slice(1).toLowerCase();
+                return tok.charAt(0).toUpperCase() + tok.slice(1).toLowerCase();
             }
 
             /*

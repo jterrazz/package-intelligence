@@ -1,5 +1,5 @@
-import type { LanguageModelV4CallOptions } from '@ai-sdk/provider';
-import { describe, expect, it } from 'vitest';
+import { type LanguageModelV4CallOptions } from '@ai-sdk/provider';
+import { describe, expect, test } from 'vitest';
 
 import { createSchemaInstructionMiddleware } from './schema-instruction.middleware.js';
 
@@ -17,30 +17,46 @@ const jsonSchema = {
 };
 
 async function transform(params: LanguageModelV4CallOptions): Promise<LanguageModelV4CallOptions> {
-    const middleware = createSchemaInstructionMiddleware();
-    return middleware.transformParams!({
+    const { transformParams } = createSchemaInstructionMiddleware();
+    if (transformParams === undefined) {
+        throw new Error('the schema-instruction middleware must transform params');
+    }
+    return await transformParams({
         model: {} as never,
         params,
         type: 'generate',
     });
 }
 
+/**
+ * The text of the first content part of `prompt[index]` — what every case below
+ * asserts on, read through one place that fails loudly on an absent message.
+ */
+function partText(params: LanguageModelV4CallOptions, index: number): string {
+    const parts = params.prompt[index]?.content as undefined | { text: string }[];
+    const text = parts?.[0]?.text;
+    if (text === undefined) {
+        throw new Error(`prompt[${index}] carries no text content part`);
+    }
+    return text;
+}
+
 describe('createSchemaInstructionMiddleware', () => {
-    it('leaves params untouched when there is no responseFormat', async () => {
+    test('leaves params untouched when there is no responseFormat', async () => {
         const result = await transform(baseParams);
 
-        expect(result).toEqual(baseParams);
+        expect(result).toStrictEqual(baseParams);
     });
 
-    it('leaves params untouched for text responseFormat', async () => {
+    test('leaves params untouched for text responseFormat', async () => {
         const params = { ...baseParams, responseFormat: { type: 'text' as const } };
 
         const result = await transform(params);
 
-        expect(result).toEqual(params);
+        expect(result).toStrictEqual(params);
     });
 
-    it('appends the schema instruction to the last user message', async () => {
+    test('appends the schema instruction to the last user message', async () => {
         const params = {
             ...baseParams,
             responseFormat: { schema: jsonSchema, type: 'json' as const },
@@ -49,17 +65,15 @@ describe('createSchemaInstructionMiddleware', () => {
         const result = await transform(params);
 
         expect(result.prompt).toHaveLength(2);
-        const user = result.prompt[1];
-        expect(user.role).toBe('user');
-        const parts = user.content as { text: string; type: string }[];
-        expect(parts).toHaveLength(1);
-        expect(parts[0].text).toContain('Hello');
-        expect(parts[0].text).toContain('valid JSON only');
-        expect(parts[0].text).toContain(JSON.stringify(jsonSchema));
-        expect(result.prompt[0]).toEqual(baseParams.prompt[0]);
+        expect(result.prompt[1]?.role).toBe('user');
+        expect(result.prompt[1]?.content).toHaveLength(1);
+        expect(partText(result, 1)).toContain('Hello');
+        expect(partText(result, 1)).toContain('valid JSON only');
+        expect(partText(result, 1)).toContain(JSON.stringify(jsonSchema));
+        expect(result.prompt[0]).toStrictEqual(baseParams.prompt[0]);
     });
 
-    it('targets the LAST user message in multi-turn prompts', async () => {
+    test('targets the LAST user message in multi-turn prompts', async () => {
         const params: LanguageModelV4CallOptions = {
             prompt: [
                 { content: [{ text: 'First', type: 'text' }], role: 'user' },
@@ -71,13 +85,12 @@ describe('createSchemaInstructionMiddleware', () => {
 
         const result = await transform(params);
 
-        const [first, , last] = result.prompt;
-        expect((first.content as { text: string }[])[0].text).toBe('First');
-        expect((last.content as { text: string }[])[0].text).toContain('Second');
-        expect((last.content as { text: string }[])[0].text).toContain('valid JSON only');
+        expect(partText(result, 0)).toBe('First');
+        expect(partText(result, 2)).toContain('Second');
+        expect(partText(result, 2)).toContain('valid JSON only');
     });
 
-    it('appends a user message when the prompt has none', async () => {
+    test('appends a user message when the prompt has none', async () => {
         const params: LanguageModelV4CallOptions = {
             prompt: [{ content: 'Be terse.', role: 'system' }],
             responseFormat: { schema: jsonSchema, type: 'json' },
@@ -86,10 +99,10 @@ describe('createSchemaInstructionMiddleware', () => {
         const result = await transform(params);
 
         expect(result.prompt).toHaveLength(2);
-        expect(result.prompt[1].role).toBe('user');
+        expect(result.prompt[1]?.role).toBe('user');
     });
 
-    it('keeps the original responseFormat in the params', async () => {
+    test('keeps the original responseFormat in the params', async () => {
         const params = {
             ...baseParams,
             responseFormat: { schema: jsonSchema, type: 'json' as const },
@@ -97,16 +110,15 @@ describe('createSchemaInstructionMiddleware', () => {
 
         const result = await transform(params);
 
-        expect(result.responseFormat).toEqual(params.responseFormat);
+        expect(result.responseFormat).toStrictEqual(params.responseFormat);
     });
 
-    it('still instructs JSON-only output when no schema is provided', async () => {
+    test('still instructs JSON-only output when no schema is provided', async () => {
         const params = { ...baseParams, responseFormat: { type: 'json' as const } };
 
         const result = await transform(params);
 
-        const parts = result.prompt[1].content as { text: string }[];
-        expect(parts[0].text).toContain('valid JSON only');
-        expect(parts[0].text).not.toContain('JSON schema');
+        expect(partText(result, 1)).toContain('valid JSON only');
+        expect(partText(result, 1)).not.toContain('JSON schema');
     });
 });

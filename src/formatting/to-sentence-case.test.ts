@@ -17,7 +17,7 @@ describe('toSentenceCase', () => {
         });
     });
 
-    describe('Title Case detection (does not over-trigger)', () => {
+    describe('title Case detection (does not over-trigger)', () => {
         test('leaves sentence-case strings with one proper noun untouched', () => {
             expect(toSentenceCase('Cursor: the compression of mechanical work')).toBe(
                 'Cursor: the compression of mechanical work',
@@ -250,7 +250,7 @@ describe('toSentenceCase', () => {
         });
     });
 
-    describe('ALL-CAPS shouting titles', () => {
+    describe('aLL-CAPS shouting titles', () => {
         test('lowercases an ALL-CAPS token that happens to be a real dictionary word, capitalizes it as first word', () => {
             /*
              * "ACME" isn't in any preserved list, but — coincidentally —
@@ -266,7 +266,7 @@ describe('toSentenceCase', () => {
             );
         });
 
-        test('BEHAVIOR CHANGE: an unrecognized ALL-CAPS token is now preserved, not lowercased', () => {
+        test('bEHAVIOR CHANGE: an unrecognized ALL-CAPS token is now preserved, not lowercased', () => {
             /*
              * Old behavior: in "shouting" mode (>= 50% of words look like a
              * 2-6 char ALL-CAPS acronym), the old code disabled its generic
@@ -419,7 +419,7 @@ describe('toSentenceCase', () => {
             );
         });
 
-        test('KNOWN COLLISION: "Macron" mid-sentence lowercases, because "macron" is a genuine English dictionary word', () => {
+        test('kNOWN COLLISION: "Macron" mid-sentence lowercases, because "macron" is a genuine English dictionary word', () => {
             /*
              * This is the flip side of the "Macron"/"Zelensky" example used in
              * the task brief: the political figure's name is illustrative, but
@@ -473,7 +473,7 @@ describe('toSentenceCase', () => {
         });
     });
 
-    describe('ALL-CAPS dictionary resolution', () => {
+    describe('aLL-CAPS dictionary resolution', () => {
         test('lowercases a known ALL-CAPS word and restores title casing for a known-but-unlowercase-friendly proper noun', () => {
             /*
              * "BREAKING" -> known common word -> lowercased.
@@ -485,7 +485,7 @@ describe('toSentenceCase', () => {
             );
         });
 
-        test('KNOWN COLLISION: "CANNES" lowercases with the default languages, because "cannes" is a French dictionary word (plural of "canne", a cane/walking stick)', () => {
+        test('kNOWN COLLISION: "CANNES" lowercases with the default languages, because "cannes" is a French dictionary word (plural of "canne", a cane/walking stick)', () => {
             /*
              * The task brief's own "PARIS -> Paris" example turns out not to
              * exercise this path at all: "Paris" is already in the generated

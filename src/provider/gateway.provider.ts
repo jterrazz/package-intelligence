@@ -1,20 +1,20 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import type { LanguageModelV4 } from '@ai-sdk/provider';
+import { type LanguageModelV4 } from '@ai-sdk/provider';
 import { extractJsonMiddleware, type LanguageModel, wrapLanguageModel } from 'ai';
 
 import { createSchemaInstructionMiddleware } from '../middleware/schema-instruction.middleware.js';
 
-export interface GatewayConfig {
+export type GatewayConfig = {
     /** Base URL of the gateway's chat-completions endpoint */
     baseURL: string;
     /** API key for authentication, if required by the endpoint */
     apiKey?: string;
-}
+};
 
-export interface GatewayProvider {
+export type GatewayProvider = {
     /** Get a language model instance for the given model id */
     model: (id: string) => LanguageModel;
-}
+};
 
 /**
  * Creates a provider for gateways exposing a chat-completions API — any API
@@ -36,8 +36,8 @@ export interface GatewayProvider {
  */
 export function createGatewayProvider(config: GatewayConfig): GatewayProvider {
     const openai = createOpenAI({
-        apiKey: config.apiKey,
         baseURL: config.baseURL,
+        ...(config.apiKey === undefined ? {} : { apiKey: config.apiKey }),
     });
 
     return {

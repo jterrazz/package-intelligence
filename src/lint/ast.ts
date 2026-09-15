@@ -1,4 +1,4 @@
-import type { AstNode } from './types.js';
+import { type AstNode } from './types.js';
 
 /**
  * Shared AST helpers for the rule files. Everything here is pure and
@@ -9,7 +9,7 @@ import type { AstNode } from './types.js';
 
 /** Split a path into its non-empty segments (posix or win separators). */
 export function segments(path: string): string[] {
-    return path.split(/[/\\]/).filter(Boolean);
+    return path.split(/[/\\]/u).filter(Boolean);
 }
 
 /** The string value of a plain string literal (or a template with no holes). */
@@ -24,7 +24,7 @@ export function stringValue(node: AstNode | undefined): string | undefined {
         const expressions = node.expressions as AstNode[] | undefined;
         const quasis = node.quasis as AstNode[] | undefined;
         if (expressions?.length === 0 && quasis?.length === 1) {
-            return (quasis[0].value as undefined | { cooked?: string })?.cooked;
+            return (quasis[0]?.value as undefined | { cooked?: string })?.cooked;
         }
     }
     return undefined;

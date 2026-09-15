@@ -46,7 +46,7 @@ describe('createLoggingMiddleware', () => {
             const result = await middleware.wrapGenerate?.({
                 doGenerate,
                 doStream: vi.fn(),
-                params: { prompt: [] } as never,
+                params: { prompt: [] },
                 model: model as never,
             });
 
@@ -81,7 +81,7 @@ describe('createLoggingMiddleware', () => {
                 middleware.wrapGenerate?.({
                     doGenerate,
                     doStream: vi.fn(),
-                    params: { prompt: [] } as never,
+                    params: { prompt: [] },
                     model: model as never,
                 }),
             ).rejects.toThrow('API error');
@@ -109,7 +109,7 @@ describe('createLoggingMiddleware', () => {
             await middleware.wrapGenerate?.({
                 doGenerate,
                 doStream: vi.fn(),
-                params: mockParams as never,
+                params: mockParams,
                 model: model as never,
             });
 
@@ -132,7 +132,7 @@ describe('createLoggingMiddleware', () => {
             await middleware.wrapGenerate?.({
                 doGenerate,
                 doStream: vi.fn(),
-                params: { prompt: [] } as never,
+                params: { prompt: [] },
                 model: model as never,
             });
 
@@ -155,13 +155,12 @@ describe('createLoggingMiddleware', () => {
             await middleware.wrapGenerate?.({
                 doGenerate,
                 doStream: vi.fn(),
-                params: { prompt: [] } as never,
+                params: { prompt: [] },
                 model: model as never,
             });
 
             // Then -- the completion log does not include usage
-            const completedCall = logger.debug.mock.calls[1];
-            expect(completedCall[1]).not.toHaveProperty('usage');
+            expect(logger.debug.mock.calls[1]?.[1]).not.toHaveProperty('usage');
         });
     });
 });

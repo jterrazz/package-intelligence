@@ -1,5 +1,5 @@
-import type { LanguageModelV4CallOptions, LanguageModelV4Prompt } from '@ai-sdk/provider';
-import type { LanguageModelMiddleware } from 'ai';
+import { type LanguageModelV4CallOptions, type LanguageModelV4Prompt } from '@ai-sdk/provider';
+import { type LanguageModelMiddleware } from 'ai';
 
 function buildInstruction(responseFormat: LanguageModelV4CallOptions['responseFormat']): string {
     if (responseFormat?.type !== 'json') {
@@ -71,16 +71,16 @@ function appendToLastUserMessage(
 export function createSchemaInstructionMiddleware(): LanguageModelMiddleware {
     return {
         specificationVersion: 'v4',
-        transformParams: ({ params }) => {
+        transformParams: async ({ params }) => {
             const instruction = buildInstruction(params.responseFormat);
-            if (!instruction) {
-                return Promise.resolve(params);
+            if (instruction === '') {
+                return params;
             }
 
-            return Promise.resolve({
+            return {
                 ...params,
                 prompt: appendToLastUserMessage(params.prompt, instruction),
-            });
+            };
         },
     };
 }

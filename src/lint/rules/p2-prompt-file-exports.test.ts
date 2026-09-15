@@ -18,7 +18,7 @@ ruleTester.run('p2-prompt-file-exports', p2PromptFileExports as unknown as Oxlin
     invalid: [
         // Default export.
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export default (v: string) => `Hello ${v}`;',
             errors: [{ messageId: 'defaultExport' }],
             filename: PROMPT_FILE,
@@ -37,7 +37,7 @@ ruleTester.run('p2-prompt-file-exports', p2PromptFileExports as unknown as Oxlin
         },
         // A plain `function` declaration — the convention is arrow consts.
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export function buildPrompt(v: string): string { return `Hello ${v}`; }',
             errors: [{ messageId: 'nonFunctionExport' }],
             filename: PROMPT_FILE,
@@ -50,7 +50,7 @@ ruleTester.run('p2-prompt-file-exports', p2PromptFileExports as unknown as Oxlin
         },
         // Block body with a non-string return mixed with a string one.
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export const buildPrompt = (v: string) => { if (!v) return []; return `Hello ${v}`; };',
             errors: [{ messageId: 'nonStringReturn' }],
             filename: PROMPT_FILE,
@@ -59,13 +59,13 @@ ruleTester.run('p2-prompt-file-exports', p2PromptFileExports as unknown as Oxlin
     valid: [
         // The canonical shape: a template-literal-returning arrow const.
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export const buildPrompt = (v: string): string => `Hello ${v}`;',
             filename: PROMPT_FILE,
         },
         // A section builder with an early-return string plus a template-literal return.
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: "export const buildSection = (items: string[]): string => { if (items.length === 0) { return ''; } return `Items: ${items.join(', ')}`; };",
             filename: PROMPT_FILE,
         },
@@ -76,7 +76,7 @@ ruleTester.run('p2-prompt-file-exports', p2PromptFileExports as unknown as Oxlin
         },
         // Types and interfaces are always allowed.
         {
-            // eslint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
+            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export interface Variables { word: string; }\nexport type Lang = "EN" | "FR";\nexport const buildPrompt = (v: Variables): string => `Word: ${v.word}`;',
             filename: PROMPT_FILE,
         },

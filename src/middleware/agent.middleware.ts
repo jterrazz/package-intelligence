@@ -1,12 +1,12 @@
 import { trace } from '@opentelemetry/api';
-import type { LanguageModelMiddleware } from 'ai';
+import { type LanguageModelMiddleware } from 'ai';
 
 const AGENT_ATTRIBUTE = 'gen_ai.agent.name';
 
-export interface AgentMiddlewareOptions {
+export type AgentMiddlewareOptions = {
     /** The agent this model serves — becomes the generation's name in Langfuse */
     agentName: string;
-}
+};
 
 /**
  * Creates middleware that names the AI SDK's inference span after the agent.
@@ -41,11 +41,11 @@ export function createAgentMiddleware(options: AgentMiddlewareOptions): Language
         specificationVersion: 'v4',
         wrapGenerate: async ({ doGenerate }) => {
             nameActiveSpan();
-            return doGenerate();
+            return await doGenerate();
         },
         wrapStream: async ({ doStream }) => {
             nameActiveSpan();
-            return doStream();
+            return await doStream();
         },
     };
 }

@@ -4,7 +4,7 @@ import { detectAgentFile, detectPromptFile } from '../agents.js';
 import { stringValue } from '../ast.js';
 import { fileExists } from '../fs.js';
 import { RULE_DOCS } from '../manifest.js';
-import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
+import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
 
 /**
  * CONVENTIONS P3 — the two-way link between an agent file and its prompt:

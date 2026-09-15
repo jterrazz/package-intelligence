@@ -1,5 +1,5 @@
 import { RULE_DOCS } from '../manifest.js';
-import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
+import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
 
 /** Declaration types that are types, not values — always allowed. */
 const TYPE_DECLARATIONS = new Set(['TSInterfaceDeclaration', 'TSTypeAliasDeclaration']);
@@ -76,7 +76,8 @@ function ownReturnExpressions(fn: AstNode): AstNode[] {
             node.type === 'FunctionExpression' ||
             node.type === 'FunctionDeclaration'
         ) {
-            return; // Do not descend into a nested function's own returns.
+            // Do not descend into a nested function's own returns.
+            return;
         }
         for (const key of Object.keys(node)) {
             if (key === 'parent') {
@@ -133,7 +134,8 @@ export const p2PromptFileExports: LintRule = {
                     }
                     const declaration = statement.declaration as AstNode | undefined;
                     if (declaration === undefined) {
-                        continue; // `export { x };` re-export form — out of P2's static reach.
+                        // `export { x };` re-export form — out of P2's static reach.
+                        continue;
                     }
                     if (TYPE_DECLARATIONS.has(declaration.type)) {
                         continue;

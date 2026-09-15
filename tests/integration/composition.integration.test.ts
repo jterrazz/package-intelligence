@@ -1,4 +1,4 @@
-import { APICallError } from '@ai-sdk/provider';
+import { APICallError, type SharedV4ProviderMetadata } from '@ai-sdk/provider';
 import { trace } from '@opentelemetry/api';
 import { generateText, wrapLanguageModel } from 'ai';
 import { MockLanguageModelV4 } from 'ai/test';
@@ -22,16 +22,16 @@ function createMockLogger() {
     return logger;
 }
 
-function generateResult(text: string, providerMetadata?: Record<string, unknown>) {
+function generateResult(text: string, providerMetadata?: SharedV4ProviderMetadata) {
     return {
         content: [{ type: 'text' as const, text }],
-        finishReason: 'stop' as const,
-        providerMetadata,
+        finishReason: { raw: 'stop', unified: 'stop' as const },
         usage: {
-            inputTokens: { total: 100 },
-            outputTokens: { total: 50 },
+            inputTokens: { cacheRead: undefined, cacheWrite: undefined, noCache: 100, total: 100 },
+            outputTokens: { reasoning: undefined, text: 50, total: 50 },
         },
         warnings: [],
+        ...(providerMetadata === undefined ? {} : { providerMetadata }),
     };
 }
 
@@ -53,10 +53,7 @@ describe('composition: cost + logging + fallback wrapped around a real LanguageM
         });
 
         const model = wrapLanguageModel({
-            middleware: [
-                createCostMiddleware({ modelRef: 'openrouter/mock-model' }),
-                createLoggingMiddleware({ logger }),
-            ],
+            middleware: [createCostMiddleware(), createLoggingMiddleware({ logger })],
             model: baseModel,
         });
 
@@ -69,7 +66,7 @@ describe('composition: cost + logging + fallback wrapped around a real LanguageM
         expect(logger.debug).toHaveBeenCalledWith('ai.generate.start', expect.any(Object));
         expect(logger.debug).toHaveBeenCalledWith(
             'ai.generate.complete',
-            expect.objectContaining({ finishReason: 'stop' }),
+            expect.objectContaining({ finishReason: { raw: 'stop', unified: 'stop' } }),
         );
     });
 
@@ -95,7 +92,7 @@ describe('composition: cost + logging + fallback wrapped around a real LanguageM
         const composed = createFallbackModel({ fallback, logger, primary });
 
         const model = wrapLanguageModel({
-            middleware: [createCostMiddleware({ modelRef: 'openrouter/primary-model' })],
+            middleware: [createCostMiddleware()],
             model: composed,
         });
 

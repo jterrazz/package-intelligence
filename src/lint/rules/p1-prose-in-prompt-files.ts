@@ -1,9 +1,9 @@
 import { isUnderAgentsFolder } from '../agents.js';
 import { RULE_DOCS } from '../manifest.js';
-import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
+import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
 
 /** A markdown heading — `#`, `##`, or `###` followed by a space. */
-const MARKDOWN_HEADING = /^#{1,3}\s/;
+const MARKDOWN_HEADING = /^#{1,3}\s/u;
 /** A line reading as prose: 4+ tokens separated by whitespace. */
 const MIN_PROSE_WORDS = 4;
 
@@ -40,11 +40,11 @@ export const p1ProseInPromptFiles: LintRule = {
         if (!isUnderAgentsFolder(file)) {
             return {};
         }
-        const base = file.split(/[/\\]/).pop() ?? '';
+        const base = file.split(/[/\\]/u).pop() ?? '';
         if (base.endsWith('.prompt.ts') || base.endsWith('.test.ts')) {
             return {};
         }
-        const target = `${base.replace(/\.ts$/, '')}.prompt.ts`;
+        const target = `${base.replace(/\.ts$/u, '')}.prompt.ts`;
 
         return {
             TemplateLiteral(node: AstNode) {

@@ -1,23 +1,23 @@
-import type { LanguageModelV4 } from '@ai-sdk/provider';
+import { type LanguageModelV4 } from '@ai-sdk/provider';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import type { LanguageModel } from 'ai';
+import { type LanguageModel } from 'ai';
 
-export interface OpenRouterMetadata {
+export type OpenRouterMetadata = {
     /** Application name, sent as the `X-OpenRouter-Title` header for dashboard attribution */
     application?: string;
     /** Application URL, sent as the `HTTP-Referer` header for dashboard attribution */
     website?: string;
-}
+};
 
-export interface OpenRouterConfig {
+export type OpenRouterConfig = {
     apiKey: string;
     metadata?: OpenRouterMetadata;
-}
+};
 
-export interface OpenRouterProvider {
+export type OpenRouterProvider = {
     /** Get a language model instance for the given OpenRouter model id */
     model: (id: string) => LanguageModel;
-}
+};
 
 /**
  * Creates an OpenRouter provider for AI SDK models.
@@ -41,8 +41,10 @@ export interface OpenRouterProvider {
 export function createOpenRouterProvider(config: OpenRouterConfig): OpenRouterProvider {
     const openrouter = createOpenRouter({
         apiKey: config.apiKey,
-        appName: config.metadata?.application,
-        appUrl: config.metadata?.website,
+        ...(config.metadata?.application === undefined
+            ? {}
+            : { appName: config.metadata.application }),
+        ...(config.metadata?.website === undefined ? {} : { appUrl: config.metadata.website }),
     });
 
     return {

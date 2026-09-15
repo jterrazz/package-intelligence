@@ -54,8 +54,7 @@ describe('createAgentMiddleware', () => {
     });
 
     test('never throws without an active span or with a broken span', async () => {
-        // Given -- no span, then a span whose updateName explodes
-        vi.spyOn(trace, 'getActiveSpan').mockReturnValueOnce(undefined);
+        // Given -- no span (unmocked, the real default), then one whose updateName explodes
         const middleware = createAgentMiddleware({ agentName: 'x' });
 
         // When / Then

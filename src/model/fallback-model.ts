@@ -3,18 +3,18 @@ import {
     type LanguageModelV4,
     type LanguageModelV4CallOptions,
 } from '@ai-sdk/provider';
-import type { LoggerPort } from '@jterrazz/telemetry';
-import type { LanguageModel } from 'ai';
+import { type LoggerPort } from '@jterrazz/telemetry';
+import { type LanguageModel } from 'ai';
 
 const RETRYABLE_MESSAGE_PATTERNS = [
-    /ECONNREFUSED/i,
-    /ECONNRESET/i,
-    /ETIMEDOUT/i,
-    /EAI_AGAIN/i,
-    /ENOTFOUND/i,
-    /timed?\s*out/i,
-    /network/i,
-    /fetch failed/i,
+    /ECONNREFUSED/iu,
+    /ECONNRESET/iu,
+    /ETIMEDOUT/iu,
+    /EAI_AGAIN/iu,
+    /ENOTFOUND/iu,
+    /timed?\s*out/iu,
+    /network/iu,
+    /fetch failed/iu,
 ];
 
 function isRetryableError(error: unknown): boolean {
@@ -29,11 +29,11 @@ function isRetryableError(error: unknown): boolean {
     return RETRYABLE_MESSAGE_PATTERNS.some((pattern) => pattern.test(message));
 }
 
-export interface FallbackModelOptions {
+export type FallbackModelOptions = {
     primary: LanguageModel;
     fallback: LanguageModel;
     logger?: LoggerPort;
-}
+};
 
 /**
  * Creates a `LanguageModelV4` that transparently falls back to a secondary
@@ -53,7 +53,7 @@ export interface FallbackModelOptions {
  * });
  * ```
  */
-export function createFallbackModel(options: FallbackModelOptions): LanguageModel {
+export function createFallbackModel(options: FallbackModelOptions): LanguageModelV4 {
     const { primary, fallback, logger } = options;
     const primaryModel = primary as LanguageModelV4;
     const fallbackModel = fallback as LanguageModelV4;
@@ -79,7 +79,7 @@ export function createFallbackModel(options: FallbackModelOptions): LanguageMode
                     throw error;
                 }
                 logFallback(error);
-                return fallbackModel.doGenerate(callOptions);
+                return await fallbackModel.doGenerate(callOptions);
             }
         },
 
@@ -91,7 +91,7 @@ export function createFallbackModel(options: FallbackModelOptions): LanguageMode
                     throw error;
                 }
                 logFallback(error);
-                return fallbackModel.doStream(callOptions);
+                return await fallbackModel.doStream(callOptions);
             }
         },
     };

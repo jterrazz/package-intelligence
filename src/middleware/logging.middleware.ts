@@ -1,15 +1,15 @@
-import type { LanguageModelV4StreamPart } from '@ai-sdk/provider';
-import type { LoggerPort } from '@jterrazz/telemetry';
-import type { LanguageModelMiddleware } from 'ai';
+import { type LanguageModelV4StreamPart } from '@ai-sdk/provider';
+import { type LoggerPort } from '@jterrazz/telemetry';
+import { type LanguageModelMiddleware } from 'ai';
 
-export interface LoggingMiddlewareOptions {
+export type LoggingMiddlewareOptions = {
     logger: LoggerPort;
     include?: {
         params?: boolean;
         content?: boolean;
         usage?: boolean;
     };
-}
+};
 
 /**
  * Creates middleware that logs AI SDK requests and responses.
@@ -18,7 +18,11 @@ export function createLoggingMiddleware(
     options: LoggingMiddlewareOptions,
 ): LanguageModelMiddleware {
     const { logger, include = {} } = options;
-    const { params: includeParams, content: includeContent, usage: includeUsage = true } = include;
+    const {
+        params: includeParams = false,
+        content: includeContent = false,
+        usage: includeUsage = true,
+    } = include;
 
     return {
         specificationVersion: 'v4',

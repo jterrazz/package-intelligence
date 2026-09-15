@@ -135,8 +135,7 @@ describe('createCostMiddleware', () => {
         });
 
         test('never throws when there is no active span', async () => {
-            // Given -- no active span (getActiveSpan returns undefined, the real default)
-            vi.spyOn(trace, 'getActiveSpan').mockReturnValue(undefined);
+            // Given -- no active span: unmocked, `trace.getActiveSpan()` is the real default
 
             const middleware = createCostMiddleware({
                 pricing: { input: 1, output: 2 },

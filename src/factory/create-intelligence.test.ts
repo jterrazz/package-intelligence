@@ -1,4 +1,6 @@
+import { type OpenAIProvider } from '@ai-sdk/openai';
 import { APICallError } from '@ai-sdk/provider';
+import { type OpenRouterProvider } from '@openrouter/ai-sdk-provider';
 import { generateText } from 'ai';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -17,7 +19,7 @@ function baseGenerateResult(id: string) {
     };
 }
 
-vi.mock('@openrouter/ai-sdk-provider', () => {
+vi.mock(import('@openrouter/ai-sdk-provider'), () => {
     function makeModel(id: string) {
         return {
             specificationVersion: 'v4' as const,
@@ -26,17 +28,19 @@ vi.mock('@openrouter/ai-sdk-provider', () => {
             supportedUrls: {},
             doGenerate: vi.fn(async () => {
                 const override = modelOverrides.get(id);
-                return override ? override() : baseGenerateResult(id);
+                return override ? await override() : baseGenerateResult(id);
             }),
             doStream: vi.fn(),
         };
     }
     return {
-        createOpenRouter: vi.fn(() => (id: string) => makeModel(id)),
+        createOpenRouter: vi.fn(
+            () => ((id: string) => makeModel(id)) as unknown as OpenRouterProvider,
+        ),
     };
 });
 
-vi.mock('@ai-sdk/openai', () => {
+vi.mock(import('@ai-sdk/openai'), () => {
     function makeModel(id: string) {
         return {
             specificationVersion: 'v4' as const,
@@ -45,13 +49,15 @@ vi.mock('@ai-sdk/openai', () => {
             supportedUrls: {},
             doGenerate: vi.fn(async () => {
                 const override = modelOverrides.get(id);
-                return override ? override() : baseGenerateResult(id);
+                return override ? await override() : baseGenerateResult(id);
             }),
             doStream: vi.fn(),
         };
     }
     return {
-        createOpenAI: vi.fn(() => ({ chat: (id: string) => makeModel(id) })),
+        createOpenAI: vi.fn(
+            () => ({ chat: (id: string) => makeModel(id) }) as unknown as OpenAIProvider,
+        ),
     };
 });
 
@@ -78,7 +84,7 @@ describe('createIntelligence', () => {
             });
 
             expect(() => intelligence.model('summarizer')).toThrow(
-                /Unknown provider "unknown-provider".*openrouter/,
+                /Unknown provider "unknown-provider".*openrouter/u,
             );
         });
     });
@@ -90,7 +96,7 @@ describe('createIntelligence', () => {
                 providers: {},
             });
 
-            expect(() => intelligence.model('typo')).toThrow(/summarizer/);
+            expect(() => intelligence.model('typo')).toThrow(/summarizer/u);
         });
 
         test('caches the model instance per agent name', () => {
@@ -138,7 +144,7 @@ describe('createIntelligence', () => {
         });
 
         test('falls back to the configured fallback model on a retryable error', async () => {
-            modelOverrides.set('flaky-model', async () => {
+            modelOverrides.set('flaky-model', () => {
                 throw new APICallError({
                     message: 'Service unavailable',
                     requestBodyValues: {},
@@ -188,7 +194,7 @@ describe('createIntelligence', () => {
             // Then -- no error, and the model is a plain (unwrapped-by-logging) composition
             await expect(
                 generateText({ model: intelligence.model('summarizer'), prompt: 'Hello!' }),
-            ).resolves.toEqual(expect.objectContaining({ text: 'response from model-a' }));
+            ).resolves.toStrictEqual(expect.objectContaining({ text: 'response from model-a' }));
         });
     });
 });
