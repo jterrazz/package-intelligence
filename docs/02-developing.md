@@ -54,9 +54,9 @@ otherwise flag them as unused.
        `error` unless the id's own segment ends in `w` (`m2w-…` → `warn`).
     4. `docs/01-architecture.md`'s rule table — one row.
     5. A fixture pair under
-       `tests/lint-fixtures/lint-violations/<id>/` (a violation) and
+       `tests/_fixtures/lint-violations/<id>/` (a violation) and
        `<id>-ok/` (its compliant twin), plus a line in
-       `tests/lint-fixtures/lint-violations/oxlint.e2e.json` and in the
+       `tests/_fixtures/lint-violations/oxlint.e2e.json` and in the
        `RULES` array of `tests/lint/oxlint-rules.e2e.test.ts`.
 
     `src/lint/plugin.test.ts` is the completeness meta-test that refuses a

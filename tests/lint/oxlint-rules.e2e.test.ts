@@ -15,8 +15,8 @@ import { describe, expect, test } from 'vitest';
 
 const ROOT = resolve(import.meta.dirname, '../..');
 const OXLINT_BIN = resolve(ROOT, 'node_modules/.bin/oxlint');
-const CONFIG = resolve(ROOT, 'tests/lint-fixtures/lint-violations/oxlint.e2e.json');
-const FIXTURES = resolve(ROOT, 'tests/lint-fixtures/lint-violations');
+const CONFIG = resolve(ROOT, 'tests/_fixtures/lint-violations/oxlint.e2e.json');
+const FIXTURES = resolve(ROOT, 'tests/_fixtures/lint-violations');
 
 type Severity = 'error' | 'warn';
 

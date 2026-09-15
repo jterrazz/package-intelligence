@@ -41,7 +41,7 @@ Two more layers guard the oxlint plugin beyond each rule's `RuleTester`:
   every rule, carries no `extends`), that severities follow the `<id>w-*` →
   `warn` convention, and — the inventory check — that every rule in
   `plugin.rules` has BOTH a `src/lint/rules/<id>.test.ts` and a fixture pair
-  under `tests/lint-fixtures/lint-violations/<id>/` and `<id>-ok/`. Adding a
+  under `tests/_fixtures/lint-violations/<id>/` and `<id>-ok/`. Adding a
   rule without one of the six pieces [02-developing.md](02-developing.md)
   lists fails this test before anything else does.
 - **The E2E fixture run**, `tests/lint/oxlint-rules.e2e.test.ts` — executes
