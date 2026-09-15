@@ -4,6 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import { RULE_DOCS } from './manifest.js';
 import plugin, { intelligence, recommendedRules } from './plugin.js';
+import { type RuleDoc } from './types.js';
 
 /**
  * Completeness meta-test — mirrors `@jterrazz/test`'s `src/lint/plugin.test.ts`
@@ -20,6 +21,9 @@ import plugin, { intelligence, recommendedRules } from './plugin.js';
  */
 const ROOT = resolve(import.meta.dirname, '../..');
 
+/** The manifest read by an arbitrary id — what a shipped rule id is, is the subject under test. */
+const docsById: Record<string, RuleDoc> = RULE_DOCS;
+
 const pluginRules = new Set(Object.keys(plugin.rules));
 
 describe('rule manifest — completeness (meta-test)', () => {
@@ -28,20 +32,20 @@ describe('rule manifest — completeness (meta-test)', () => {
         for (const [id, rule] of Object.entries(plugin.rules)) {
             // Then - it attaches its manifest doc as meta.docs
             expect(rule.meta?.docs, `rule ${id} is missing meta.docs`).toBeDefined();
-            expect(rule.meta?.docs).toBe(RULE_DOCS[id]);
+            expect(rule.meta?.docs).toBe(docsById[id]);
         }
     });
 
     test('the manifest covers exactly the shipped plugin rules', () => {
         // Given - the manifest and the plugin map
         // Then - the two sets are identical (no orphan doc, no undocumented rule)
-        expect(Object.keys(RULE_DOCS).sort()).toEqual([...pluginRules].sort());
+        expect(Object.keys(RULE_DOCS).toSorted()).toStrictEqual([...pluginRules].toSorted());
     });
 
     test('every rule id is unique across the manifest', () => {
         const ids = new Set<string>();
         for (const doc of Object.values(RULE_DOCS)) {
-            expect(ids.has(doc.id), `duplicate manifest id ${doc.id}`).toBe(false);
+            expect(ids.has(doc.id), `duplicate manifest id ${doc.id}`).toBeFalsy();
             ids.add(doc.id);
         }
     });
@@ -53,11 +57,11 @@ describe('intelligence fragment — standalone oxlint config', () => {
         // Then - it registers the tool-facing plugin and enables every shipped rule
         expect(intelligence.jsPlugins).toContain('@jterrazz/intelligence/oxlint');
         expect(intelligence.rules).toBe(recommendedRules);
-        expect(Object.keys(intelligence.rules)).toEqual(
+        expect(Object.keys(intelligence.rules)).toStrictEqual(
             Object.keys(plugin.rules).map((id) => `intelligence/${id}`),
         );
         // The fragment carries no `extends` — it's additive, composed via `compose()`.
-        expect('extends' in intelligence).toBe(false);
+        expect('extends' in intelligence).toBeFalsy();
     });
 
     test('severities follow the `<id>w-*` warning convention', () => {
@@ -65,7 +69,7 @@ describe('intelligence fragment — standalone oxlint config', () => {
         for (const [key, severity] of Object.entries(recommendedRules)) {
             const id = key.replace('intelligence/', '');
             // Then - only `<letter><digit>w-*` ids are warnings, the rest are errors
-            expect(severity).toBe(/^\w+w-/.test(id) ? 'warn' : 'error');
+            expect(severity).toBe(/^\w+w-/u.test(id) ? 'warn' : 'error');
         }
     });
 });
@@ -81,11 +85,11 @@ describe('rule catalogue — E2E inventory (meta-test)', () => {
         // Given - each shipped rule
         for (const id of pluginRules) {
             // Then - its unit spec and its violation/compliant fixture twin exist
-            expect(ruleTestFiles.has(id), `${id} has no src/lint/rules/${id}.test.ts`).toBe(true);
-            expect(existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', id))).toBe(true);
+            expect(ruleTestFiles.has(id), `${id} has no src/lint/rules/${id}.test.ts`).toBeTruthy();
+            expect(existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', id))).toBeTruthy();
             expect(
                 existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', `${id}-ok`)),
-            ).toBe(true);
+            ).toBeTruthy();
         }
     });
 
@@ -93,7 +97,7 @@ describe('rule catalogue — E2E inventory (meta-test)', () => {
         // Given - each src/lint/rules/*.test.ts file
         for (const id of ruleTestFiles) {
             // Then - it names a rule the plugin actually ships
-            expect(pluginRules.has(id), `${id}.test.ts has no matching plugin rule`).toBe(true);
+            expect(pluginRules.has(id), `${id}.test.ts has no matching plugin rule`).toBeTruthy();
         }
     });
 
@@ -106,6 +110,8 @@ describe('rule catalogue — E2E inventory (meta-test)', () => {
         const config = JSON.parse(raw) as { rules: Record<string, unknown> };
 
         // Then - its rule keys match recommendedRules exactly
-        expect(Object.keys(config.rules).sort()).toEqual(Object.keys(recommendedRules).sort());
+        expect(Object.keys(config.rules).toSorted()).toStrictEqual(
+            Object.keys(recommendedRules).toSorted(),
+        );
     });
 });

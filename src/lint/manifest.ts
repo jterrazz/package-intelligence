@@ -1,4 +1,13 @@
-import type { RuleDoc } from './types.js';
+import { type RuleDoc } from './types.js';
+
+/** The closed set of mechanized rule ids — the manifest and the plugin agree on it. */
+export type RuleId =
+    | 'g1-agent-class-shape'
+    | 'm1-model-resolution-in-container'
+    | 'm2w-no-hardcoded-model-id'
+    | 'p1-prose-in-prompt-files'
+    | 'p2-prompt-file-exports'
+    | 'p3-agent-prompt-sibling';
 
 /**
  * The rule manifest — the single source of truth for the mechanized
@@ -13,7 +22,7 @@ import type { RuleDoc } from './types.js';
  * "what exactly is checked" — `plugin.test.ts` asserts every shipped rule
  * carries its entry and that no entry is orphaned.
  */
-export const RULE_DOCS: Record<string, RuleDoc> = {
+export const RULE_DOCS: Record<RuleId, RuleDoc> = {
     'g1-agent-class-shape': {
         id: 'G1',
         convention:

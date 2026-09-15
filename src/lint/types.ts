@@ -79,3 +79,17 @@ export type LintPlugin = {
     meta: { name: string };
     rules: Record<string, LintRule>;
 };
+
+/** A shipped severity: a hard convention errors, an `<id>w-*` heuristic warns. */
+export type LintSeverity = 'error' | 'warn';
+
+/**
+ * The composable oxlint fragment a consumer spreads into its own config: the
+ * plugin registration plus the whole catalogue at its severities. Structural
+ * like every type above it — `OxlintConfig` accepts this shape, and describing
+ * it here keeps the layer importing nothing.
+ */
+export type LintFragment = {
+    jsPlugins: string[];
+    rules: Record<string, LintSeverity>;
+};

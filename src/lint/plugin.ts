@@ -4,7 +4,7 @@ import { m2wNoHardcodedModelId } from './rules/m2w-no-hardcoded-model-id.js';
 import { p1ProseInPromptFiles } from './rules/p1-prose-in-prompt-files.js';
 import { p2PromptFileExports } from './rules/p2-prompt-file-exports.js';
 import { p3AgentPromptSibling } from './rules/p3-agent-prompt-sibling.js';
-import type { LintPlugin } from './types.js';
+import { type LintFragment, type LintPlugin, type LintSeverity } from './types.js';
 
 /**
  * The `@jterrazz/intelligence` oxlint plugin — formalizes the agent/prompt
@@ -48,10 +48,10 @@ const plugin: LintPlugin = {
  *
  * Hard conventions are errors; `m2w-*` (the model-id heuristic) is a warning.
  */
-export const recommendedRules: Record<string, 'error' | 'warn'> = Object.fromEntries(
+export const recommendedRules: Record<string, LintSeverity> = Object.fromEntries(
     Object.keys(plugin.rules).map((rule) => [
         `intelligence/${rule}`,
-        /^\w+w-/.test(rule) ? 'warn' : 'error',
+        /^\w+w-/u.test(rule) ? 'warn' : 'error',
     ]),
 );
 
@@ -64,14 +64,11 @@ export const recommendedRules: Record<string, 'error' | 'warn'> = Object.fromEnt
  *     export default compose(node, intelligence);
  *
  * `jsPlugins` registers the tool-facing entry, `rules` is {@link recommendedRules}.
- * `overrides` ships empty (no per-glob relaxation is needed today — every rule
- * gates itself by file path/name internally) but is kept on the fragment's
- * shape for parity with `@jterrazz/test`'s `testing` fragment and so a future
- * relaxation has somewhere to go without a breaking shape change.
+ * The fragment carries no `overrides`: every rule gates itself by file path and
+ * name internally, so there is no per-glob relaxation to ship.
  */
-export const intelligence = {
+export const intelligence: LintFragment = {
     jsPlugins: ['@jterrazz/intelligence/oxlint'],
-    overrides: [],
     rules: recommendedRules,
 };
 
