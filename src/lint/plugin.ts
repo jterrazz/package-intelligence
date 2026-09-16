@@ -4,7 +4,7 @@ import { m2wNoHardcodedModelId } from './rules/m2w-no-hardcoded-model-id.js';
 import { p1ProseInPromptFiles } from './rules/p1-prose-in-prompt-files.js';
 import { p2PromptFileExports } from './rules/p2-prompt-file-exports.js';
 import { p3AgentPromptSibling } from './rules/p3-agent-prompt-sibling.js';
-import { type LintFragment, type LintPlugin, type LintSeverity } from './types.js';
+import type { LintFragment, LintPlugin, LintSeverity } from './types.js';
 
 /**
  * The `@jterrazz/intelligence` oxlint plugin — formalizes the agent/prompt

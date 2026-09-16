@@ -1,5 +1,5 @@
 import { RULE_DOCS } from '../manifest.js';
-import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
+import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
 /** Declaration types that are types, not values — always allowed. */
 const TYPE_DECLARATIONS = new Set(['TSInterfaceDeclaration', 'TSTypeAliasDeclaration']);

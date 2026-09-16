@@ -1,6 +1,6 @@
-import { type LanguageModelV4StreamPart, type LanguageModelV4Usage } from '@ai-sdk/provider';
+import type { LanguageModelV4StreamPart, LanguageModelV4Usage } from '@ai-sdk/provider';
 import { trace } from '@opentelemetry/api';
-import { type LanguageModelMiddleware } from 'ai';
+import type { LanguageModelMiddleware } from 'ai';
 
 const COST_ATTRIBUTE = 'gen_ai.usage.cost';
 

@@ -1,4 +1,4 @@
-import { type LanguageModelV4CallOptions } from '@ai-sdk/provider';
+import type { LanguageModelV4CallOptions } from '@ai-sdk/provider';
 import { describe, expect, test } from 'vitest';
 
 import { createSchemaInstructionMiddleware } from './schema-instruction.middleware.js';

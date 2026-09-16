@@ -1,4 +1,5 @@
-import { APICallError, type SharedV4ProviderMetadata } from '@ai-sdk/provider';
+import { APICallError } from '@ai-sdk/provider';
+import type { SharedV4ProviderMetadata } from '@ai-sdk/provider';
 import { trace } from '@opentelemetry/api';
 import { generateText, wrapLanguageModel } from 'ai';
 import { MockLanguageModelV4 } from 'ai/test';

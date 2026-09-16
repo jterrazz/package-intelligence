@@ -1,6 +1,7 @@
 import { createOpenAI } from '@ai-sdk/openai';
-import { type LanguageModelV4 } from '@ai-sdk/provider';
-import { extractJsonMiddleware, type LanguageModel, wrapLanguageModel } from 'ai';
+import type { LanguageModelV4 } from '@ai-sdk/provider';
+import { extractJsonMiddleware, wrapLanguageModel } from 'ai';
+import type { LanguageModel } from 'ai';
 
 import { createSchemaInstructionMiddleware } from '../middleware/schema-instruction.middleware.js';
 

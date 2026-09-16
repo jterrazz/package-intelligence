@@ -1,4 +1,4 @@
-import { type AstNode } from './types.js';
+import type { AstNode } from './types.js';
 
 /**
  * Shared AST helpers for the rule files. Everything here is pure and

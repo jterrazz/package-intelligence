@@ -1,6 +1,6 @@
 import { isUnderAgentsFolder } from '../agents.js';
 import { RULE_DOCS } from '../manifest.js';
-import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
+import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
 /** A markdown heading — `#`, `##`, or `###` followed by a space. */
 const MARKDOWN_HEADING = /^#{1,3}\s/u;

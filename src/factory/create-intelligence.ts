@@ -1,17 +1,17 @@
 import { OpenTelemetry } from '@ai-sdk/otel';
-import { type LanguageModelV4 } from '@ai-sdk/provider';
-import { type LoggerPort } from '@jterrazz/telemetry';
-import { type LanguageModel, registerTelemetry, wrapLanguageModel } from 'ai';
+import type { LanguageModelV4 } from '@ai-sdk/provider';
+import type { LoggerPort } from '@jterrazz/telemetry';
+import { registerTelemetry, wrapLanguageModel } from 'ai';
+import type { LanguageModel } from 'ai';
 
 import { createAgentMiddleware } from '../middleware/agent.middleware.js';
 import { createCostMiddleware } from '../middleware/cost.middleware.js';
 import { createLoggingMiddleware } from '../middleware/logging.middleware.js';
 import { createFallbackModel } from '../model/fallback-model.js';
-import { createGatewayProvider, type GatewayConfig } from '../provider/gateway.provider.js';
-import {
-    createOpenRouterProvider,
-    type OpenRouterConfig,
-} from '../provider/openrouter.provider.js';
+import { createGatewayProvider } from '../provider/gateway.provider.js';
+import type { GatewayConfig } from '../provider/gateway.provider.js';
+import { createOpenRouterProvider } from '../provider/openrouter.provider.js';
+import type { OpenRouterConfig } from '../provider/openrouter.provider.js';
 
 type ProviderConfig =
     | (GatewayConfig & { type: 'gateway' })

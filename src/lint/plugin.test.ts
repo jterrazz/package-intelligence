@@ -4,7 +4,7 @@ import { describe, expect, test } from 'vitest';
 
 import { RULE_DOCS } from './manifest.js';
 import plugin, { intelligence, recommendedRules } from './plugin.js';
-import { type RuleDoc } from './types.js';
+import type { RuleDoc } from './types.js';
 
 /**
  * Completeness meta-test — mirrors `@jterrazz/test`'s `src/lint/plugin.test.ts`

@@ -1,5 +1,5 @@
-import { type LanguageModelV4CallOptions, type LanguageModelV4Prompt } from '@ai-sdk/provider';
-import { type LanguageModelMiddleware } from 'ai';
+import type { LanguageModelV4CallOptions, LanguageModelV4Prompt } from '@ai-sdk/provider';
+import type { LanguageModelMiddleware } from 'ai';
 
 function buildInstruction(responseFormat: LanguageModelV4CallOptions['responseFormat']): string {
     if (responseFormat?.type !== 'json') {

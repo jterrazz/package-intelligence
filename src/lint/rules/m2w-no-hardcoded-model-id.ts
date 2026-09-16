@@ -1,6 +1,6 @@
 import { segments } from '../ast.js';
 import { RULE_DOCS } from '../manifest.js';
-import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
+import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
 /** `claude-…`, `gpt-4o`, `o1-preview`, `grok-2`, `deepseek-v3`, … */
 const BARE_MODEL_ID =

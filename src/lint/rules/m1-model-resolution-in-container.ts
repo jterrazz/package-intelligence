@@ -1,6 +1,6 @@
 import { memberPropertyName, stringValue } from '../ast.js';
 import { RULE_DOCS } from '../manifest.js';
-import { type AstNode, type LintRule, type RuleContext, type Visitor } from '../types.js';
+import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
 /** The composition-root factories `@jterrazz/intelligence` exposes. */
 const FACTORY_NAMES = new Set([

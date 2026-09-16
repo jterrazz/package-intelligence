@@ -1,4 +1,4 @@
-import { type RuleDoc } from './types.js';
+import type { RuleDoc } from './types.js';
 
 /** The closed set of mechanized rule ids — the manifest and the plugin agree on it. */
 export type RuleId =

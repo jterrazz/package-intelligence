@@ -1,6 +1,6 @@
-import { type OpenAIProvider } from '@ai-sdk/openai';
+import type { OpenAIProvider } from '@ai-sdk/openai';
 import { APICallError } from '@ai-sdk/provider';
-import { type OpenRouterProvider } from '@openrouter/ai-sdk-provider';
+import type { OpenRouterProvider } from '@openrouter/ai-sdk-provider';
 import { generateText } from 'ai';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
