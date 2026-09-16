@@ -45,7 +45,7 @@ describe('rule manifest — completeness (meta-test)', () => {
     test('every rule id is unique across the manifest', () => {
         const ids = new Set<string>();
         for (const doc of Object.values(RULE_DOCS)) {
-            expect(ids.has(doc.id), `duplicate manifest id ${doc.id}`).toBeFalsy();
+            expect(ids.has(doc.id), `duplicate manifest id ${doc.id}`).toBe(false);
             ids.add(doc.id);
         }
     });
@@ -61,7 +61,7 @@ describe('intelligence fragment — standalone oxlint config', () => {
             Object.keys(plugin.rules).map((id) => `intelligence/${id}`),
         );
         // The fragment carries no `extends` — it's additive, composed via `compose()`.
-        expect('extends' in intelligence).toBeFalsy();
+        expect('extends' in intelligence).toBe(false);
     });
 
     test('severities follow the `<id>w-*` warning convention', () => {
@@ -85,11 +85,11 @@ describe('rule catalogue — E2E inventory (meta-test)', () => {
         // Given - each shipped rule
         for (const id of pluginRules) {
             // Then - its unit spec and its violation/compliant fixture twin exist
-            expect(ruleTestFiles.has(id), `${id} has no src/lint/rules/${id}.test.ts`).toBeTruthy();
-            expect(existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', id))).toBeTruthy();
-            expect(
-                existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', `${id}-ok`)),
-            ).toBeTruthy();
+            expect(ruleTestFiles.has(id), `${id} has no src/lint/rules/${id}.test.ts`).toBe(true);
+            expect(existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', id))).toBe(true);
+            expect(existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', `${id}-ok`))).toBe(
+                true,
+            );
         }
     });
 
@@ -97,7 +97,7 @@ describe('rule catalogue — E2E inventory (meta-test)', () => {
         // Given - each src/lint/rules/*.test.ts file
         for (const id of ruleTestFiles) {
             // Then - it names a rule the plugin actually ships
-            expect(pluginRules.has(id), `${id}.test.ts has no matching plugin rule`).toBeTruthy();
+            expect(pluginRules.has(id), `${id}.test.ts has no matching plugin rule`).toBe(true);
         }
     });
 
