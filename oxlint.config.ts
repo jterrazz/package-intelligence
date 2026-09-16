@@ -1,4 +1,5 @@
-import { compose, defineConfig, library, type OxlintConfig } from '@jterrazz/typescript/oxlint';
+import { compose, defineConfig, library } from '@jterrazz/typescript/oxlint';
+import type { OxlintConfig } from '@jterrazz/typescript/oxlint';
 
 // This package is consumer #1 of the convention it ships: it lints itself with its own
 // plugin. The fragment names `@jterrazz/intelligence/oxlint`, which Node resolves from

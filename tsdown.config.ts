@@ -1,4 +1,5 @@
-import { defineConfig, type UserConfig } from 'tsdown';
+import { defineConfig } from 'tsdown';
+import type { UserConfig } from 'tsdown';
 
 // Mirrors @jterrazz/typescript's `bundle` preset, with two extra dependency-free
 // Entries: `formatting` (text formatting without the AI peer dependencies) and
