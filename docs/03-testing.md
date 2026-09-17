@@ -3,8 +3,10 @@
 What proves a change: three layers of vitest, run in one pass by `npm test`
 (`vitest --run`, no config file — vitest's own defaults discover every
 `*.test.ts` under the tree). There is no golden or fixture-recording
-convention here; a scenario is an ordinary `describe`/`test`, `// Given` /
-`// Then` commented as `@jterrazz/test`'s shape states.
+convention here; a scenario is an ordinary `describe`/`test`, `// Given -` /
+`// Then -` commented as `@jterrazz/test`'s shape states — and since
+`oxlint.config.ts` composes that package's `testing` fragment, the B4 rule
+holds the narration rather than convention alone.
 
 ## Unit tests
 
@@ -52,6 +54,14 @@ Two more layers guard the oxlint plugin beyond each rule's `RuleTester`:
   actually loads it, not as `RuleTester` simulates it — and it needs
   `npm run build` first: oxlint's JS-plugin loader takes a JS module, so the
   test always loads from `dist/`, never `src/lint/plugin.ts` directly.
+
+## What the ledger holds against the suites
+
+Three of the `testing` fragment's rules are recorded in `oxlint.baseline.json` rather than satisfied, because each asks for a decision this package has not taken:
+
+- `jterrazz/b4-given-then`, 106 — `src/formatting/to-sentence-case.test.ts` alone, whose 53 cases are one-line input/output pairs; the honest fix is a `test.each` table, not two comments per case.
+- `jterrazz/i2-sibling-test-naming`, 2 — the rule bans a root `tests/` directory, where the integration test and the lint E2E run live for the reasons above.
+- `jterrazz/i4-no-vi-mock-in-src`, 2 — the `vi.mock` calls that stand in for the provider SDKs in `src/factory/create-intelligence.test.ts`.
 
 ## When a red run is not yours
 

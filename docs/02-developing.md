@@ -21,9 +21,12 @@ so a repeat run is a no-op). **`npm run build` precedes `npm run lint`**: the
 lint config loads this package's own plugin from `dist/`, so a tree that has
 never been built has no rulebook to lint itself with.
 
-`tsconfig.json`, `oxlint.config.ts` and `oxfmt.config.ts` name
-`@jterrazz/typescript`'s `library` profile and nothing else — no local
-`compilerOptions`, no `include` of its own. The presets, the passes they run
+`tsconfig.json` and `oxfmt.config.ts` name `@jterrazz/typescript`'s
+`library` profile and nothing else — no local `compilerOptions`, no
+`include` of its own. `oxlint.config.ts` composes three fragments and no
+local rulebook: that same `library`, `@jterrazz/test`'s `testing` — the
+conventions the suites answer to, the shape every repository of the estate
+with tests uses — and this package's own `intelligence`. The presets, the passes they run
 and the `oxlint.baseline.json` ratchet are that package's own
 (`@jterrazz/typescript`'s `docs/06-quality-checks.md`), not restated here.
 
