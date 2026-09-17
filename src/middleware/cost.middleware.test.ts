@@ -85,7 +85,7 @@ describe('createCostMiddleware', () => {
                 model: createMockModel() as never,
             });
 
-            // Then
+            // Then - the cost is the pricing estimate
             expect(span.setAttribute).toHaveBeenCalledWith('gen_ai.usage.cost', 2);
         });
 
@@ -110,7 +110,7 @@ describe('createCostMiddleware', () => {
                 model: createMockModel() as never,
             });
 
-            // Then
+            // Then - the cost is the pricing estimate
             expect(span.setAttribute).toHaveBeenCalledWith('gen_ai.usage.cost', 2);
         });
 

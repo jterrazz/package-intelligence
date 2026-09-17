@@ -43,8 +43,10 @@ describe('rule manifest — completeness (meta-test)', () => {
     });
 
     test('every rule id is unique across the manifest', () => {
+        // Given - every entry of the rule manifest
         const ids = new Set<string>();
         for (const doc of Object.values(RULE_DOCS)) {
+            // Then - no id has been seen before
             expect(ids.has(doc.id), `duplicate manifest id ${doc.id}`).toBe(false);
             ids.add(doc.id);
         }

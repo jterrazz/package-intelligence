@@ -116,7 +116,7 @@ describe('createFallbackModel', () => {
             model as never as { doGenerate: (o: unknown) => Promise<unknown> }
         ).doGenerate({});
 
-        // Then
+        // Then - the fallback answered
         expect(result).toBe(successResult);
         expect(fallback.doGenerate).toHaveBeenCalledOnce();
     });
@@ -141,7 +141,7 @@ describe('createFallbackModel', () => {
             model as never as { doGenerate: (o: unknown) => Promise<unknown> }
         ).doGenerate({});
 
-        // Then
+        // Then - the fallback answered
         expect(result).toBe(successResult);
         expect(fallback.doGenerate).toHaveBeenCalledOnce();
     });
@@ -182,7 +182,7 @@ describe('createFallbackModel', () => {
             fallback,
         });
 
-        // Then
+        // Then - the error surfaces and the fallback is never reached
         await expect(
             (model as never as { doGenerate: (o: unknown) => Promise<unknown> }).doGenerate({}),
         ).rejects.toBe(error);
@@ -209,7 +209,7 @@ describe('createFallbackModel', () => {
             model as never as { doStream: (o: unknown) => Promise<unknown> }
         ).doStream({});
 
-        // Then
+        // Then - the fallback stream is the one returned
         expect(result).toBe(streamResult);
         expect(fallback.doStream).toHaveBeenCalledOnce();
     });

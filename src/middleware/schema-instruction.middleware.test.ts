@@ -43,20 +43,25 @@ function partText(params: LanguageModelV4CallOptions, index: number): string {
 
 describe('createSchemaInstructionMiddleware', () => {
     test('leaves params untouched when there is no responseFormat', async () => {
+        // Given - call options that ask for no particular response format
         const result = await transform(baseParams);
 
+        // Then - the middleware hands them back unchanged
         expect(result).toStrictEqual(baseParams);
     });
 
     test('leaves params untouched for text responseFormat', async () => {
+        // Given - call options asking for a text response
         const params = { ...baseParams, responseFormat: { type: 'text' as const } };
 
         const result = await transform(params);
 
+        // Then - the middleware hands them back unchanged
         expect(result).toStrictEqual(params);
     });
 
     test('appends the schema instruction to the last user message', async () => {
+        // Given - a single-turn prompt and a JSON response format carrying a schema
         const params = {
             ...baseParams,
             responseFormat: { schema: jsonSchema, type: 'json' as const },
@@ -64,6 +69,7 @@ describe('createSchemaInstructionMiddleware', () => {
 
         const result = await transform(params);
 
+        // Then - the user turn keeps its text and gains the JSON-only instruction
         expect(result.prompt).toHaveLength(2);
         expect(result.prompt[1]?.role).toBe('user');
         expect(result.prompt[1]?.content).toHaveLength(1);
@@ -74,6 +80,7 @@ describe('createSchemaInstructionMiddleware', () => {
     });
 
     test('targets the LAST user message in multi-turn prompts', async () => {
+        // Given - a prompt with two user turns separated by an assistant turn
         const params: LanguageModelV4CallOptions = {
             prompt: [
                 { content: [{ text: 'First', type: 'text' }], role: 'user' },
@@ -85,12 +92,14 @@ describe('createSchemaInstructionMiddleware', () => {
 
         const result = await transform(params);
 
+        // Then - only the second user turn carries the instruction
         expect(partText(result, 0)).toBe('First');
         expect(partText(result, 2)).toContain('Second');
         expect(partText(result, 2)).toContain('valid JSON only');
     });
 
     test('appends a user message when the prompt has none', async () => {
+        // Given - a prompt made of a system message alone
         const params: LanguageModelV4CallOptions = {
             prompt: [{ content: 'Be terse.', role: 'system' }],
             responseFormat: { schema: jsonSchema, type: 'json' },
@@ -98,11 +107,13 @@ describe('createSchemaInstructionMiddleware', () => {
 
         const result = await transform(params);
 
+        // Then - the middleware adds the user turn it needs to instruct
         expect(result.prompt).toHaveLength(2);
         expect(result.prompt[1]?.role).toBe('user');
     });
 
     test('keeps the original responseFormat in the params', async () => {
+        // Given - a JSON response format carrying a schema
         const params = {
             ...baseParams,
             responseFormat: { schema: jsonSchema, type: 'json' as const },
@@ -110,14 +121,17 @@ describe('createSchemaInstructionMiddleware', () => {
 
         const result = await transform(params);
 
+        // Then - the response format reaches the provider untouched
         expect(result.responseFormat).toStrictEqual(params.responseFormat);
     });
 
     test('still instructs JSON-only output when no schema is provided', async () => {
+        // Given - a JSON response format with no schema attached
         const params = { ...baseParams, responseFormat: { type: 'json' as const } };
 
         const result = await transform(params);
 
+        // Then - the instruction demands JSON but names no schema
         expect(partText(result, 1)).toContain('valid JSON only');
         expect(partText(result, 1)).not.toContain('JSON schema');
     });

@@ -29,7 +29,7 @@ describe('createAgentMiddleware', () => {
         // When
         await middleware.wrapGenerate?.(args);
 
-        // Then
+        // Then - the span is renamed and tagged with the agent, and generation runs
         expect(span.updateName).toHaveBeenCalledExactlyOnceWith('articleComposition');
         expect(span.setAttribute).toHaveBeenCalledExactlyOnceWith(
             'gen_ai.agent.name',
@@ -39,7 +39,7 @@ describe('createAgentMiddleware', () => {
     });
 
     test('also names the span on the streaming path', async () => {
-        // Given
+        // Given - an active inference span
         const span = createMockSpan();
         vi.spyOn(trace, 'getActiveSpan').mockReturnValue(span as never);
         const middleware = createAgentMiddleware({ agentName: 'reportIngestion' });
@@ -48,7 +48,7 @@ describe('createAgentMiddleware', () => {
         // When
         await middleware.wrapStream?.(args);
 
-        // Then
+        // Then - the span is renamed and streaming runs
         expect(span.updateName).toHaveBeenCalledExactlyOnceWith('reportIngestion');
         expect(args.doStream).toHaveBeenCalledOnce();
     });
@@ -57,7 +57,7 @@ describe('createAgentMiddleware', () => {
         // Given -- no span (unmocked, the real default), then one whose updateName explodes
         const middleware = createAgentMiddleware({ agentName: 'x' });
 
-        // When / Then
+        // Then - generation resolves in both cases, telemetry never breaking the call
         await expect(middleware.wrapGenerate?.(callArgs())).resolves.toBeDefined();
 
         const broken = {

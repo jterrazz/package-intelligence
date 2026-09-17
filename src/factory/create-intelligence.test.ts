@@ -78,11 +78,13 @@ describe('createIntelligence', () => {
 
     describe('provider resolution', () => {
         test('throws a clear error listing available providers for an unknown provider', () => {
+            // Given - an agent naming a provider the configuration does not declare
             const intelligence = createIntelligence({
                 agents: { summarizer: { model: 'some-model', provider: 'unknown-provider' } },
                 providers: { openrouter: { apiKey: 'key', type: 'openrouter' } },
             });
 
+            // Then - resolving it names the unknown provider and the ones that exist
             expect(() => intelligence.model('summarizer')).toThrow(
                 /Unknown provider "unknown-provider".*openrouter/u,
             );
@@ -91,15 +93,18 @@ describe('createIntelligence', () => {
 
     describe('agent resolution', () => {
         test('throws a clear error listing available agents when the agent is unknown', () => {
+            // Given - a configuration declaring one agent
             const intelligence = createIntelligence({
                 agents: { summarizer: { model: 'some-model', provider: 'openrouter' } },
                 providers: {},
             });
 
+            // Then - asking for another one names the agent that does exist
             expect(() => intelligence.model('typo')).toThrow(/summarizer/u);
         });
 
         test('caches the model instance per agent name', () => {
+            // Given - a resolvable agent
             const intelligence = createIntelligence({
                 agents: { summarizer: { model: 'model-a', provider: 'openrouter' } },
                 providers: { openrouter: { apiKey: 'key', type: 'openrouter' } },
@@ -108,12 +113,14 @@ describe('createIntelligence', () => {
             const first = intelligence.model('summarizer');
             const second = intelligence.model('summarizer');
 
+            // Then - two resolutions hand back the same instance
             expect(first).toBe(second);
         });
     });
 
     describe('composition', () => {
         test('the resolved model is usable with generateText', async () => {
+            // Given - an agent on an openrouter provider
             const intelligence = createIntelligence({
                 agents: { summarizer: { model: 'model-a', provider: 'openrouter' } },
                 providers: { openrouter: { apiKey: 'key', type: 'openrouter' } },
@@ -124,10 +131,12 @@ describe('createIntelligence', () => {
                 prompt: 'Hello!',
             });
 
+            // Then - the model answers through the ai SDK
             expect(text).toBe('response from model-a');
         });
 
         test('resolves gateway provider references', async () => {
+            // Given - an agent on a gateway provider named by base URL
             const intelligence = createIntelligence({
                 agents: { summarizer: { model: 'model-b', provider: 'proxy' } },
                 providers: {
@@ -140,10 +149,12 @@ describe('createIntelligence', () => {
                 prompt: 'Hello!',
             });
 
+            // Then - the gateway model answers
             expect(text).toBe('response from model-b');
         });
 
         test('falls back to the configured fallback model on a retryable error', async () => {
+            // Given - a primary model that raises a 503 and a declared fallback
             modelOverrides.set('flaky-model', () => {
                 throw new APICallError({
                     message: 'Service unavailable',
@@ -169,10 +180,12 @@ describe('createIntelligence', () => {
                 prompt: 'Hello!',
             });
 
+            // Then - the fallback model is the one that answers
             expect(text).toBe('response from backup-model');
         });
 
         test('applies the logging middleware when a logger is provided', async () => {
+            // Given - a configuration carrying a logger
             const logger = createMockLogger();
             const intelligence = createIntelligence({
                 agents: { summarizer: { model: 'model-a', provider: 'openrouter' } },
@@ -182,10 +195,12 @@ describe('createIntelligence', () => {
 
             await generateText({ model: intelligence.model('summarizer'), prompt: 'Hello!' });
 
+            // Then - the logging middleware reports the generation
             expect(logger.debug).toHaveBeenCalledWith('ai.generate.start', expect.any(Object));
         });
 
         test('does not apply logging middleware when no logger is provided', async () => {
+            // Given - a configuration carrying no logger
             const intelligence = createIntelligence({
                 agents: { summarizer: { model: 'model-a', provider: 'openrouter' } },
                 providers: { openrouter: { apiKey: 'key', type: 'openrouter' } },
