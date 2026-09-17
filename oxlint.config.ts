@@ -1,3 +1,4 @@
+import { testing } from '@jterrazz/test/oxlint';
 import { compose, defineConfig, library } from '@jterrazz/typescript/oxlint';
 import type { OxlintConfig } from '@jterrazz/typescript/oxlint';
 
@@ -9,7 +10,7 @@ import { intelligence } from './dist/oxlint.js';
 // The `library` tsconfig's `isolatedDeclarations` refuses a default export whose type it
 // would have to infer, so this config names its own type.
 const config: OxlintConfig = defineConfig(
-    compose(library, intelligence, {
+    compose(library, testing, intelligence, {
         rules: {
             // reason: M1 gates a CONSUMER's composition root. This package defines the
             // factories it names, so every call in this tree is that definition or its
