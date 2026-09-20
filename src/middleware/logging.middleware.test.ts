@@ -2,6 +2,10 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { createLoggingMiddleware } from './logging.middleware.js';
 
+// `expect.any(Number)` is typed `any`, so the widening is named once here and
+// the payload literals below stay exactly typed.
+const ANY_DURATION_MS: number = expect.any(Number);
+
 function createMockLogger() {
     return {
         child: vi.fn(() => createMockLogger()),
@@ -50,21 +54,17 @@ describe('createLoggingMiddleware', () => {
                 model: model as never,
             });
 
-            // Then -- debug is called for start and completion with correct details
+            // Then -- two debug events, each carrying exactly the payload the middleware promises
             expect(logger.debug).toHaveBeenCalledTimes(2);
             expect(logger.debug).toHaveBeenNthCalledWith(1, 'ai.generate.start', {
                 model: 'test-model',
             });
-            expect(logger.debug).toHaveBeenNthCalledWith(
-                2,
-                'ai.generate.complete',
-                expect.objectContaining({
-                    model: 'test-model',
-                    durationMs: expect.any(Number),
-                    finishReason: 'stop',
-                    usage: mockResult.usage,
-                }),
-            );
+            expect(logger.debug).toHaveBeenNthCalledWith(2, 'ai.generate.complete', {
+                model: 'test-model',
+                durationMs: ANY_DURATION_MS,
+                finishReason: 'stop',
+                usage: mockResult.usage,
+            });
             expect(result).toBe(mockResult);
         });
 
@@ -87,14 +87,11 @@ describe('createLoggingMiddleware', () => {
             ).rejects.toThrow('API error');
 
             expect(logger.debug).toHaveBeenCalledWith('ai.generate.start', { model: 'test-model' });
-            expect(logger.error).toHaveBeenCalledWith(
-                'ai.generate.error',
-                expect.objectContaining({
-                    model: 'test-model',
-                    durationMs: expect.any(Number),
-                    error: 'API error',
-                }),
-            );
+            expect(logger.error).toHaveBeenCalledWith('ai.generate.error', {
+                model: 'test-model',
+                durationMs: ANY_DURATION_MS,
+                error: 'API error',
+            });
         });
 
         test('includes params when include.params is true', async () => {
@@ -113,12 +110,11 @@ describe('createLoggingMiddleware', () => {
                 model: model as never,
             });
 
-            // Then -- the start log includes params
-            expect(logger.debug).toHaveBeenNthCalledWith(
-                1,
-                'ai.generate.start',
-                expect.objectContaining({ params: mockParams }),
-            );
+            // Then -- the start log carries the params beside the model, and nothing else
+            expect(logger.debug).toHaveBeenNthCalledWith(1, 'ai.generate.start', {
+                model: 'test-model',
+                params: mockParams,
+            });
         });
 
         test('includes content when include.content is true', async () => {
@@ -136,12 +132,14 @@ describe('createLoggingMiddleware', () => {
                 model: model as never,
             });
 
-            // Then -- the completion log includes content
-            expect(logger.debug).toHaveBeenNthCalledWith(
-                2,
-                'ai.generate.complete',
-                expect.objectContaining({ content: 'Hello world' }),
-            );
+            // Then -- the completion log carries the generated text beside the usual fields
+            expect(logger.debug).toHaveBeenNthCalledWith(2, 'ai.generate.complete', {
+                model: 'test-model',
+                durationMs: ANY_DURATION_MS,
+                finishReason: 'stop',
+                usage: mockResult.usage,
+                content: 'Hello world',
+            });
         });
 
         test('excludes usage when include.usage is false', async () => {
@@ -159,8 +157,12 @@ describe('createLoggingMiddleware', () => {
                 model: model as never,
             });
 
-            // Then -- the completion log does not include usage
-            expect(logger.debug.mock.calls[1]?.[1]).not.toHaveProperty('usage');
+            // Then -- the completion log is the usual payload minus usage
+            expect(logger.debug).toHaveBeenNthCalledWith(2, 'ai.generate.complete', {
+                model: 'test-model',
+                durationMs: ANY_DURATION_MS,
+                finishReason: 'stop',
+            });
         });
     });
 });
