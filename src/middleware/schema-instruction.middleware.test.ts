@@ -69,14 +69,25 @@ describe('createSchemaInstructionMiddleware', () => {
 
         const result = await transform(params);
 
-        // Then - the user turn keeps its text and gains the JSON-only instruction
-        expect(result.prompt).toHaveLength(2);
-        expect(result.prompt[1]?.role).toBe('user');
-        expect(result.prompt[1]?.content).toHaveLength(1);
-        expect(partText(result, 1)).toContain('Hello');
-        expect(partText(result, 1)).toContain('valid JSON only');
-        expect(partText(result, 1)).toContain(JSON.stringify(jsonSchema));
-        expect(result.prompt[0]).toStrictEqual(baseParams.prompt[0]);
+        // Then - the system turn is untouched and the user turn is its text plus the instruction
+        expect(result.prompt).toStrictEqual([
+            baseParams.prompt[0],
+            {
+                content: [
+                    {
+                        text: [
+                            'Hello',
+                            '',
+                            'You must respond with valid JSON only \u2014 no prose, no markdown code fences.',
+                            'The JSON must strictly conform to this JSON schema:',
+                            JSON.stringify(jsonSchema),
+                        ].join('\n'),
+                        type: 'text',
+                    },
+                ],
+                role: 'user',
+            },
+        ]);
     });
 
     test('targets the LAST user message in multi-turn prompts', async () => {
