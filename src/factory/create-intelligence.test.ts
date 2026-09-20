@@ -2,7 +2,7 @@ import type { OpenAIProvider } from '@ai-sdk/openai';
 import { APICallError } from '@ai-sdk/provider';
 import type { OpenRouterProvider } from '@openrouter/ai-sdk-provider';
 import { generateText } from 'ai';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { createIntelligence } from './create-intelligence.js';
 
@@ -61,6 +61,19 @@ vi.mock(import('@ai-sdk/openai'), () => {
     };
 });
 
+/**
+ * Registers a model answer for the scope of ONE test and gives it back when
+ * that scope ends, so the Given stays inside the test that needs it.
+ */
+function overrideModel(id: string, answer: () => Promise<unknown>): Disposable {
+    modelOverrides.set(id, answer);
+    return {
+        [Symbol.dispose]() {
+            modelOverrides.delete(id);
+        },
+    };
+}
+
 function createMockLogger() {
     return {
         child: vi.fn(() => createMockLogger()),
@@ -72,10 +85,6 @@ function createMockLogger() {
 }
 
 describe('createIntelligence', () => {
-    beforeEach(() => {
-        modelOverrides.clear();
-    });
-
     describe('provider resolution', () => {
         test('throws a clear error listing available providers for an unknown provider', () => {
             // Given - an agent naming a provider the configuration does not declare
@@ -155,7 +164,7 @@ describe('createIntelligence', () => {
 
         test('falls back to the configured fallback model on a retryable error', async () => {
             // Given - a primary model that raises a 503 and a declared fallback
-            modelOverrides.set('flaky-model', () => {
+            using _ = overrideModel('flaky-model', () => {
                 throw new APICallError({
                     message: 'Service unavailable',
                     requestBodyValues: {},
