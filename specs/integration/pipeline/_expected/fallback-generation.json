@@ -1,0 +1,19 @@
+{
+    "attributes": {
+        "gen_ai.usage.cost": 0.0007
+    },
+    "logs": [
+        {
+            "event": "ai.fallback.triggered",
+            "level": "warn",
+            "meta": {
+                "modelIds": [
+                    "primary-model",
+                    "fallback-model"
+                ],
+                "error": "Service unavailable"
+            }
+        }
+    ],
+    "text": "Response from fallback"
+}

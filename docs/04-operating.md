@@ -8,7 +8,7 @@ what does not.
 
 `@jterrazz/intelligence` on the public npm registry
 (`publishConfig.registry`), `files: ["dist"]` — only the tsdown build
-output ships; `src/`, `tests/`, `docs/`, `scripts/` and the lint fixtures do
+output ships; `src/`, `specs/`, `docs/`, `scripts/` and the lint fixtures do
 not leave the repository. The `exports` map
 ([01-architecture.md](01-architecture.md)) is the consumer-facing surface:
 `.`, `./formatting`, `./oxlint`, each an ESM+CJS pair with its own `.d.ts`.

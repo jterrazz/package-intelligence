@@ -15,7 +15,7 @@ const ruleTester = new RuleTester();
 // At REAL fixture files shipped in this repo — mirrors `@jterrazz/test`'s
 // `c8-referenced-fixture-exists.test.ts`. Check (a) — the import-source check
 // — is pure AST and needs no real file, so it uses synthetic filenames.
-const FIXTURES = resolve(import.meta.dirname, '../../../tests/_fixtures/lint-violations');
+const FIXTURES = resolve(import.meta.dirname, '../../../specs/integration/lint/_fixtures');
 const ORPHAN_PROMPT = `${FIXTURES}/p3-agent-prompt-sibling/src/infrastructure/outbound/agents/orphan-prompt/orphan-prompt.prompt.ts`;
 const PAIRED_PROMPT = `${FIXTURES}/g1-agent-class-shape-ok/src/infrastructure/outbound/agents/good-agent/good-agent.prompt.ts`;
 
