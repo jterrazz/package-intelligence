@@ -2,16 +2,10 @@
     "eslint/complexity": 4,
     "eslint/no-await-in-loop": 1,
     "eslint/no-console": 5,
-    "jterrazz/b4-given-then": 106,
-    "jterrazz/i2-sibling-test-naming": 2,
     "jterrazz/i4-no-vi-mock-in-src": 2,
-    "typescript/no-unsafe-assignment": 2,
+    "typescript/no-unsafe-assignment": 1,
     "typescript/no-unsafe-type-assertion": 99,
     "typescript/require-await": 1,
     "typescript/strict-void-return": 6,
-    "vitest/max-expects": 2,
-    "vitest/no-conditional-expect": 1,
-    "vitest/prefer-each": 1,
-    "vitest/require-mock-type-parameters": 79,
-    "vitest/valid-title": 1
+    "vitest/require-mock-type-parameters": 73
 }
