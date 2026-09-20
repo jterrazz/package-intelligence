@@ -8,7 +8,7 @@ install, quick start — is the root `README.md`, not this map.
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
 | [01-architecture.md](01-architecture.md) | The building blocks and how `createIntelligence` wires them, the model and formatting layers, the lint plugin's shape, the exports map |
 | [02-developing.md](02-developing.md)     | The toolchain, where a new provider/middleware/rule goes, the preserved-terms generator, what a change owes                            |
-| [03-testing.md](03-testing.md)           | The unit and integration suites, the lint plugin's fixture-driven E2E, the manifest completeness meta-test                             |
+| [03-testing.md](03-testing.md)           | The two vitest projects, the goldens the integration specs stand on, the manifest completeness meta-test, the ledger                   |
 | [04-operating.md](04-operating.md)       | What is published, what a GitHub Release triggers, and why a merge to `main` ships nothing                                             |
 | [05-providers.md](05-providers.md)       | The OpenRouter and gateway providers                                                                                                   |
 | [06-middleware.md](06-middleware.md)     | The agent, cost, logging and schema-instruction middleware                                                                             |
