@@ -16,7 +16,7 @@ import type { RuleDoc } from './types.js';
  *   undocumented rule);
  * - the `intelligence` fragment is a complete, standalone oxlint config
  *   fragment (every rule wired, nothing missing);
- * - every rule has an E2E fixture pair (`tests/_fixtures/lint-violations/<id>`
+ * - every rule has an E2E fixture pair (`specs/integration/lint/_fixtures/<id>`
  *   and `<id>-ok`) AND a `RuleTester` spec file (`src/lint/rules/<id>.test.ts`).
  */
 const ROOT = resolve(import.meta.dirname, '../..');
@@ -88,8 +88,8 @@ describe('rule catalogue — E2E inventory (meta-test)', () => {
         for (const id of pluginRules) {
             // Then - its unit spec and its violation/compliant fixture twin exist
             expect(ruleTestFiles.has(id), `${id} has no src/lint/rules/${id}.test.ts`).toBe(true);
-            expect(existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', id))).toBe(true);
-            expect(existsSync(resolve(ROOT, 'tests/_fixtures/lint-violations', `${id}-ok`))).toBe(
+            expect(existsSync(resolve(ROOT, 'specs/integration/lint/_fixtures', id))).toBe(true);
+            expect(existsSync(resolve(ROOT, 'specs/integration/lint/_fixtures', `${id}-ok`))).toBe(
                 true,
             );
         }
@@ -106,7 +106,7 @@ describe('rule catalogue — E2E inventory (meta-test)', () => {
     test('the E2E oxlint config enables exactly the shipped rule set', () => {
         // Given - the standalone oxlint config the E2E spec lints fixtures with
         const raw = readFileSync(
-            resolve(ROOT, 'tests/_fixtures/lint-violations/oxlint.e2e.json'),
+            resolve(ROOT, 'specs/integration/lint/_fixtures/oxlint.e2e.json'),
             'utf8',
         );
         const config = JSON.parse(raw) as { rules: Record<string, unknown> };

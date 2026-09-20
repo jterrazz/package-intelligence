@@ -1,0 +1,37 @@
+{
+    "attributes": {
+        "gen_ai.usage.cost": 0.0013
+    },
+    "logs": [
+        {
+            "event": "ai.generate.start",
+            "level": "debug",
+            "meta": {
+                "model": "mock-model-id"
+            }
+        },
+        {
+            "event": "ai.generate.complete",
+            "level": "debug",
+            "meta": {
+                "model": "mock-model-id",
+                "durationMs": "{{int}}",
+                "finishReason": {
+                    "raw": "stop",
+                    "unified": "stop"
+                },
+                "usage": {
+                    "inputTokens": {
+                        "noCache": 100,
+                        "total": 100
+                    },
+                    "outputTokens": {
+                        "text": 50,
+                        "total": 50
+                    }
+                }
+            }
+        }
+    ],
+    "text": "Hello, world!"
+}

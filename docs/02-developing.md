@@ -68,10 +68,10 @@ which the generated `dist/*.d.ts` reaches through the AI SDK's own types.
        `error` unless the id's own segment ends in `w` (`m2w-…` → `warn`).
     4. `docs/01-architecture.md`'s rule table — one row.
     5. A fixture pair under
-       `tests/_fixtures/lint-violations/<id>/` (a violation) and
+       `specs/integration/lint/_fixtures/<id>/` (a violation) and
        `<id>-ok/` (its compliant twin), plus a line in
-       `tests/_fixtures/lint-violations/oxlint.e2e.json` and in the
-       `RULES` array of `tests/lint/oxlint-rules.e2e.test.ts`.
+       `specs/integration/lint/_fixtures/oxlint.e2e.json` and in the
+       `RULES` array of `specs/integration/lint/rules.test.ts`.
 
     `src/lint/plugin.test.ts` is the completeness meta-test that refuses a
     rule missing any of the first three — see
@@ -94,7 +94,7 @@ drift is a diff a reviewer sees, not a silent runtime difference.
   `docs/01-architecture.md` in the same commit — the manifest's
   `RULE_DOCS` is the machine-facing text, the chapter is the human-facing
   one, and neither restates the other's wording.
-- The lint plugin's E2E suite (`tests/lint/oxlint-rules.e2e.test.ts`) and
+- The lint plugin's E2E suite (`specs/integration/lint/rules.test.ts`) and
   `oxlint.config.ts` both load the BUILT plugin (`dist/oxlint.js`), never
   `src/lint/plugin.ts` directly — run `npm run build` after touching a rule,
   before either `npm test` or `npm run lint`, neither of which rebuilds for

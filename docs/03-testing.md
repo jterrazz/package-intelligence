@@ -21,7 +21,7 @@ in-process layer of the lint plugin's proof.
 
 ## The composition integration test
 
-`tests/integration/composition.integration.test.ts` wraps a REAL
+`specs/integration/pipeline/composition.test.ts` wraps a REAL
 `LanguageModelV4` (`MockLanguageModelV4`, deterministic but shaped exactly
 like a live model) with `createCostMiddleware`, `createLoggingMiddleware` and
 `createFallbackModel` together, and asserts the three interact correctly —
@@ -43,10 +43,10 @@ Two more layers guard the oxlint plugin beyond each rule's `RuleTester`:
   every rule, carries no `extends`), that severities follow the `<id>w-*` →
   `warn` convention, and — the inventory check — that every rule in
   `plugin.rules` has BOTH a `src/lint/rules/<id>.test.ts` and a fixture pair
-  under `tests/_fixtures/lint-violations/<id>/` and `<id>-ok/`. Adding a
+  under `specs/integration/lint/_fixtures/<id>/` and `<id>-ok/`. Adding a
   rule without one of the six pieces [02-developing.md](02-developing.md)
   lists fails this test before anything else does.
-- **The E2E fixture run**, `tests/lint/oxlint-rules.e2e.test.ts` — executes
+- **The E2E fixture run**, `specs/integration/lint/rules.test.ts` — executes
   the REAL `oxlint` binary against the BUILT plugin (`dist/oxlint.js`), once
   per rule in its own `RULES` list, over the violation fixture (expects the
   diagnostic, and exit `1` for an `error`-severity rule) and the `-ok` twin
