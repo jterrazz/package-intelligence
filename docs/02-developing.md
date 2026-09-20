@@ -10,7 +10,7 @@ once written is [03-testing.md](03-testing.md).
 ```bash
 npm ci             # or `make install`
 npm run build      # tsdown — three entries: index, formatting, oxlint
-npm run lint       # typescript check — the eleven passes of @jterrazz/typescript
+npm run lint       # typescript check — the twelve passes of @jterrazz/typescript
 npm run lint:fix   # typescript fix
 npm test           # vitest --run — both projects, unit and integration
 ```
@@ -73,7 +73,7 @@ which the generated `dist/*.d.ts` reaches through the AI SDK's own types.
        `specs/integration/lint/_fixtures/<id>/` (a violation) and
        `<id>-ok/` (its compliant twin), plus a line in
        `specs/integration/lint/_fixtures/oxlint.e2e.json` and in the
-       `RULES` array of `specs/integration/lint/rules.test.ts`.
+       `RULES` array of `specs/integration/lint/rules.spec.ts`.
 
     `src/lint/plugin.test.ts` is the completeness meta-test that refuses a
     rule missing any of the first three — see
@@ -96,7 +96,7 @@ drift is a diff a reviewer sees, not a silent runtime difference.
   `docs/01-architecture.md` in the same commit — the manifest's
   `RULE_DOCS` is the machine-facing text, the chapter is the human-facing
   one, and neither restates the other's wording.
-- The lint plugin's E2E suite (`specs/integration/lint/rules.test.ts`) and
+- The lint plugin's E2E suite (`specs/integration/lint/rules.spec.ts`) and
   `oxlint.config.ts` both load the BUILT plugin (`dist/oxlint.js`), never
   `src/lint/plugin.ts` directly — run `npm run build` after touching a rule,
   before either `npm test` or `npm run lint`, neither of which rebuilds for
