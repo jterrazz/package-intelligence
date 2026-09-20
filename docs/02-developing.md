@@ -12,7 +12,7 @@ npm ci             # or `make install`
 npm run build      # tsdown — three entries: index, formatting, oxlint
 npm run lint       # typescript check — the eleven passes of @jterrazz/typescript
 npm run lint:fix   # typescript fix
-npm test           # vitest --run
+npm test           # vitest --run — both projects, unit and integration
 ```
 
 `Makefile` mirrors the same four as `install`/`build`/`lint`/`test`, each
@@ -23,7 +23,9 @@ never been built has no rulebook to lint itself with.
 
 `tsconfig.json` and `oxfmt.config.ts` name `@jterrazz/typescript`'s
 `library` profile and nothing else — no local `compilerOptions`, no
-`include` of its own. `oxlint.config.ts` composes three fragments and no
+`include` of its own. `vitest.config.ts` is the same gesture for the suites:
+`defineSpecConfig()` from `@jterrazz/test`, carrying the two projects
+[03-testing.md](03-testing.md) describes and no budget of its own. `oxlint.config.ts` composes three fragments and no
 local rulebook: that same `library`, `@jterrazz/test`'s `testing` — the
 conventions the suites answer to, the shape every repository of the estate
 with tests uses — and this package's own `intelligence`. The presets, the passes they run
