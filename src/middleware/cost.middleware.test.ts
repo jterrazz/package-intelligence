@@ -142,7 +142,7 @@ describe('createCostMiddleware', () => {
             });
             const doGenerate = vi.fn().mockResolvedValue(createMockGenerateResult());
 
-            // Then -- the call resolves without throwing
+            // Then -- the generation passes through untouched
             await expect(
                 middleware.wrapGenerate?.({
                     doGenerate,
@@ -150,7 +150,7 @@ describe('createCostMiddleware', () => {
                     params: {} as never,
                     model: createMockModel() as never,
                 }),
-            ).resolves.toBeDefined();
+            ).resolves.toStrictEqual(createMockGenerateResult());
         });
 
         test('never throws when enrichment itself fails', async () => {
@@ -163,7 +163,7 @@ describe('createCostMiddleware', () => {
             });
             const doGenerate = vi.fn().mockResolvedValue(createMockGenerateResult());
 
-            // Then -- generation still resolves successfully
+            // Then -- the generation passes through untouched
             await expect(
                 middleware.wrapGenerate?.({
                     doGenerate,
@@ -171,7 +171,7 @@ describe('createCostMiddleware', () => {
                     params: {} as never,
                     model: createMockModel() as never,
                 }),
-            ).resolves.toBeDefined();
+            ).resolves.toStrictEqual(createMockGenerateResult());
         });
     });
 
