@@ -71,12 +71,16 @@ a third party's diagnostic formatting.
 
 ### The published tarball
 
-`specs/integration/tarball/oxlint-entry.spec.ts` reads the plugin as npm would ship
-it: `npm pack --dry-run --json` lists the tarball's files, the spec checks that
-both halves of the `./oxlint` export are among them, then loads that entry, ESM
-and CJS, and asserts every rule it registers — and every key of its
-`recommendedRules` — is a `consumer` rule. It is the tarball-level twin of the
-audience rows below, and like the E2E run it needs `npm run build` first.
+`specs/integration/tarball/oxlint-entry.spec.ts` reads the package as npm ships
+it: `npm pack` writes the tarball into `.artifacts/tarball/`, the spec extracts it, and
+loads every entry `package.json` exports, ESM and CJS, from the extracted bytes.
+It pins the `./oxlint` entry's export set to `default`, `intelligence` and
+`recommendedRules`, so a new export has to pass review before it ships. It
+walks every export value of every entry to each object carrying a
+`meta.docs.audience`, and asserts each one is `consumer`. It also checks that
+`recommendedRules` enables exactly the rules the plugin registers. It is the
+tarball-level twin of the audience rows below, and like the E2E run it needs
+`npm run build` first.
 
 ## The completeness meta-test
 

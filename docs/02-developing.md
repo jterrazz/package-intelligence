@@ -82,8 +82,10 @@ which the generated `dist/*.d.ts` reaches through the AI SDK's own types.
     Those six are a `consumer` rule's — one meaningful in any project that
     uses the package. A `self` rule, one that only makes sense against this
     package's own tree, enters neither `plugin.rules` nor `RULE_DOCS`, so it
-    never ships: the meta-tests refuse any published rule that is not
-    `consumer`.
+    never ships. `src/lint/plugin.test.ts` refuses a rule in `plugin.rules`
+    that is not `consumer`. The tarball spec loads every entry the packed
+    package exports: it refuses a new export on `./oxlint`, and any rule
+    reachable from an entry's exports that is not `consumer`.
 
 ## The preserved-terms generator
 
