@@ -24,13 +24,7 @@ export type CleanAiTextOptions = {
     normalizeEmDashesToCommas?: boolean;
 };
 
-/**
- * Cleans AI-generated text by removing AI artifacts and normalizing typography.
- *
- * @param text - The text to clean
- * @param options - Cleaning options
- * @returns The cleaned text
- */
+/** Strips AI artifacts (citation markers, invisible characters) and normalizes typography. */
 export function cleanAiText(text: string, options: CleanAiTextOptions = {}): string {
     const { normalizeEmDashesToCommas = true, collapseSpaces = true } = options;
 
