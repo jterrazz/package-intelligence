@@ -75,7 +75,9 @@ a third party's diagnostic formatting.
 (minus the docs-generation freshness checks: this package has no generated
 catalogue). It asserts every rule in `plugin.rules` carries a `meta.docs`
 sourced from `RULE_DOCS`, that the manifest and the plugin cover exactly the
-same rule set, that every manifest id is unique, that the `intelligence`
+same rule set, that every manifest entry declares an audience from the closed
+`consumer`/`self` pair and every rule the plugin ships is `consumer`, that
+every manifest id is unique, that the `intelligence`
 fragment is self-sufficient, and that severities follow the `<id>w-*` → `warn`
 convention.
 

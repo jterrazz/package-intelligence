@@ -43,6 +43,9 @@ export type RuleContext = {
 /** A visitor: node-type keys → handlers invoked on entry (plus `Program:exit`). */
 export type Visitor = Record<string, (node: AstNode) => void>;
 
+/** The closed set of audiences a rule may declare. */
+export type RuleAudience = 'consumer' | 'self';
+
 /**
  * The normative documentation a rule carries — the code is the source of truth
  * for the mechanized catalogue (docs-as-code inversion, mirroring
@@ -51,6 +54,12 @@ export type Visitor = Record<string, (node: AstNode) => void>;
  * carries one and that the manifest covers exactly the shipped rules.
  */
 export type RuleDoc = {
+    /**
+     * Who the rule speaks to. `consumer` — meaningful in any project that uses
+     * the package; only these ship in the published plugin. `self` — this
+     * package's own suite discipline; never enters the published plugin.
+     */
+    audience: RuleAudience;
     /** Convention code, e.g. `'P1'`. */
     id: string;
     /** The normative sentence — what the rule enforces. */

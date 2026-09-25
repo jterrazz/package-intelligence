@@ -79,7 +79,9 @@ fragments the same way — `@jterrazz/test`'s `testing` fragment, `hexagonal`,
 or a project's own overrides:
 `compose(node, hexagonal, testing, intelligence, { rules: {...} })`.
 
-The shape it enforces, folder-per-agent with the prompt isolated from the
+### The shape it enforces
+
+Folder-per-agent, with the prompt isolated from the
 class that shapes data for it:
 
 ```
@@ -96,6 +98,8 @@ unabstracted. A `*.prompt.ts` file is not limited to one export: a main
 `buildPrompt` plus section builders it calls internally, each a pure
 `(data) => string` function owning its own empty-case handling.
 
+### The rules
+
 | Rule                                            | Severity | Enforces                                                                                                          |
 | ----------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
 | `intelligence/p1-prose-in-prompt-files`         | error    | No multi-line natural-language template literal outside `*.prompt.ts` — the flagship rule.                        |
@@ -104,6 +108,13 @@ unabstracted. A `*.prompt.ts` file is not limited to one export: a main
 | `intelligence/g1-agent-class-shape`             | error    | An agent file exports exactly one class with `static readonly SCHEMA`, a `run` method, `constructor(model, ...)`. |
 | `intelligence/m1-model-resolution-in-container` | error    | `createIntelligence`/`createGatewayProvider`/`createOpenRouterProvider` and `.model('…')` are DI/container-only.  |
 | `intelligence/m2w-no-hardcoded-model-id`        | warning  | A string literal shaped like a model id outside config/test/fixture files.                                        |
+
+Every rule declares its audience in its manifest entry: `consumer`, meaningful
+in any project that uses the package, or `self`, this package's own suite
+discipline. The published plugin carries `consumer` rules alone, so the table
+above is the whole of them; every rule in it is `consumer`, and the discipline
+the package holds over its own tree is its meta-tests
+([03-testing.md](03-testing.md)).
 
 Each rule is deliberately best-effort where full static verification is not
 possible — the goal is catching the common slip, not standing in for a type

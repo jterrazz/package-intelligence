@@ -63,8 +63,8 @@ which the generated `dist/*.d.ts` reaches through the AI SDK's own types.
 
     1. `src/lint/rules/<id>.ts` — the rule, plus a `RuleTester` spec
        `src/lint/rules/<id>.test.ts`.
-    2. `src/lint/manifest.ts` — the `RULE_DOCS[<id>]` entry (`id`,
-       `convention`, `rationale`) the rule's `meta.docs` attaches.
+    2. `src/lint/manifest.ts` — the `RULE_DOCS[<id>]` entry (`audience`,
+       `id`, `convention`, `rationale`) the rule's `meta.docs` attaches.
     3. `src/lint/plugin.ts` — the rule added to `plugin.rules`; `recommendedRules`
        needs no separate edit, since it is derived from that map's keys, at
        `error` unless the id's own segment ends in `w` (`m2w-…` → `warn`).
@@ -78,6 +78,12 @@ which the generated `dist/*.d.ts` reaches through the AI SDK's own types.
     `src/lint/plugin.test.ts` is the completeness meta-test that refuses a
     rule missing any of the first three — see
     [03-testing.md](03-testing.md).
+
+    Those six are a `consumer` rule's — one meaningful in any project that
+    uses the package. A `self` rule, one that only makes sense against this
+    package's own tree, enters neither `plugin.rules` nor `RULE_DOCS`, so it
+    never ships: the meta-tests refuse any published rule that is not
+    `consumer`.
 
 ## The preserved-terms generator
 

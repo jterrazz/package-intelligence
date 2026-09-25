@@ -12,6 +12,8 @@ import type { RuleDoc } from './types.js';
  * catalogue file to keep in sync, only the manifest itself). Guards:
  *
  * - every shipped rule carries `meta.docs`, sourced from {@link RULE_DOCS};
+ * - every manifest entry declares its audience, and the published plugin
+ *   carries only `consumer` rules;
  * - the manifest covers EXACTLY the shipped rules (no orphan doc, no
  *   undocumented rule);
  * - the `intelligence` fragment is a complete, standalone oxlint config
@@ -49,6 +51,26 @@ describe('rule manifest — completeness (meta-test)', () => {
             // Then - no id has been seen before
             expect(ids.has(doc.id), `duplicate manifest id ${doc.id}`).toBe(false);
             ids.add(doc.id);
+        }
+    });
+});
+
+describe('rule audience (meta-test)', () => {
+    const AUDIENCES: ReadonlySet<string> = new Set(['consumer', 'self']);
+
+    test('every manifest entry declares an audience from the closed set', () => {
+        // Given - every entry of the rule manifest
+        for (const [id, doc] of Object.entries(RULE_DOCS)) {
+            // Then - it names `consumer` or `self`, and nothing else
+            expect(AUDIENCES.has(doc.audience), `${id} declares no known audience`).toBe(true);
+        }
+    });
+
+    test('the published plugin carries only consumer rules', () => {
+        // Given - each rule the `./oxlint` entry ships
+        for (const [id, rule] of Object.entries(plugin.rules)) {
+            // Then - it speaks to a consumer project, never to this package's own suite
+            expect(rule.meta?.docs?.audience, `${id} is not a consumer rule`).toBe('consumer');
         }
     });
 });
