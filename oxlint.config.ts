@@ -2,19 +2,14 @@ import { testing } from '@jterrazz/test/oxlint';
 import { compose, defineConfig, library } from '@jterrazz/typescript/oxlint';
 import type { OxlintConfig } from '@jterrazz/typescript/oxlint';
 
-// This package is consumer #1 of the convention it ships: it lints itself with its own
-// plugin. The fragment names `@jterrazz/intelligence/oxlint`, which Node resolves from
-// inside the package to `dist/oxlint.js` — so `npm run build` precedes `npm run lint`.
+// Its own plugin is read from dist/, so `npm run build` precedes `npm run lint`.
 import { intelligence } from './dist/oxlint.js';
 
-// The `library` tsconfig's `isolatedDeclarations` refuses a default export whose type it
-// would have to infer, so this config names its own type.
+// `isolatedDeclarations` refuses a default export whose type it would infer.
 const config: OxlintConfig = defineConfig(
     compose(library, testing, intelligence, {
         rules: {
-            // reason: M1 gates a CONSUMER's composition root. This package defines the
-            // factories it names, so every call in this tree is that definition or its
-            // own test — there is no container here for them to move to.
+            // reason: M1 gates a consumer's composition root; this package defines the factories it names.
             'intelligence/m1-model-resolution-in-container': 'off',
         },
     }),

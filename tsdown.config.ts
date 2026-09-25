@@ -1,10 +1,7 @@
 import { defineConfig } from 'tsdown';
 import type { UserConfig } from 'tsdown';
 
-// Mirrors @jterrazz/typescript's `bundle` preset, with two extra dependency-free
-// Entries: `formatting` (text formatting without the AI peer dependencies) and
-// `oxlint` (the agent/prompt convention plugin — imports nothing from the `ai`/
-// `@ai-sdk/*` runtime, so it stays free of that dependency graph too).
+// `formatting` and `oxlint` import nothing from the optional `ai` peer.
 const config: UserConfig = defineConfig({
     clean: true,
     dts: true,
