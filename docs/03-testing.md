@@ -29,7 +29,7 @@ proof.
 
 ## Integration specs
 
-One runner serves the three domains: `specs/integration/integration.specification.ts`
+One runner serves the four domains: `specs/integration/integration.specification.ts`
 calls `specification.integration()` with no services. Nothing starts — what
 earns the facet here is the golden, or the process a spec spawns.
 
@@ -68,6 +68,15 @@ stands for.
 The assertion stays a rule-id probe rather than a full snapshot — the
 sanctioned exception to `@jterrazz/test`'s D11, so the spec is not coupled to
 a third party's diagnostic formatting.
+
+### The published tarball
+
+`specs/integration/tarball/oxlint-entry.spec.ts` reads the plugin as npm would ship
+it: `npm pack --dry-run --json` lists the tarball's files, the spec checks that
+both halves of the `./oxlint` export are among them, then loads that entry, ESM
+and CJS, and asserts every rule it registers — and every key of its
+`recommendedRules` — is a `consumer` rule. It is the tarball-level twin of the
+audience rows below, and like the E2E run it needs `npm run build` first.
 
 ## The completeness meta-test
 
