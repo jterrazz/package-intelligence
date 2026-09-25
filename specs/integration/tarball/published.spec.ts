@@ -7,21 +7,10 @@ import { expect, test } from 'vitest';
 
 import { integration } from '../integration.specification.js';
 
-/**
- * The package as npm publishes it: `npm pack` writes the tarball, the spec
- * extracts it, and judges the extracted bytes. Its file set, its bins, its
- * exports map and every entry's export names are pinned, so nothing new ships
- * unreviewed. Every entry the extracted `package.json` exports is loaded under
- * every condition Node resolves, and every rule reachable from its exports is
- * `consumer`. The tarball carries the BUILT `dist/`, so
- * `npm run build` precedes this spec. It is extracted under
- * `.artifacts/tarball/`, inside the package, so an entry's bare imports
- * resolve to this package's `node_modules` the way they would to a consumer's.
- */
+// Extracted inside the package, so an entry's bare imports resolve to its node_modules as a consumer's would; `npm run build` precedes this spec.
 const ROOT = resolve(import.meta.dirname, '../../..');
 const EXTRACTED = resolve(ROOT, '.artifacts/tarball');
 
-/** Every file the tarball carries — a new one has to pass review before it can ship. */
 const PACKED_FILES = [
     'LICENSE',
     'README.md',
@@ -33,7 +22,6 @@ const PACKED_FILES = [
     ),
 ].toSorted();
 
-/** Every export name of every published entry — a new export has to pass review before it can ship. */
 const EXPORT_NAMES: Record<string, string[]> = {
     '.': [
         'createAgentMiddleware',
@@ -49,7 +37,6 @@ const EXPORT_NAMES: Record<string, string[]> = {
     './oxlint': ['default', 'intelligence', 'recommendedRules'],
 };
 
-/** The conditions Node resolves, by the loader that honours each. */
 const LOADERS: Record<string, 'import' | 'require'> = {
     default: 'import',
     import: 'import',
@@ -57,7 +44,6 @@ const LOADERS: Record<string, 'import' | 'require'> = {
     require: 'require',
 };
 
-/** Reads `key` off a value of unknown shape — `undefined` when it holds no properties. */
 function field(value: unknown, key: string): unknown {
     return (typeof value === 'object' || typeof value === 'function') && value !== null
         ? Reflect.get(value, key)
@@ -70,7 +56,6 @@ function keysOf(value: unknown): string[] {
         : [];
 }
 
-/** The values a container holds besides its own keys: a Map's values, a Set's members. */
 function membersOf(value: unknown): unknown[] {
     if (value instanceof Map || value instanceof Set) {
         return [...value.values()];
@@ -78,11 +63,6 @@ function membersOf(value: unknown): unknown[] {
     return [];
 }
 
-/**
- * Walks every value reachable from `value` — own enumerable keys of objects
- * and functions, Map values, Set members — and records the
- * `meta.docs.audience` of each value that sets one, by path.
- */
 function collectAudiences(
     value: unknown,
     path: string,
@@ -109,7 +89,6 @@ function collectAudiences(
     }
 }
 
-/** One entry loaded under one condition. */
 type LoadedEntry = {
     audiences: Record<string, unknown>;
     condition: string;
@@ -127,7 +106,6 @@ function loaded(subpath: string, condition: string, module: unknown): LoadedEntr
     return { audiences, condition, exports: keysOf(module).toSorted(), module, subpath };
 }
 
-/** Packs the package, extracts the tarball, and returns the directory npm would install. */
 function packAndExtract(): string {
     rmSync(EXTRACTED, { force: true, recursive: true });
     mkdirSync(EXTRACTED, { recursive: true });
@@ -153,7 +131,6 @@ function filesUnder(directory: string): string[] {
         .map((entry) => relative(directory, resolve(entry.parentPath, entry.name)));
 }
 
-/** Every subpath of an `exports` map, with its targets by condition. */
 function exportTargets(exports: unknown): Record<string, Record<string, string>> {
     return Object.fromEntries(
         keysOf(exports).map((subpath) => {
