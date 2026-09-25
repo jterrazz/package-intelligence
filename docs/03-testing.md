@@ -79,8 +79,8 @@ extracts it. It judges the extracted bytes, starting from the extracted
 It pins what ships, so nothing new ships unreviewed: the exact packed file
 set, the absence of a `bin`, the `import` and `require` conditions of each
 subpath, and every entry's export names under each condition. It loads every
-entry under each condition and walks every export value — the own keys of
-objects and functions, the members of a Map or a Set — to each value
+entry under each condition and walks every export value — the enumerable own
+keys of objects and functions, the members of a Map or a Set — to each value
 carrying a `meta.docs.audience`, and asserts each one is `consumer`. It also
 checks that `recommendedRules` enables exactly the rules the plugin
 registers. It is the tarball-level twin of the audience rows below, and like
