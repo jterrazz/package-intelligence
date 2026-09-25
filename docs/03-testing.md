@@ -87,8 +87,8 @@ tarball-level twin of the audience rows below, and like the E2E run it needs
 `src/lint/plugin.test.ts` mirrors `@jterrazz/test`'s own `src/lint/plugin.test.ts`
 (minus the docs-generation freshness checks: this package has no generated
 catalogue). It asserts every rule in `plugin.rules` carries a `meta.docs`
-sourced from `RULE_DOCS`, that the manifest and the plugin cover exactly the
-same rule set, that every manifest entry declares an audience from the closed
+sourced from `RULE_DOCS`, that the manifest's `consumer` entries and the
+plugin cover exactly the same rule set, that every manifest entry declares an audience from the closed
 `consumer`/`self` pair and every rule the plugin ships is `consumer`, that
 every manifest id is unique, that the `intelligence`
 fragment is self-sufficient, and that severities follow the `<id>w-*` → `warn`

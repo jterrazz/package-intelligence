@@ -57,7 +57,8 @@ export type RuleDoc = {
     /**
      * Who the rule speaks to. `consumer` — meaningful in any project that uses
      * the package; only these ship in the published plugin. `self` — this
-     * package's own suite discipline; never enters the published plugin.
+     * package's own suite discipline; keeps its manifest entry but never
+     * enters the published plugin.
      */
     audience: RuleAudience;
     /** Convention code, e.g. `'P1'`. */

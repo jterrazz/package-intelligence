@@ -14,8 +14,8 @@ import type { RuleDoc } from './types.js';
  * - every shipped rule carries `meta.docs`, sourced from {@link RULE_DOCS};
  * - every manifest entry declares its audience, and the published plugin
  *   carries only `consumer` rules;
- * - the manifest covers EXACTLY the shipped rules (no orphan doc, no
- *   undocumented rule);
+ * - the manifest's `consumer` entries cover EXACTLY the shipped rules (no
+ *   orphan doc, no undocumented rule), so a `self` entry never ships;
  * - the `intelligence` fragment is a complete, standalone oxlint config
  *   fragment (every rule wired, nothing missing);
  * - every rule has an E2E fixture pair (`specs/integration/lint/_fixtures/<id>`
@@ -38,10 +38,14 @@ describe('rule manifest — completeness (meta-test)', () => {
         }
     });
 
-    test('the manifest covers exactly the shipped plugin rules', () => {
-        // Given - the manifest and the plugin map
+    test("the manifest's consumer entries cover exactly the shipped plugin rules", () => {
+        // Given - the manifest's consumer entries and the plugin map
+        const consumerIds = Object.entries(RULE_DOCS)
+            .filter(([, doc]) => doc.audience === 'consumer')
+            .map(([id]) => id);
+
         // Then - the two sets are identical (no orphan doc, no undocumented rule)
-        expect(Object.keys(RULE_DOCS).toSorted()).toStrictEqual([...pluginRules].toSorted());
+        expect(consumerIds.toSorted()).toStrictEqual([...pluginRules].toSorted());
     });
 
     test('every rule id is unique across the manifest', () => {

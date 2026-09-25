@@ -22,8 +22,10 @@ export type RuleId =
  * "what exactly is checked" — `plugin.test.ts` asserts every shipped rule
  * carries its entry and that no entry is orphaned.
  *
- * It is the PUBLISHED catalogue: every entry is a `consumer` rule the
- * `./oxlint` entry ships. A `self` rule's doc never lives here.
+ * Every rule this package holds has an entry, and each entry declares its
+ * audience. The `consumer` entries are the published catalogue: `plugin.rules`
+ * wires exactly them. A `self` entry is wired only in this package's own lint
+ * config, never in `plugin.rules`.
  */
 export const RULE_DOCS: Record<RuleId, RuleDoc> = {
     'g1-agent-class-shape': {
