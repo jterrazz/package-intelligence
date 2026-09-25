@@ -2,7 +2,6 @@ import { detectAgentFile } from '../agents.js';
 import { RULE_DOCS } from '../manifest.js';
 import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
-/** Unwrap `private readonly model: T` (TSParameterProperty) / defaults to the bare identifier. */
 function parameterName(param: AstNode | undefined): string | undefined {
     if (param === undefined) {
         return undefined;
@@ -24,12 +23,6 @@ function classBody(classNode: AstNode): AstNode[] {
     return (body?.body as AstNode[] | undefined) ?? [];
 }
 
-/**
- * CONVENTIONS G1 — an agent file's class shape: exactly one exported class,
- * carrying a `static readonly SCHEMA` member, a `run` method, and a
- * constructor whose first parameter is `model` (the `LanguageModel` the
- * class's `run()` passes straight to `generateText`/`streamText`).
- */
 export const g1AgentClassShape: LintRule = {
     create(context: RuleContext): Visitor {
         const file = context.physicalFilename;

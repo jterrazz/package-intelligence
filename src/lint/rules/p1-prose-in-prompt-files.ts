@@ -2,12 +2,10 @@ import { isUnderAgentsFolder } from '../agents.js';
 import { RULE_DOCS } from '../manifest.js';
 import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
-/** A markdown heading — `#`, `##`, or `###` followed by a space. */
 const MARKDOWN_HEADING = /^#{1,3}\s/u;
-/** A line reading as prose: 4+ tokens separated by whitespace. */
 const MIN_PROSE_WORDS = 4;
+const MIN_PROSE_LINES = 3;
 
-/** Does `text` (one physical line) look like natural-language prose? */
 function looksLikeProseLine(line: string): boolean {
     const trimmed = line.trim();
     if (trimmed.length === 0) {
@@ -20,20 +18,10 @@ function looksLikeProseLine(line: string): boolean {
     return words.length >= MIN_PROSE_WORDS;
 }
 
-/** Number of physical lines a source span covers, from a `\n` count. */
 function lineSpan(text: string): number {
     return text.split('\n').length;
 }
 
-/**
- * CONVENTIONS P1 — the flagship rule: no multi-line natural-language literal
- * outside a `*.prompt.ts` file. A template literal is flagged when its full
- * source span reaches 3+ lines AND at least one of its own static quasis
- * (never the interpolated expressions) reads as prose — a line with 4+
- * space-separated words, or a markdown heading. Single-line literals, JSON-ish
- * multi-line literals, and pure data interpolation stay under the threshold
- * and pass.
- */
 export const p1ProseInPromptFiles: LintRule = {
     create(context: RuleContext): Visitor {
         const file = context.physicalFilename;
@@ -54,7 +42,7 @@ export const p1ProseInPromptFiles: LintRule = {
                     return;
                 }
                 const fullText = context.sourceCode.text.slice(start, end);
-                if (lineSpan(fullText) < 3) {
+                if (lineSpan(fullText) < MIN_PROSE_LINES) {
                     return;
                 }
                 const quasis = (node.quasis as AstNode[] | undefined) ?? [];

@@ -1,6 +1,5 @@
 import type { ConsumerRuleDoc } from './types.js';
 
-/** The closed set of mechanized rule ids — the manifest and the plugin agree on it. */
 export type RuleId =
     | 'g1-agent-class-shape'
     | 'm1-model-resolution-in-container'
@@ -9,24 +8,7 @@ export type RuleId =
     | 'p2-prompt-file-exports'
     | 'p3-agent-prompt-sibling';
 
-/**
- * The rule manifest — the single source of truth for the mechanized
- * agent/prompt conventions catalogue (mirrors `@jterrazz/test`'s
- * `src/lint/manifest.ts` docs-as-code inversion: the normative text lives
- * NEXT TO the rule it documents, attached as `meta.docs`, instead of drifting
- * apart in a hand-maintained doc).
- *
- * `docs/01-architecture.md`'s "The lint plugin — the agent/prompt convention"
- * section is the human-facing explanation of *why* this shape exists; this
- * manifest is the machine-facing
- * "what exactly is checked" — `plugin.test.ts` asserts every shipped rule
- * carries its entry and that no entry is orphaned.
- *
- * Every entry here is `consumer`, and `plugin.rules` wires exactly them: the
- * rule modules import this object, so tsdown inlines ALL of it into
- * `dist/oxlint.*`. A `self` row therefore lives in `manifest.self.ts`, which no
- * tsdown entry reaches.
- */
+// Every rule module imports this object, so tsdown bundles all of it: a `self` row goes to manifest.self.ts.
 export const RULE_DOCS: Record<RuleId, ConsumerRuleDoc> = {
     'g1-agent-class-shape': {
         audience: 'consumer',

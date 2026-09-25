@@ -6,16 +6,6 @@ import { fileExists } from '../fs.js';
 import { RULE_DOCS } from '../manifest.js';
 import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
-/**
- * CONVENTIONS P3 — the two-way link between an agent file and its prompt:
- *
- * - an agent file (`agents/<name>/<name>.ts`) imports its prompt from
- *   `./<name>.prompt.js` (best effort: checks for the import SOURCE string,
- *   not that the imported bindings are actually used);
- * - a `<name>.prompt.ts` file outside `_shared/` has a sibling `<name>.ts`
- *   in the same directory (`fs.existsSync` — mirrors `@jterrazz/test`'s
- *   `c8-referenced-fixture-exists`, the same on-disk-reference pattern).
- */
 export const p3AgentPromptSibling: LintRule = {
     create(context: RuleContext): Visitor {
         const file = context.physicalFilename;

@@ -23,64 +23,64 @@ export class ArticleComposer {
 
 ruleTester.run('g1-agent-class-shape', g1AgentClassShape as unknown as OxlintRule, {
     invalid: [
-        // No exported class at all.
         {
             code: 'const build = () => {};',
             errors: [{ messageId: 'noExportedClass' }],
             filename: AGENT_FILE,
+            name: 'no exported class',
         },
-        // Two exported classes.
         {
             code: 'export class A { static readonly SCHEMA = {}; constructor(model) {} run() {} }\nexport class B {}',
             errors: [{ messageId: 'multipleExportedClasses' }],
             filename: AGENT_FILE,
+            name: 'two exported classes',
         },
-        // Missing `static readonly SCHEMA`.
         {
             code: 'export class ArticleComposer { constructor(model) {} run() {} }',
             errors: [{ messageId: 'missingSchema' }],
             filename: AGENT_FILE,
+            name: 'no static readonly SCHEMA',
         },
-        // Missing `run` method.
         {
             code: 'export class ArticleComposer { static readonly SCHEMA = {}; constructor(model) {} }',
             errors: [{ messageId: 'missingRun' }],
             filename: AGENT_FILE,
+            name: 'no run method',
         },
-        // Constructor's first parameter is not named `model`.
         {
             code: 'export class ArticleComposer { static readonly SCHEMA = {}; constructor(client) {} run() {} }',
             errors: [{ messageId: 'missingConstructorModel' }],
             filename: AGENT_FILE,
+            name: 'a first constructor parameter not named model',
         },
-        // No constructor at all.
         {
             code: 'export class ArticleComposer { static readonly SCHEMA = {}; run() {} }',
             errors: [{ messageId: 'missingConstructorModel' }],
             filename: AGENT_FILE,
+            name: 'no constructor',
         },
     ],
     valid: [
-        // The canonical shape.
         {
             code: CANONICAL,
             filename: AGENT_FILE,
+            name: 'the canonical shape',
         },
-        // A TS parameter property (`private readonly model: T`) still reads as `model`.
         {
             code: 'export class ArticleComposer { static readonly SCHEMA = {}; constructor(private readonly model: unknown) {} run() {} }',
             filename: AGENT_FILE,
+            name: 'a parameter property named model',
         },
-        // Not an agent file (basename ≠ parent dir name) — rule inert.
         {
             code: 'export class NotAnAgent {}',
             filename: NOT_AGENT_FILE,
+            name: 'a basename unlike its folder is not an agent file',
         },
-        // A *.test.ts sibling — never an agent file.
         {
             code: 'export class WhateverInTest {}',
             filename:
                 '/repo/src/infrastructure/outbound/agents/article-composer/article-composer.test.ts',
+            name: 'a test sibling is not an agent file',
         },
     ],
 });

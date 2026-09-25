@@ -19,19 +19,18 @@ ruleTester.run(
     m1ModelResolutionInContainer as unknown as OxlintRule,
     {
         invalid: [
-            // CreateIntelligence() called outside di/ and outside *container.ts.
             {
                 code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});",
                 errors: [{ messageId: 'factoryOutsideContainer' }],
                 filename: OUTSIDE,
+                name: 'createIntelligence outside a container',
             },
-            // CreateGatewayProvider() outside the allow-listed locations.
             {
                 code: "import { createGatewayProvider } from '@jterrazz/intelligence';\nconst p = createGatewayProvider({});",
                 errors: [{ messageId: 'factoryOutsideContainer' }],
                 filename: OUTSIDE,
+                name: 'createGatewayProvider outside a container',
             },
-            // .model('…') called outside the allow-listed locations, file imports the package.
             {
                 code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});\nconst m = i.model('summarizer');",
                 errors: [
@@ -39,32 +38,29 @@ ruleTester.run(
                     { messageId: 'modelCallOutsideContainer' },
                 ],
                 filename: OUTSIDE,
+                name: 'a literal model call outside a container',
             },
         ],
         valid: [
-            // Allowed: a file under di/.
             {
                 code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});\nconst m = i.model('summarizer');",
                 filename: DI_FILE,
+                name: 'a file under di/',
             },
-            // Allowed: a file named *container.ts (not necessarily under di/).
             {
                 code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});\nconst m = i.model('summarizer');",
                 filename: NAMED_CONTAINER,
+                name: 'a file named *container.ts',
             },
-            // .model('…') outside the allow-listed location, but the file never
-            // Imports @jterrazz/intelligence — documented limitation: not tracked.
             {
                 code: "const m = someOtherClient.model('gpt-4');",
                 filename: OUTSIDE,
+                name: 'a model call in a file that never imports the package',
             },
-            // .model() call with a non-literal argument is out of static reach
-            // (the file imports the package but never calls a factory itself —
-            // E.g. `i` arrives as an injected parameter, as in the README's
-            // Container.ts example).
             {
                 code: "import type { Intelligence } from '@jterrazz/intelligence';\nfunction wire(i: Intelligence, agentName: string) { return i.model(agentName); }",
                 filename: OUTSIDE,
+                name: 'a model call with a non-literal argument',
             },
         ],
     },

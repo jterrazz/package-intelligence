@@ -7,30 +7,12 @@ import { SELF_RULE_DOCS } from './manifest.self.js';
 import plugin, { intelligence, recommendedRules } from './plugin.js';
 import type { RuleDoc } from './types.js';
 
-/**
- * Completeness meta-test — mirrors `@jterrazz/test`'s `src/lint/plugin.test.ts`
- * (minus the docs-generation freshness checks: this package has no generated
- * catalogue file to keep in sync, only the manifest itself). Guards:
- *
- * - every shipped rule carries `meta.docs`, sourced from {@link RULE_DOCS};
- * - every row of both manifests declares its audience: `manifest.ts` holds
- *   `consumer` rows alone, `manifest.self.ts` `self` rows alone, and the
- *   published plugin carries only `consumer` rules;
- * - the `consumer` rows cover EXACTLY the shipped rules (no orphan doc, no
- *   undocumented rule), and no `self` row is wired;
- * - the `intelligence` fragment is a complete, standalone oxlint config
- *   fragment (every rule wired, nothing missing);
- * - every rule has an E2E fixture pair (`specs/integration/lint/_fixtures/<id>`
- *   and `<id>-ok`) AND a `RuleTester` spec file (`src/lint/rules/<id>.test.ts`).
- */
 const ROOT = resolve(import.meta.dirname, '../..');
 
-/** The manifest read by an arbitrary id — what a shipped rule id is, is the subject under test. */
 const docsById: Record<string, RuleDoc> = RULE_DOCS;
 
 const selfDocsById: Record<string, RuleDoc> = SELF_RULE_DOCS;
 
-/** Both manifests, each row tagged with the file that holds it. */
 const allRows: { doc: RuleDoc; file: 'manifest.self.ts' | 'manifest.ts'; key: string }[] = [
     ...Object.entries(RULE_DOCS).map(([key, doc]) => ({ doc, file: 'manifest.ts' as const, key })),
     ...Object.entries(selfDocsById).map(([key, doc]) => ({
@@ -114,7 +96,6 @@ describe('intelligence fragment — standalone oxlint config', () => {
         expect(Object.keys(intelligence.rules)).toStrictEqual(
             Object.keys(plugin.rules).map((id) => `intelligence/${id}`),
         );
-        // The fragment carries no `extends` — it's additive, composed via `compose()`.
         expect('extends' in intelligence).toBe(false);
     });
 

@@ -6,8 +6,6 @@ import { p1ProseInPromptFiles } from './p1-prose-in-prompt-files.js';
 RuleTester.describe = describe;
 RuleTester.it = it;
 
-// Boundary cast: oxlint does not export its `Rule` type, and our structural
-// `LintRule` is intentionally decoupled from its internal (alpha) typings.
 type OxlintRule = Parameters<RuleTester['run']>[1];
 
 const ruleTester = new RuleTester();
@@ -22,60 +20,59 @@ const OUTSIDE_AGENTS = '/repo/src/domain/news/article.ts';
 
 ruleTester.run('p1-prose-in-prompt-files', p1ProseInPromptFiles as unknown as OxlintRule, {
     invalid: [
-        // Multi-line prose (a real sentence) leaking into the agent file itself.
         {
             code: 'const prompt = `You are a careful assistant.\nWrite a concise summary of the article.\nUse neutral language throughout.`;',
             errors: [{ messageId: 'moveProse' }],
             filename: AGENT_FILE,
+            name: 'multi-line prose in the agent file',
         },
-        // A markdown heading is prose even without a 4-word line.
         {
             code: 'const prompt = `# Article\n## Rules\nGo.`;',
             errors: [{ messageId: 'moveProse' }],
             filename: AGENT_FILE,
+            name: 'a markdown heading',
         },
-        // P1's scope is any non-prompt/non-test file under agents/, not just <name>.ts.
         {
             code: 'const text = `This is a fairly long instruction\nspanning several lines of natural language\nfor the model to follow.`;',
             errors: [{ messageId: 'moveProse' }],
             filename: AGENT_HELPER,
+            name: 'prose in a helper under agents/',
         },
-        // Interpolated data inside a multi-line prose literal still counts (the
-        // Static quasis carry the prose; the hole is just a value).
         {
             // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const prompt = `Summarize this article about ${topic}.\nFocus on the key facts and events.\nKeep it neutral and factual.`;',
             errors: [{ messageId: 'moveProse' }],
             filename: AGENT_FILE,
+            name: 'prose around an interpolation',
         },
     ],
     valid: [
-        // Outside any agents/ folder entirely — rule inert.
         {
             code: 'const prompt = `You are a careful assistant.\nWrite a concise summary of the article.\nUse neutral language throughout.`;',
             filename: OUTSIDE_AGENTS,
+            name: 'prose outside agents/',
         },
-        // *.prompt.ts is the rule's own escape hatch — inert there.
         {
             code: 'export const buildPrompt = () => `You are a careful assistant.\nWrite a concise summary of the article.\nUse neutral language throughout.`;',
             filename: PROMPT_FILE,
+            name: 'prose in a prompt file',
         },
-        // *.test.ts under agents/ is exempt too.
         {
             code: 'const prompt = `You are a careful assistant.\nWrite a concise summary of the article.\nUse neutral language throughout.`;',
             filename: TEST_FILE,
+            name: 'prose in a test file under agents/',
         },
-        // Single-line literal — never reaches the 3-line threshold.
         {
             // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const label = `Composing article for ${eventId}`;',
             filename: AGENT_FILE,
+            name: 'a single-line literal',
         },
-        // Multi-line but not prose (JSON-ish data interpolation, short lines).
         {
             // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const json = `{\n  "id": ${id},\n  "ok": true\n}`;',
             filename: AGENT_FILE,
+            name: 'multi-line data that is not prose',
         },
     ],
 });

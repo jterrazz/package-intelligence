@@ -2,33 +2,17 @@ import { memberPropertyName, stringValue } from '../ast.js';
 import { RULE_DOCS } from '../manifest.js';
 import type { AstNode, LintRule, RuleContext, Visitor } from '../types.js';
 
-/** The composition-root factories `@jterrazz/intelligence` exposes. */
 const FACTORY_NAMES = new Set([
     'createGatewayProvider',
     'createIntelligence',
     'createOpenRouterProvider',
 ]);
 
-/** Is `file` a DI/composition-root file? */
 function isContainerFile(file: string): boolean {
     return file.includes('/di/') || file.endsWith('container.ts');
 }
 
-/**
- * CONVENTIONS M1 — model resolution is composition-root work. `createIntelligence`
- * and the two provider factories, plus `.model('…')` calls on whatever they
- * produce, are only allowed in a file under `di/` or named `*container.ts`.
- *
- * Detection is best effort by design: a `.model(<string literal>)` call is
- * flagged wherever it appears in a file that imports `@jterrazz/intelligence`,
- * WITHOUT verifying the receiver is actually the `Intelligence` instance —
- * static analysis cannot reliably trace that binding across parameter
- * passing/destructuring (see the container.ts example in the README, where
- * `Intelligence` arrives as an injected parameter, not a local `const`). A
- * project with an unrelated `.model()` method on some other object, imported
- * from the same file as `@jterrazz/intelligence`, would false-positive here —
- * an accepted, documented limitation of this rule.
- */
+// A literal `.model()` call is flagged in any file importing the package, receiver unresolved: an unrelated `.model()` there is a known false positive.
 export const m1ModelResolutionInContainer: LintRule = {
     create(context: RuleContext): Visitor {
         const file = context.physicalFilename;

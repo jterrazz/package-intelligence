@@ -7,17 +7,10 @@ import { RULE_DOCS } from './manifest.js';
 import { SELF_RULE_DOCS } from './manifest.self.js';
 import type { RuleDoc } from './types.js';
 
-/**
- * No `self` row ships, judged by CONTENT: the package is packed as npm
- * publishes it, and the text of every file of the tarball is searched for
- * the name, quoted id and convention of every `self` row of either manifest — whichever bundle,
- * entry, map or declaration file would carry it. The tarball carries the
- * BUILT `dist/`, so `npm run build` precedes this test.
- */
+// The tarball carries the built dist/, so `npm run build` precedes this test.
 const ROOT = resolve(import.meta.dirname, '../..');
 const PACKED = resolve(ROOT, '.artifacts/tarball-text');
 
-/** The concatenated text of every file of the tarball `npm pack` writes. */
 function packedText(): string {
     rmSync(PACKED, { force: true, recursive: true });
     mkdirSync(PACKED, { recursive: true });
@@ -39,7 +32,6 @@ function escaped(text: string): string {
     return text.replaceAll(/[$()*+.?[\\\]^{|}]/gu, String.raw`\$&`);
 }
 
-/** How a manifest row surfaces in shipped text: its name, its quoted id, its convention. */
 function tracesOf(name: string, doc: RuleDoc): RegExp[] {
     return [
         new RegExp(escaped(name), 'u'),
@@ -51,7 +43,6 @@ function tracesOf(name: string, doc: RuleDoc): RegExp[] {
 const text = packedText();
 const selfDocsById: Record<string, RuleDoc> = SELF_RULE_DOCS;
 
-/** Every row of both manifests — a `self` row filed in the wrong one is still searched. */
 const rows: [string, RuleDoc][] = [...Object.entries(RULE_DOCS), ...Object.entries(selfDocsById)];
 
 function rowsOf(audience: RuleDoc['audience']): [string, RuleDoc][] {

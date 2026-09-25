@@ -6,11 +6,7 @@ import { expect, test } from 'vitest';
 
 import { integration } from '../integration.specification.js';
 
-/**
- * The plugin as oxlint actually loads it: the REAL binary, the BUILT
- * `dist/oxlint.js`, and each rule's violation/compliant fixture pair. oxlint's
- * JS-plugin loader takes a JS module, so `npm run build` precedes this spec.
- */
+// oxlint loads the built `dist/oxlint.js`, so `npm run build` precedes this spec.
 const ROOT = resolve(import.meta.dirname, '../../..');
 const OXLINT_BIN = resolve(ROOT, 'node_modules/.bin/oxlint');
 const CONFIG = resolve(import.meta.dirname, '_fixtures/oxlint.e2e.json');
@@ -20,12 +16,7 @@ type Severity = 'error' | 'warn';
 
 type RunResult = { exitCode: number; stdout: string };
 
-/**
- * A fixture stands for a CONSUMER's repository, so it is linted from a
- * directory of its own. Several rules exempt a path carrying a `specs`,
- * `fixtures` or `config` segment, and this package's own spec tree would
- * otherwise answer for the tree under test.
- */
+// Linted from a directory of its own: several rules exempt the `specs`/`fixtures` segments this tree's path carries.
 function lintFixture(name: string): RunResult {
     const workdir = mkdtempSync(join(tmpdir(), 'intelligence-lint-'));
     try {
@@ -52,9 +43,7 @@ const RULES: { id: string; severity: Severity }[] = [
     { id: 'p3-agent-prompt-sibling', severity: 'error' },
 ];
 
-// Scalpel over snapshot (D11 exception d): the assertion is the rule id THIS
-// plugin reports, never oxlint's diagnostic formatting, which is a third
-// party's to change.
+// Scalpel over snapshot (D11 exception d): oxlint's diagnostic formatting is a third party's to change.
 test.each(RULES)('$id rejects its violation fixture', async ({ id, severity }) => {
     // Given - the fixture project that breaks the rule
     const result = await integration.call(() => lintFixture(id));
