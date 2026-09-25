@@ -71,16 +71,20 @@ a third party's diagnostic formatting.
 
 ### The published tarball
 
-`specs/integration/tarball/oxlint-entry.spec.ts` reads the package as npm ships
-it: `npm pack` writes the tarball into `.artifacts/tarball/`, the spec extracts it, and
-loads every entry `package.json` exports, ESM and CJS, from the extracted bytes.
-It pins the `./oxlint` entry's export set to `default`, `intelligence` and
-`recommendedRules`, so a new export has to pass review before it ships. It
-walks every export value of every entry to each object carrying a
-`meta.docs.audience`, and asserts each one is `consumer`. It also checks that
-`recommendedRules` enables exactly the rules the plugin registers. It is the
-tarball-level twin of the audience rows below, and like the E2E run it needs
-`npm run build` first.
+`specs/integration/tarball/published.spec.ts` reads the package as npm ships
+it: `npm pack` writes the tarball into `.artifacts/tarball/`, and the spec
+extracts it. It judges the extracted bytes, starting from the extracted
+`package.json`.
+
+It pins what ships, so nothing new ships unreviewed: the exact packed file
+set, the absence of a `bin`, the `import` and `require` conditions of each
+subpath, and every entry's export names under each condition. It loads every
+entry under each condition and walks every export value — the own keys of
+objects and functions, the members of a Map or a Set — to each value
+carrying a `meta.docs.audience`, and asserts each one is `consumer`. It also
+checks that `recommendedRules` enables exactly the rules the plugin
+registers. It is the tarball-level twin of the audience rows below, and like
+the E2E run it needs `npm run build` first.
 
 ## The completeness meta-test
 
