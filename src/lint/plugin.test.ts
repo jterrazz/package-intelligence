@@ -3,6 +3,7 @@ import { resolve } from 'node:path';
 import { describe, expect, test } from 'vitest';
 
 import { RULE_DOCS } from './manifest.js';
+import { SELF_RULE_DOCS } from './manifest.self.js';
 import plugin, { intelligence, recommendedRules } from './plugin.js';
 import type { RuleDoc } from './types.js';
 
@@ -12,10 +13,11 @@ import type { RuleDoc } from './types.js';
  * catalogue file to keep in sync, only the manifest itself). Guards:
  *
  * - every shipped rule carries `meta.docs`, sourced from {@link RULE_DOCS};
- * - every manifest entry declares its audience, and the published plugin
- *   carries only `consumer` rules;
- * - the manifest's `consumer` entries cover EXACTLY the shipped rules (no
- *   orphan doc, no undocumented rule), so a `self` entry never ships;
+ * - every row of both manifests declares its audience: `manifest.ts` holds
+ *   `consumer` rows alone, `manifest.self.ts` `self` rows alone, and the
+ *   published plugin carries only `consumer` rules;
+ * - the `consumer` rows cover EXACTLY the shipped rules (no orphan doc, no
+ *   undocumented rule), and no `self` row is wired;
  * - the `intelligence` fragment is a complete, standalone oxlint config
  *   fragment (every rule wired, nothing missing);
  * - every rule has an E2E fixture pair (`specs/integration/lint/_fixtures/<id>`
@@ -25,6 +27,18 @@ const ROOT = resolve(import.meta.dirname, '../..');
 
 /** The manifest read by an arbitrary id — what a shipped rule id is, is the subject under test. */
 const docsById: Record<string, RuleDoc> = RULE_DOCS;
+
+const selfDocsById: Record<string, RuleDoc> = SELF_RULE_DOCS;
+
+/** Both manifests, each row tagged with the file that holds it. */
+const allRows: { doc: RuleDoc; file: 'manifest.self.ts' | 'manifest.ts'; key: string }[] = [
+    ...Object.entries(RULE_DOCS).map(([key, doc]) => ({ doc, file: 'manifest.ts' as const, key })),
+    ...Object.entries(selfDocsById).map(([key, doc]) => ({
+        doc,
+        file: 'manifest.self.ts' as const,
+        key,
+    })),
+];
 
 const pluginRules = new Set(Object.keys(plugin.rules));
 
@@ -38,23 +52,25 @@ describe('rule manifest — completeness (meta-test)', () => {
         }
     });
 
-    test("the manifest's consumer entries cover exactly the shipped plugin rules", () => {
-        // Given - the manifest's consumer entries and the plugin map
-        const consumerIds = Object.entries(RULE_DOCS)
-            .filter(([, doc]) => doc.audience === 'consumer')
-            .map(([id]) => id);
+    test('the consumer rows of both manifests cover exactly the shipped plugin rules', () => {
+        // Given - every consumer row, whichever manifest holds it, and the plugin map
+        const consumerIds = allRows
+            .filter(({ doc }) => doc.audience === 'consumer')
+            .map(({ key }) => key);
 
         // Then - the two sets are identical (no orphan doc, no undocumented rule)
         expect(consumerIds.toSorted()).toStrictEqual([...pluginRules].toSorted());
     });
 
-    test('every rule id is unique across the manifest', () => {
-        // Given - every entry of the rule manifest
-        const ids = new Set<string>();
-        for (const doc of Object.values(RULE_DOCS)) {
-            // Then - no id has been seen before
-            expect(ids.has(doc.id), `duplicate manifest id ${doc.id}`).toBe(false);
-            ids.add(doc.id);
+    test('every rule id and name is unique across both manifests', () => {
+        // Given - every row of both manifests
+        const seen = new Set<string>();
+        for (const { doc, key } of allRows) {
+            // Then - neither its id nor its name has been seen before
+            expect(seen.has(doc.id), `duplicate manifest id ${doc.id}`).toBe(false);
+            expect(seen.has(key), `duplicate manifest name ${key}`).toBe(false);
+            seen.add(doc.id);
+            seen.add(key);
         }
     });
 });
@@ -62,11 +78,21 @@ describe('rule manifest — completeness (meta-test)', () => {
 describe('rule audience (meta-test)', () => {
     const AUDIENCES: ReadonlySet<string> = new Set(['consumer', 'self']);
 
-    test('every manifest entry declares an audience from the closed set', () => {
-        // Given - every entry of the rule manifest
-        for (const [id, doc] of Object.entries(RULE_DOCS)) {
+    test('every manifest row declares an audience from the closed set', () => {
+        // Given - every row of both manifests
+        for (const { doc, key } of allRows) {
             // Then - it names `consumer` or `self`, and nothing else
-            expect(AUDIENCES.has(doc.audience), `${id} declares no known audience`).toBe(true);
+            expect(AUDIENCES.has(doc.audience), `${key} declares no known audience`).toBe(true);
+        }
+    });
+
+    test('each manifest holds the rows of one audience', () => {
+        // Given - every row of both manifests
+        for (const { doc, file, key } of allRows) {
+            // Then - the published manifest holds consumer rows, the home-only one self rows
+            expect(doc.audience, `${key} sits in ${file}`).toBe(
+                file === 'manifest.ts' ? 'consumer' : 'self',
+            );
         }
     });
 

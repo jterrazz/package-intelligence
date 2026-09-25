@@ -81,15 +81,22 @@ which the generated `dist/*.d.ts` reaches through the AI SDK's own types.
 
     Those six are a `consumer` rule's — one meaningful in any project that
     uses the package. A `self` rule, one that only makes sense against this
-    package's own tree, keeps its `RULE_DOCS` entry with `audience: 'self'`
-    but never enters `plugin.rules`: it is wired only in this package's own
-    oxlint config, so it never ships.
+    package's own tree, takes its row in `src/lint/manifest.self.ts`, never in
+    `RULE_DOCS`: every rule module imports `RULE_DOCS`, so all of it ships.
+    It never enters `plugin.rules`.
+
+    No home wiring for a `self` rule exists yet, because the package holds
+    none. The first one needs a plugin module of its own that is never a
+    tsdown entry, since every entry is packed and published.
 
     `src/lint/plugin.test.ts` refuses a rule in `plugin.rules` that is not
-    `consumer`, and a `consumer` entry `plugin.rules` does not wire. The
-    tarball spec loads every entry the packed package exports: it refuses a
-    new export on `./oxlint`, and any rule reachable from an entry's exports
-    that is not `consumer`.
+    `consumer`, a row filed in the other audience's manifest, and a
+    `consumer` row `plugin.rules` does not wire.
+    `src/lint/manifest.self.test.ts` packs the package and refuses any
+    `self` row whose name, quoted id or convention a packed file carries. The
+    tarball spec refuses a packed file, a bin, an export condition or an
+    export name nobody reviewed, and any rule reachable from an entry's
+    exports that is not `consumer`.
 
 ## The preserved-terms generator
 

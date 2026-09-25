@@ -1,4 +1,4 @@
-import type { RuleDoc } from './types.js';
+import type { ConsumerRuleDoc } from './types.js';
 
 /** The closed set of mechanized rule ids — the manifest and the plugin agree on it. */
 export type RuleId =
@@ -22,12 +22,12 @@ export type RuleId =
  * "what exactly is checked" — `plugin.test.ts` asserts every shipped rule
  * carries its entry and that no entry is orphaned.
  *
- * Every rule this package holds has an entry, and each entry declares its
- * audience. The `consumer` entries are the published catalogue: `plugin.rules`
- * wires exactly them. A `self` entry is wired only in this package's own lint
- * config, never in `plugin.rules`.
+ * Every entry here is `consumer`, and `plugin.rules` wires exactly them: the
+ * rule modules import this object, so tsdown inlines ALL of it into
+ * `dist/oxlint.*`. A `self` row therefore lives in `manifest.self.ts`, which no
+ * tsdown entry reaches.
  */
-export const RULE_DOCS: Record<RuleId, RuleDoc> = {
+export const RULE_DOCS: Record<RuleId, ConsumerRuleDoc> = {
     'g1-agent-class-shape': {
         audience: 'consumer',
         id: 'G1',

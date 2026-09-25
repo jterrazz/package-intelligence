@@ -109,12 +109,17 @@ unabstracted. A `*.prompt.ts` file is not limited to one export: a main
 | `intelligence/m1-model-resolution-in-container` | error    | `createIntelligence`/`createGatewayProvider`/`createOpenRouterProvider` and `.model('…')` are DI/container-only.  |
 | `intelligence/m2w-no-hardcoded-model-id`        | warning  | A string literal shaped like a model id outside config/test/fixture files.                                        |
 
-Every rule declares its audience in its manifest entry: `consumer`, meaningful
+Every rule declares its audience in its manifest row: `consumer`, meaningful
 in any project that uses the package, or `self`, this package's own suite
 discipline. The published plugin carries `consumer` rules alone, so the table
 above is the whole of them; every rule in it is `consumer`, and the discipline
 the package holds over its own tree is its meta-tests
 ([03-testing.md](03-testing.md)).
+
+The two audiences live in two files. `src/lint/manifest.ts` holds the
+`consumer` rows, and tsdown bundles all of it into `dist/oxlint.*`, because
+every rule module imports it. `src/lint/manifest.self.ts` holds the `self`
+rows, and no module a tsdown entry bundles reaches it; it is empty today.
 
 Each rule is deliberately best-effort where full static verification is not
 possible — the goal is catching the common slip, not standing in for a type

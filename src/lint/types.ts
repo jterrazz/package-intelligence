@@ -56,9 +56,9 @@ export type RuleAudience = 'consumer' | 'self';
 export type RuleDoc = {
     /**
      * Who the rule speaks to. `consumer` — meaningful in any project that uses
-     * the package; only these ship in the published plugin. `self` — this
-     * package's own suite discipline; keeps its manifest entry but never
-     * enters the published plugin.
+     * the package; only these ship, in `manifest.ts` and the published plugin.
+     * `self` — this package's own suite discipline; its row lives in
+     * `manifest.self.ts`, which nothing published imports.
      */
     audience: RuleAudience;
     /** Convention code, e.g. `'P1'`. */
@@ -68,6 +68,12 @@ export type RuleDoc = {
     /** One line: why the rule exists. */
     rationale: string;
 };
+
+/** A row of the published manifest. */
+export type ConsumerRuleDoc = RuleDoc & { audience: 'consumer' };
+
+/** A row of the home-only manifest. */
+export type SelfRuleDoc = RuleDoc & { audience: 'self' };
 
 /** Rule metadata (the subset we set). */
 export type RuleMeta = {

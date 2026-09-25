@@ -91,12 +91,25 @@ the E2E run it needs `npm run build` first.
 `src/lint/plugin.test.ts` mirrors `@jterrazz/test`'s own `src/lint/plugin.test.ts`
 (minus the docs-generation freshness checks: this package has no generated
 catalogue). It asserts every rule in `plugin.rules` carries a `meta.docs`
-sourced from `RULE_DOCS`, that the manifest's `consumer` entries and the
-plugin cover exactly the same rule set, that every manifest entry declares an audience from the closed
-`consumer`/`self` pair and every rule the plugin ships is `consumer`, that
-every manifest id is unique, that the `intelligence`
-fragment is self-sufficient, and that severities follow the `<id>w-*` → `warn`
+sourced from `RULE_DOCS`. It judges both manifests together: their
+`consumer` rows and the plugin cover exactly the same rule set, every row
+declares an audience from the closed `consumer`/`self` pair and sits in its
+audience's file, every id and name is unique, and every rule the plugin
+ships is `consumer`. It also asserts that the `intelligence` fragment is
+self-sufficient, and that severities follow the `<id>w-*` → `warn`
 convention.
+
+`src/lint/manifest.self.test.ts` judges the tarball by content. It packs the
+package and searches the text of every packed file for each `self` row's
+name, quoted id and convention. The same search must find every `consumer`
+row, so an empty result proves the search read the shipped text. Like the
+tarball spec, it needs `npm run build` first.
+
+The meta-test rows themselves — this section's two files and the tarball
+spec — are `self`: they hold this package's own tree, and the test tree
+never ships. The runtime refusals `createIntelligence` throws, an unknown
+provider or agent, are `consumer`: they are the API's contract to its
+caller, and neither they nor the meta rows carry a manifest row.
 
 Its inventory check is the one that catches a half-added rule: every rule in
 `plugin.rules` must have BOTH a `src/lint/rules/<id>.test.ts` and a fixture
