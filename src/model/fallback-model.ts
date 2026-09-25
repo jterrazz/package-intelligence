@@ -32,24 +32,7 @@ export type FallbackModelOptions = {
     logger?: LoggerPort;
 };
 
-/**
- * Creates a `LanguageModelV4` that transparently falls back to a secondary
- * model when the primary model fails with a retryable error (HTTP 429, 5xx,
- * network errors/timeouts). Non-retryable errors (400s, validation, abort)
- * propagate unchanged.
- *
- * This is a model, not a middleware — middleware cannot switch the
- * underlying model, only transform a single model's behavior.
- *
- * @example
- * ```ts
- * const model = createFallbackModel({
- *   primary: provider.model('anthropic/claude-sonnet-4'),
- *   fallback: provider.model('openai/gpt-4o-mini'),
- *   logger,
- * });
- * ```
- */
+/** A model that answers from `fallback` when `primary` fails with a retryable error (429, 5xx, network). */
 export function createFallbackModel(options: FallbackModelOptions): LanguageModelV4 {
     const { primary, fallback, logger } = options;
     const primaryModel = primary as LanguageModelV4;

@@ -16,6 +16,7 @@ function buildInstruction(responseFormat: LanguageModelV4CallOptions['responseFo
     return lines.join('\n');
 }
 
+// The user message, not a system one: gateways fronting CLI agents bury injected system messages under their own persona.
 function appendToLastUserMessage(
     prompt: LanguageModelV4Prompt,
     instruction: string,
@@ -30,9 +31,7 @@ function appendToLastUserMessage(
             return message;
         }
 
-        // Merge into the last text part rather than appending a new part:
-        // A single-part text message serializes as a plain string, which
-        // Proxies and prompt-matching tooling handle more reliably.
+        // One text part serializes as a plain string, which proxies and prompt-matching tooling handle more reliably.
         const lastTextIndex = message.content.findLastIndex((part) => part.type === 'text');
         if (lastTextIndex === -1) {
             return {
@@ -53,21 +52,7 @@ function appendToLastUserMessage(
     });
 }
 
-/**
- * Creates middleware that injects the JSON schema of a structured-output
- * request into the last user message.
- *
- * Some gateways silently drop the native structured-output field when
- * translating to their backend, so the model never sees the schema and
- * answers in free prose. This middleware re-states the schema as part of the
- * user message so structured output works regardless. It targets the user
- * message rather than a system message because gateways backed by cloaked
- * CLI agents bury injected system messages under their own persona prompt and
- * ignore them. The original `responseFormat` is left untouched: backends that
- * honor it get the native signal too.
- *
- * No-op for text generations (no `responseFormat`, or `type: 'text'`).
- */
+/** Restates a JSON response format's schema in the last user message, for gateways that drop the native field. */
 export function createSchemaInstructionMiddleware(): LanguageModelMiddleware {
     return {
         specificationVersion: 'v4',

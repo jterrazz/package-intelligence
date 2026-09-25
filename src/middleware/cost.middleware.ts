@@ -55,33 +55,7 @@ export type CostMiddlewareOptions = {
     pricing?: CostPricing;
 };
 
-/**
- * Creates middleware that records the USD cost of a generation as
- * `gen_ai.usage.cost` on the active OpenTelemetry span — the AI SDK's own
- * inference span (`gen_ai.operation.name = chat`), which is what Langfuse
- * ingests as a generation.
- *
- * Resolution order:
- * 1. Actual cost reported by the provider (currently: OpenRouter's
- *    `providerMetadata.openrouter.usage.cost`).
- * 2. Estimated cost from `pricing` (USD per million input/output tokens),
- *    computed from the reported token usage.
- *
- * When neither is available nothing is written: `gen_ai.request.model` is
- * left to the AI SDK (the bare model id), so Langfuse can still price the
- * generation from its own model catalogue. Langfuse prioritizes
- * `gen_ai.usage.cost` over that inference when both exist.
- *
- * Never throws: all enrichment is best-effort.
- *
- * @example
- * ```ts
- * const model = wrapLanguageModel({
- *   model: provider.model('google/gemini-2.5-flash-lite'),
- *   middleware: [createCostMiddleware({ pricing: { input: 0.1, output: 0.4 } })],
- * });
- * ```
- */
+/** Records a generation's USD cost on the active span: the provider's reported cost, else an estimate from `pricing`. */
 export function createCostMiddleware(options: CostMiddlewareOptions = {}): LanguageModelMiddleware {
     const { pricing } = options;
 

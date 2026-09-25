@@ -23,11 +23,6 @@ type ResolvedProvider = {
 
 let telemetryRegistered = false;
 
-/**
- * Registers the AI SDK OpenTelemetry integration, once per process. Best
- * effort — if the host app has no OTel SDK configured, `@ai-sdk/otel` spans
- * are simply dropped rather than throwing.
- */
 function ensureTelemetryRegistered(): void {
     if (telemetryRegistered) {
         return;
@@ -84,11 +79,7 @@ export type AgentConfig = ModelRef & {
 export type IntelligenceConfig = {
     providers: Record<string, ProviderConfig>;
     agents: Record<string, AgentConfig>;
-    /**
-     * USD-per-million-token pricing, keyed by `"<provider>/<model>"` (the
-     * agent's `provider` and `model` joined with `/`, not a provider-side
-     * identifier).
-     */
+    /** USD per million tokens, keyed by `"<provider>/<model>"` as the agent config names them. */
     pricing?: Record<string, { input: number; output: number }>;
     logger?: LoggerPort;
 };
@@ -98,38 +89,7 @@ export type Intelligence = {
     model: (agentName: string) => LanguageModel;
 };
 
-/**
- * Creates a composition root over AI SDK v7: resolves each agent's
- * `provider`/`model` pair into a fully instrumented `LanguageModel` — cost
- * tracking, optional fallback, and optional logging — cached per agent name.
- *
- * Registers the `@ai-sdk/otel` telemetry integration on first use (idempotent,
- * best-effort). The host app is expected to have already registered an
- * OpenTelemetry Node SDK (e.g. via `@jterrazz/telemetry`).
- *
- * @example
- * ```ts
- * const intelligence = createIntelligence({
- *   providers: {
- *     openrouter: { type: 'openrouter', apiKey: process.env.OPENROUTER_API_KEY },
- *   },
- *   agents: {
- *     summarizer: {
- *       provider: 'openrouter',
- *       model: 'google/gemini-2.5-flash-lite',
- *       fallback: { provider: 'openrouter', model: 'openai/gpt-4o-mini' },
- *     },
- *   },
- *   pricing: {
- *     'openrouter/google/gemini-2.5-flash-lite': { input: 0.1, output: 0.4 },
- *   },
- *   logger,
- * });
- *
- * const model = intelligence.model('summarizer');
- * const { text } = await generateText({ model, prompt: 'Hello!' });
- * ```
- */
+/** Resolves each agent's provider and model into an instrumented `LanguageModel`, cached per agent. */
 export function createIntelligence(config: IntelligenceConfig): Intelligence {
     ensureTelemetryRegistered();
 

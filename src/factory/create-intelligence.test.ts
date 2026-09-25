@@ -61,11 +61,7 @@ vi.mock(import('@ai-sdk/openai'), () => {
     };
 });
 
-/**
- * Registers a model answer for the scope of ONE test and gives it back when
- * that scope ends, so the Given stays inside the test that needs it.
- */
-function overrideModel(id: string, answer: () => Promise<unknown>): Disposable {
+function overrideModelForThisScope(id: string, answer: () => Promise<unknown>): Disposable {
     modelOverrides.set(id, answer);
     return {
         [Symbol.dispose]() {
@@ -164,7 +160,7 @@ describe('createIntelligence', () => {
 
         test('falls back to the configured fallback model on a retryable error', async () => {
             // Given - a primary model that raises a 503 and a declared fallback
-            using _ = overrideModel('flaky-model', () => {
+            using _ = overrideModelForThisScope('flaky-model', () => {
                 throw new APICallError({
                     message: 'Service unavailable',
                     requestBodyValues: {},

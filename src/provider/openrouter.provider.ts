@@ -19,25 +19,7 @@ export type OpenRouterProvider = {
     model: (id: string) => LanguageModel;
 };
 
-/**
- * Creates an OpenRouter provider for AI SDK models.
- *
- * Per-call options (reasoning effort, max tokens, etc.) are no longer
- * configured here — pass them at the call site via `providerOptions.openrouter`
- * on `generateText`/`streamText`.
- *
- * @example
- * ```ts
- * const provider = createOpenRouterProvider({ apiKey: process.env.OPENROUTER_API_KEY });
- * const model = provider.model('anthropic/claude-sonnet-4-20250514');
- *
- * const { text } = await generateText({
- *   model,
- *   prompt: 'Hello!',
- *   providerOptions: { openrouter: { reasoning: { effort: 'high' } } },
- * });
- * ```
- */
+/** An OpenRouter provider; per-call options go in `providerOptions.openrouter`. */
 export function createOpenRouterProvider(config: OpenRouterConfig): OpenRouterProvider {
     const openrouter = createOpenRouter({
         apiKey: config.apiKey,

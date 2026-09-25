@@ -8,19 +8,7 @@ export type AgentMiddlewareOptions = {
     agentName: string;
 };
 
-/**
- * Creates middleware that names the AI SDK's inference span after the agent.
- *
- * The AI SDK names that span `chat <model>` and only puts the agent identity
- * (`gen_ai.agent.name`, from `experimental_telemetry.functionId`) on the
- * parent `invoke_agent` span. Langfuse extracts model, usage and cost from
- * the inference span alone, so a pipeline that forwards only that span would
- * otherwise show every agent as "chat <model>". This runs inside the
- * inference span's context (the AI SDK activates it for the provider call),
- * so the active span is the right one.
- *
- * Never throws: all enrichment is best-effort.
- */
+/** Names the AI SDK's inference span after the agent, the only span Langfuse reads a generation from. */
 export function createAgentMiddleware(options: AgentMiddlewareOptions): LanguageModelMiddleware {
     const { agentName } = options;
 

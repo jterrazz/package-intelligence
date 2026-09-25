@@ -28,10 +28,6 @@ async function transform(params: LanguageModelV4CallOptions): Promise<LanguageMo
     });
 }
 
-/**
- * The text of the first content part of `prompt[index]` — what every case below
- * asserts on, read through one place that fails loudly on an absent message.
- */
 function partText(params: LanguageModelV4CallOptions, index: number): string {
     const parts = params.prompt[index]?.content as undefined | { text: string }[];
     const text = parts?.[0]?.text;

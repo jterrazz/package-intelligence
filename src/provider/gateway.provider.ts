@@ -17,24 +17,7 @@ export type GatewayProvider = {
     model: (id: string) => LanguageModel;
 };
 
-/**
- * Creates a provider for gateways exposing a chat-completions API — any API
- * implementing the OpenAI chat completions spec.
- *
- * Every model returned is automatically wrapped with two safety nets for
- * gateways that don't support native structured output:
- * - `createSchemaInstructionMiddleware` injects the JSON schema into the
- *   system prompt (some gateways silently drop `response_format`);
- * - `extractJsonMiddleware` strips markdown code fences from JSON responses.
- *
- * @example
- * ```ts
- * const provider = createGatewayProvider({ baseURL: 'https://gateway.example.com/v1' });
- * const model = provider.model('gpt-4o-mini');
- *
- * const { text } = await generateText({ model, prompt: 'Hello!' });
- * ```
- */
+/** A provider for any OpenAI-compatible chat-completions gateway, its models wrapped for structured output. */
 export function createGatewayProvider(config: GatewayConfig): GatewayProvider {
     const openai = createOpenAI({
         baseURL: config.baseURL,
@@ -43,9 +26,7 @@ export function createGatewayProvider(config: GatewayConfig): GatewayProvider {
 
     return {
         model(id: string): LanguageModelV4 {
-            // Use `.chat()` explicitly rather than the base callable, which
-            // Targets the Responses API — most gateways only implement chat
-            // Completions.
+            // The base callable targets the Responses API, which most gateways do not implement.
             return wrapLanguageModel({
                 model: openai.chat(id),
                 middleware: [createSchemaInstructionMiddleware(), extractJsonMiddleware()],

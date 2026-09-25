@@ -1,4 +1,3 @@
-// Factory
 export {
     type AgentConfig,
     createIntelligence,
@@ -6,8 +5,6 @@ export {
     type IntelligenceConfig,
     type ProviderConfig,
 } from './factory/create-intelligence.js';
-
-// Middleware
 export {
     type AgentMiddlewareOptions,
     createAgentMiddleware,
@@ -22,19 +19,13 @@ export {
     type LoggingMiddlewareOptions,
 } from './middleware/logging.middleware.js';
 export { createSchemaInstructionMiddleware } from './middleware/schema-instruction.middleware.js';
-
-// Model
 export { createFallbackModel, type FallbackModelOptions } from './model/fallback-model.js';
-
-// Provider - OpenRouter
 export {
     createOpenRouterProvider,
     type OpenRouterConfig,
     type OpenRouterMetadata,
     type OpenRouterProvider,
 } from './provider/openrouter.provider.js';
-
-// Provider - Gateway
 export {
     createGatewayProvider,
     type GatewayConfig,

@@ -11,9 +11,7 @@ export type LoggingMiddlewareOptions = {
     };
 };
 
-/**
- * Creates middleware that logs AI SDK requests and responses.
- */
+/** Logs each AI SDK generation and stream through the given logger. */
 export function createLoggingMiddleware(
     options: LoggingMiddlewareOptions,
 ): LanguageModelMiddleware {
@@ -36,8 +34,6 @@ export function createLoggingMiddleware(
 
             try {
                 const result = await doGenerate();
-
-                // Extract text from content
                 const textContent = result.content
                     .filter((c): c is { type: 'text'; text: string } => c.type === 'text')
                     .map((c) => c.text)

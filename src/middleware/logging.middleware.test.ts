@@ -2,8 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { createLoggingMiddleware } from './logging.middleware.js';
 
-// `expect.any(Number)` is typed `any`, so the widening is named once here and
-// the payload literals below stay exactly typed.
+// `expect.any` is typed `any`; the annotation keeps the payload literals below exactly typed.
 const ANY_DURATION_MS: number = expect.any(Number);
 
 function createMockLogger() {
