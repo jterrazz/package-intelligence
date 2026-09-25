@@ -14,6 +14,7 @@ export function createAgentMiddleware(options: AgentMiddlewareOptions): Language
 
     const nameActiveSpan = (): void => {
         try {
+            // The AI SDK activates the inference span around the provider call, so it is the active one here.
             const span = trace.getActiveSpan();
             if (!span) {
                 return;
@@ -21,7 +22,7 @@ export function createAgentMiddleware(options: AgentMiddlewareOptions): Language
             span.updateName(agentName);
             span.setAttribute(AGENT_ATTRIBUTE, agentName);
         } catch {
-            // Best-effort: telemetry enrichment must never break generation.
+            // best-effort
         }
     };
 
