@@ -67,7 +67,7 @@ export function createCostMiddleware(options: CostMiddlewareOptions = {}): Langu
             try {
                 recordCost(resolveCost(result.providerMetadata, result.usage, pricing));
             } catch {
-                // Best-effort: telemetry enrichment must never break generation.
+                // best-effort
             }
 
             return result;
@@ -94,7 +94,7 @@ export function createCostMiddleware(options: CostMiddlewareOptions = {}): Langu
                     try {
                         recordCost(resolveCost(finishProviderMetadata, finishUsage, pricing));
                     } catch {
-                        // Best-effort: telemetry enrichment must never break generation.
+                        // best-effort
                     }
                 },
             });

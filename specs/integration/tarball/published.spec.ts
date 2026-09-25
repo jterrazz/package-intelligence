@@ -7,7 +7,7 @@ import { expect, test } from 'vitest';
 
 import { integration } from '../integration.specification.js';
 
-// Extracted inside the package, so an entry's bare imports resolve to its node_modules as a consumer's would; `npm run build` precedes this spec.
+// Extracted inside the package, so an entry's bare imports resolve to its node_modules as a consumer's would.
 const ROOT = resolve(import.meta.dirname, '../../..');
 const EXTRACTED = resolve(ROOT, '.artifacts/tarball');
 

@@ -7,7 +7,6 @@ import { RULE_DOCS } from './manifest.js';
 import { SELF_RULE_DOCS } from './manifest.self.js';
 import type { RuleDoc } from './types.js';
 
-// The tarball carries the built dist/, so `npm run build` precedes this test.
 const ROOT = resolve(import.meta.dirname, '../..');
 const PACKED = resolve(ROOT, '.artifacts/tarball-text');
 

@@ -32,7 +32,7 @@ function ensureTelemetryRegistered(): void {
     try {
         registerTelemetry(new OpenTelemetry());
     } catch {
-        // Best-effort: telemetry registration must never break the app.
+        // best-effort
     }
 }
 
@@ -85,7 +85,6 @@ export type IntelligenceConfig = {
 };
 
 export type Intelligence = {
-    /** Get the composed language model for the given agent name */
     model: (agentName: string) => LanguageModel;
 };
 

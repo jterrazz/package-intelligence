@@ -6,7 +6,6 @@ import { expect, test } from 'vitest';
 
 import { integration } from '../integration.specification.js';
 
-// oxlint loads the built `dist/oxlint.js`, so `npm run build` precedes this spec.
 const ROOT = resolve(import.meta.dirname, '../../..');
 const OXLINT_BIN = resolve(ROOT, 'node_modules/.bin/oxlint');
 const CONFIG = resolve(import.meta.dirname, '_fixtures/oxlint.e2e.json');

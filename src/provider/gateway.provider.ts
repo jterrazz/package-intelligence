@@ -8,12 +8,10 @@ import { createSchemaInstructionMiddleware } from '../middleware/schema-instruct
 export type GatewayConfig = {
     /** Base URL of the gateway's chat-completions endpoint */
     baseURL: string;
-    /** API key for authentication, if required by the endpoint */
     apiKey?: string;
 };
 
 export type GatewayProvider = {
-    /** Get a language model instance for the given model id */
     model: (id: string) => LanguageModel;
 };
 

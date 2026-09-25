@@ -15,7 +15,6 @@ export type OpenRouterConfig = {
 };
 
 export type OpenRouterProvider = {
-    /** Get a language model instance for the given OpenRouter model id */
     model: (id: string) => LanguageModel;
 };
 
