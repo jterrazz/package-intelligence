@@ -8,15 +8,17 @@ const FACTORY_NAMES = new Set([
     'createOpenRouterProvider',
 ]);
 
-function isContainerFile(file: string): boolean {
-    return file.includes('/di/') || file.endsWith('container.ts');
+const COMPOSITION_ROOT = '/composition/';
+
+function isCompositionFile(file: string): boolean {
+    return file.includes(COMPOSITION_ROOT);
 }
 
 // A literal `.model()` call is flagged in any file importing the package, receiver unresolved: an unrelated `.model()` there is a known false positive.
-export const m1ModelResolutionInContainer: LintRule = {
+export const m1ModelResolutionInComposition: LintRule = {
     create(context: RuleContext): Visitor {
         const file = context.physicalFilename;
-        const allowed = isContainerFile(file);
+        const allowed = isCompositionFile(file);
 
         let importsIntelligence = false;
         const modelCalls: AstNode[] = [];
@@ -49,23 +51,27 @@ export const m1ModelResolutionInContainer: LintRule = {
                     return;
                 }
                 for (const { name, node } of factoryCalls) {
-                    context.report({ data: { name }, messageId: 'factoryOutsideContainer', node });
+                    context.report({
+                        data: { name },
+                        messageId: 'factoryOutsideComposition',
+                        node,
+                    });
                 }
                 if (importsIntelligence) {
                     for (const node of modelCalls) {
-                        context.report({ messageId: 'modelCallOutsideContainer', node });
+                        context.report({ messageId: 'modelCallOutsideComposition', node });
                     }
                 }
             },
         };
     },
     meta: {
-        docs: RULE_DOCS['m1-model-resolution-in-container'],
+        docs: RULE_DOCS['m1-model-resolution-in-composition'],
         messages: {
-            factoryOutsideContainer:
-                '{{name}}() must only be called from a DI/container file (path containing "/di/" or ending in "container.ts") (M1).',
-            modelCallOutsideContainer:
-                ".model('…') resolution must only happen in a DI/container file (M1).",
+            factoryOutsideComposition:
+                '{{name}}() must only be called from the composition root, a file under `composition/` (M1).',
+            modelCallOutsideComposition:
+                ".model('…') resolution must only happen in the composition root, a file under `composition/` (M1).",
         },
         type: 'problem',
     },

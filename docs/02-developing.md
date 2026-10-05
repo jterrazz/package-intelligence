@@ -32,7 +32,7 @@ with tests uses — and this package's own `intelligence`. The presets, the pass
 and the `oxlint.baseline.json` ratchet are that package's own
 (`@jterrazz/typescript`'s `docs/06-quality-checks.md`), not restated here.
 
-The one rule this project turns off is `intelligence/m1-model-resolution-in-container`,
+The one rule this project turns off is `intelligence/m1-model-resolution-in-composition`,
 and `oxlint.config.ts` carries the reason beside it: M1 gates a CONSUMER's composition root, and this
 package defines the factories M1 names, so every call in this tree is that
 definition or its own test. Everything else the rulebook still finds is

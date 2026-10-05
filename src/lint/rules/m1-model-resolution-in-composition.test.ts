@@ -1,7 +1,7 @@
 import { RuleTester } from 'oxlint/plugins-dev';
 import { describe, it } from 'vitest';
 
-import { m1ModelResolutionInContainer } from './m1-model-resolution-in-container.js';
+import { m1ModelResolutionInComposition } from './m1-model-resolution-in-composition.js';
 
 RuleTester.describe = describe;
 RuleTester.it = it;
@@ -11,46 +11,54 @@ type OxlintRule = Parameters<RuleTester['run']>[1];
 const ruleTester = new RuleTester();
 
 const OUTSIDE = '/repo/src/wiring/setup.ts';
-const DI_FILE = '/repo/src/di/container.ts';
-const NAMED_CONTAINER = '/repo/src/infrastructure/intelligence-container.ts';
+const COMPOSITION_FILE = '/repo/src/composition/providers.ts';
+const FORMER_DI_FILE = '/repo/src/di/container.ts';
+const FORMER_CONTAINER = '/repo/src/infrastructure/intelligence-container.ts';
 
 ruleTester.run(
-    'm1-model-resolution-in-container',
-    m1ModelResolutionInContainer as unknown as OxlintRule,
+    'm1-model-resolution-in-composition',
+    m1ModelResolutionInComposition as unknown as OxlintRule,
     {
         invalid: [
             {
                 code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});",
-                errors: [{ messageId: 'factoryOutsideContainer' }],
+                errors: [{ messageId: 'factoryOutsideComposition' }],
+                filename: FORMER_DI_FILE,
+                name: 'a file under di/, the former container folder',
+            },
+            {
+                code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});",
+                errors: [{ messageId: 'factoryOutsideComposition' }],
+                filename: FORMER_CONTAINER,
+                name: 'a file named *container.ts, the former container file',
+            },
+            {
+                code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});",
+                errors: [{ messageId: 'factoryOutsideComposition' }],
                 filename: OUTSIDE,
-                name: 'createIntelligence outside a container',
+                name: 'createIntelligence outside the composition root',
             },
             {
                 code: "import { createGatewayProvider } from '@jterrazz/intelligence';\nconst p = createGatewayProvider({});",
-                errors: [{ messageId: 'factoryOutsideContainer' }],
+                errors: [{ messageId: 'factoryOutsideComposition' }],
                 filename: OUTSIDE,
-                name: 'createGatewayProvider outside a container',
+                name: 'createGatewayProvider outside the composition root',
             },
             {
                 code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});\nconst m = i.model('summarizer');",
                 errors: [
-                    { messageId: 'factoryOutsideContainer' },
-                    { messageId: 'modelCallOutsideContainer' },
+                    { messageId: 'factoryOutsideComposition' },
+                    { messageId: 'modelCallOutsideComposition' },
                 ],
                 filename: OUTSIDE,
-                name: 'a literal model call outside a container',
+                name: 'a literal model call outside the composition root',
             },
         ],
         valid: [
             {
                 code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});\nconst m = i.model('summarizer');",
-                filename: DI_FILE,
-                name: 'a file under di/',
-            },
-            {
-                code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});\nconst m = i.model('summarizer');",
-                filename: NAMED_CONTAINER,
-                name: 'a file named *container.ts',
+                filename: COMPOSITION_FILE,
+                name: 'a file of the composition root',
             },
             {
                 code: "const m = someOtherClient.model('gpt-4');",

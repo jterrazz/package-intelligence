@@ -2,7 +2,7 @@ import type { ConsumerRuleDoc } from './types.js';
 
 export type RuleId =
     | 'g1-agent-class-shape'
-    | 'm1-model-resolution-in-container'
+    | 'm1-model-resolution-in-composition'
     | 'm2w-no-hardcoded-model-id'
     | 'p1-prose-in-prompt-files'
     | 'p2-prompt-file-exports'
@@ -16,13 +16,13 @@ export const RULE_DOCS: Record<RuleId, ConsumerRuleDoc> = {
         convention:
             'An agent file (`agents/<name>/<name>.ts`) exports exactly one class; that class has a `static readonly SCHEMA` member, a `run` method, and a constructor whose first parameter is named `model`.',
         rationale:
-            'A fixed shape makes every agent class predictable to read and to wire up from a DI container without re-deriving its contract each time.',
+            'A fixed shape makes every agent class predictable to read and to wire up from the composition root without re-deriving its contract each time.',
     },
-    'm1-model-resolution-in-container': {
+    'm1-model-resolution-in-composition': {
         audience: 'consumer',
         id: 'M1',
         convention:
-            "Calls to `createIntelligence(...)`, `createGatewayProvider(...)`, `createOpenRouterProvider(...)`, and `.model('…')` on the value they produce, are only allowed in a file whose path contains `/di/` or whose name ends in `container.ts`.",
+            "Calls to `createIntelligence(...)`, `createGatewayProvider(...)`, `createOpenRouterProvider(...)`, and `.model('…')` on the value they produce, are only allowed in the composition root, a file under `composition/` (`src/composition/`).",
         rationale:
             'Model resolution is composition-root work — scattering it lets a provider/model choice drift outside the one place meant to own it.',
     },

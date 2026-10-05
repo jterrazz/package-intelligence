@@ -1,5 +1,5 @@
 import { g1AgentClassShape } from './rules/g1-agent-class-shape.js';
-import { m1ModelResolutionInContainer } from './rules/m1-model-resolution-in-container.js';
+import { m1ModelResolutionInComposition } from './rules/m1-model-resolution-in-composition.js';
 import { m2wNoHardcodedModelId } from './rules/m2w-no-hardcoded-model-id.js';
 import { p1ProseInPromptFiles } from './rules/p1-prose-in-prompt-files.js';
 import { p2PromptFileExports } from './rules/p2-prompt-file-exports.js';
@@ -13,7 +13,7 @@ const plugin: LintPlugin = {
     meta: { name: 'intelligence' },
     rules: {
         'g1-agent-class-shape': g1AgentClassShape,
-        'm1-model-resolution-in-container': m1ModelResolutionInContainer,
+        'm1-model-resolution-in-composition': m1ModelResolutionInComposition,
         'm2w-no-hardcoded-model-id': m2wNoHardcodedModelId,
         'p1-prose-in-prompt-files': p1ProseInPromptFiles,
         'p2-prompt-file-exports': p2PromptFileExports,

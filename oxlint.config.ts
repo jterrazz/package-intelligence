@@ -10,7 +10,7 @@ const config: OxlintConfig = defineConfig(
     compose(library, testing, intelligence, {
         rules: {
             // reason: M1 gates a consumer's composition root; this package defines the factories it names.
-            'intelligence/m1-model-resolution-in-container': 'off',
+            'intelligence/m1-model-resolution-in-composition': 'off',
         },
     }),
 );

@@ -100,14 +100,14 @@ unabstracted. A `*.prompt.ts` file is not limited to one export: a main
 
 ### The rules
 
-| Rule                                            | Severity | Enforces                                                                                                          |
-| ----------------------------------------------- | -------- | ----------------------------------------------------------------------------------------------------------------- |
-| `intelligence/p1-prose-in-prompt-files`         | error    | No multi-line natural-language template literal outside `*.prompt.ts` — the flagship rule.                        |
-| `intelligence/p2-prompt-file-exports`           | error    | A `*.prompt.ts` file exports only const string-builder functions and types/interfaces.                            |
-| `intelligence/p3-agent-prompt-sibling`          | error    | An agent file imports `./<name>.prompt.js`; a non-`_shared/` prompt file has its `<name>.ts` sibling on disk.     |
-| `intelligence/g1-agent-class-shape`             | error    | An agent file exports exactly one class with `static readonly SCHEMA`, a `run` method, `constructor(model, ...)`. |
-| `intelligence/m1-model-resolution-in-container` | error    | `createIntelligence`/`createGatewayProvider`/`createOpenRouterProvider` and `.model('…')` are DI/container-only.  |
-| `intelligence/m2w-no-hardcoded-model-id`        | warning  | A string literal shaped like a model id outside config/test/fixture files.                                        |
+| Rule                                              | Severity | Enforces                                                                                                                              |
+| ------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `intelligence/p1-prose-in-prompt-files`           | error    | No multi-line natural-language template literal outside `*.prompt.ts` — the flagship rule.                                            |
+| `intelligence/p2-prompt-file-exports`             | error    | A `*.prompt.ts` file exports only const string-builder functions and types/interfaces.                                                |
+| `intelligence/p3-agent-prompt-sibling`            | error    | An agent file imports `./<name>.prompt.js`; a non-`_shared/` prompt file has its `<name>.ts` sibling on disk.                         |
+| `intelligence/g1-agent-class-shape`               | error    | An agent file exports exactly one class with `static readonly SCHEMA`, a `run` method, `constructor(model, ...)`.                     |
+| `intelligence/m1-model-resolution-in-composition` | error    | `createIntelligence`/`createGatewayProvider`/`createOpenRouterProvider` and `.model('…')` are composition-root-only (`composition/`). |
+| `intelligence/m2w-no-hardcoded-model-id`          | warning  | A string literal shaped like a model id outside config/test/fixture files.                                                            |
 
 Every rule declares its audience in its manifest row: `consumer`, meaningful
 in any project that uses the package, or `self`, this package's own suite

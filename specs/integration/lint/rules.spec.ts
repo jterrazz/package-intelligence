@@ -35,7 +35,7 @@ function lintFixture(name: string): RunResult {
 
 const RULES: { id: string; severity: Severity }[] = [
     { id: 'g1-agent-class-shape', severity: 'error' },
-    { id: 'm1-model-resolution-in-container', severity: 'error' },
+    { id: 'm1-model-resolution-in-composition', severity: 'error' },
     { id: 'm2w-no-hardcoded-model-id', severity: 'warn' },
     { id: 'p1-prose-in-prompt-files', severity: 'error' },
     { id: 'p2-prompt-file-exports', severity: 'error' },
