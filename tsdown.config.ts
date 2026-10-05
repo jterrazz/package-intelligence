@@ -1,11 +1,12 @@
 import { defineConfig } from 'tsdown';
 import type { UserConfig } from 'tsdown';
 
-// `formatting` and `oxlint` import nothing from the optional `ai` peer.
+// `config`, `formatting` and `oxlint` import nothing from the optional `ai` peer.
 const config: UserConfig = defineConfig({
     clean: true,
     dts: true,
     entry: {
+        config: 'src/config.ts',
         formatting: 'src/formatting.ts',
         index: 'src/index.ts',
         oxlint: 'src/lint/plugin.ts',

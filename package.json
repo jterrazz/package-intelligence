@@ -16,6 +16,10 @@
             "require": "./dist/index.cjs",
             "import": "./dist/index.js"
         },
+        "./config": {
+            "require": "./dist/config.cjs",
+            "import": "./dist/config.js"
+        },
         "./formatting": {
             "require": "./dist/formatting.cjs",
             "import": "./dist/formatting.js"

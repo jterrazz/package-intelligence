@@ -15,11 +15,14 @@ const PACKED_FILES = [
     'LICENSE',
     'README.md',
     'package.json',
-    ...['formatting', 'index', 'oxlint'].flatMap((entry) =>
-        ['cjs', 'cjs.map', 'd.cts', 'd.ts', 'js', 'js.map'].map(
-            (extension) => `dist/${entry}.${extension}`,
-        ),
+    ...['config', 'formatting', 'index', 'plugin'].flatMap((entry) =>
+        ['cjs', 'cjs.map', 'js', 'js.map'].map((extension) => `dist/${entry}.${extension}`),
     ),
+    ...['config', 'formatting', 'index', 'oxlint', 'types'].flatMap((entry) =>
+        ['d.cts', 'd.ts'].map((extension) => `dist/${entry}.${extension}`),
+    ),
+    'dist/oxlint.cjs',
+    'dist/oxlint.js',
 ].toSorted();
 
 const EXPORT_NAMES: Record<string, string[]> = {
@@ -33,6 +36,7 @@ const EXPORT_NAMES: Record<string, string[]> = {
         'createOpenRouterProvider',
         'createSchemaInstructionMiddleware',
     ],
+    './config': ['intelligence'],
     './formatting': ['cleanAiText', 'toSentenceCase'],
     './oxlint': ['default', 'intelligence', 'recommendedRules'],
 };

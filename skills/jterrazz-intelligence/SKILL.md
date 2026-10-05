@@ -130,13 +130,16 @@ Hard rule: **no multi-line natural-language literal outside `*.prompt.ts`.** `ru
 Rationale: the shape reference TypeScript AI codebases converge on, and it gives the prompt↔variables contract native typing. Enforced by `@jterrazz/intelligence/oxlint`:
 
 ```typescript
-import { compose, node } from '@jterrazz/typescript/oxlint';
-import { intelligence } from '@jterrazz/intelligence/oxlint';
+// jterrazz.config.ts
+import { intelligence } from '@jterrazz/intelligence/config';
+import { defineConfig } from '@jterrazz/typescript/config';
 
-export default compose(node, intelligence);
+export default defineConfig({ kind: 'api', platform: 'node', presets: [intelligence()] });
 ```
 
-Six rules: `p1-prose-in-prompt-files` (error, the flagship — no multi-line prose outside `*.prompt.ts`), `p2-prompt-file-exports` (error, prompt files export only string-builder consts + types), `p3-agent-prompt-sibling` (error, the agent↔prompt import/sibling link), `g1-agent-class-shape` (error, `static readonly SCHEMA` + `run` + `constructor(model, ...)`), `m1-model-resolution-in-container` (error, `createIntelligence`/provider factories/`.model()` are DI/container-only), `m2w-no-hardcoded-model-id` (warning, model ids belong in config).
+The preset hands `@jterrazz/typescript` the plugin and every rule at its shipped severity; the fragment alone stays at `@jterrazz/intelligence/oxlint` for a config that composes its own.
+
+Six rules: `p1-prose-in-prompt-files` (error, the flagship — no multi-line prose outside `*.prompt.ts`), `p2-prompt-file-exports` (error, prompt files export only string-builder consts + types), `p3-agent-prompt-sibling` (error, the agent↔prompt import/sibling link), `g1-agent-class-shape` (error, `static readonly SCHEMA` + `run` + `constructor(model, ...)`), `m1-model-resolution-in-composition` (error, `createIntelligence`/provider factories/`.model()` are composition-root-only, under `composition/`), `m2w-no-hardcoded-model-id` (warning, model ids belong in config).
 
 ## Formatting
 
