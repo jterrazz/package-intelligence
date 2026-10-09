@@ -12,8 +12,6 @@ How a change to this package is made: the declaration every config follows, the 
 
 The declaration names one root beside the spine, `scripts/`, where the preserved-terms generator lives. It holds no other exception, and no debt is recorded: there is no `.jterrazz/` ledger.
 
-The package holds itself to its own preset, so its rules judge this tree too. One override sets `model-resolution-in-composition` aside for `src/factory/`, with its reason in the declaration: the factory is where `createIntelligence` calls the providers' factories, which the rule — written for a consumer's tree — reads as resolution outside a composition root.
-
 ## The gestures
 
 | Gesture                  | Runs                                                                                                             |

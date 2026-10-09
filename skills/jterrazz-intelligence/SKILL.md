@@ -136,7 +136,7 @@ export default defineConfig({ kind: 'api', platform: 'node', presets: [intellige
 
 The preset hands `@jterrazz/typescript` the plugin `@jterrazz/intelligence/oxlint` and every rule at `error` — the toolchain has no warn tier.
 
-Six rules, in three families: `prose-in-prompt-files` (the flagship — no multi-line prose outside `*.prompt.ts`) and `prompt-file-exports` (prompt files export only string-builder consts + types); `agent-prompt-sibling` (the agent↔prompt import/sibling link) and `agent-class-shape` (`static readonly SCHEMA` + `run` + `constructor(model, ...)`); `model-resolution-in-composition` (`createIntelligence`/provider factories/`.model()` are composition-root-only, under `composition/`) and `no-hardcoded-model-id` (model ids belong in config). Each finding's `read` is its section of `docs/reference/lint-rules.md`.
+Six rules, in three families: `prose-in-prompt-files` (the flagship — no multi-line prose outside `*.prompt.ts`) and `prompt-file-exports` (prompt files export only string-builder consts + types); `agent-prompt-sibling` (the agent↔prompt import/sibling link) and `agent-class-shape` (`static readonly SCHEMA` + `run` + `constructor(model, ...)`); `model-resolution-in-composition` (the package's `createIntelligence`/provider factories and `.model('…')` are composition-root-only, under `composition/`) and `no-hardcoded-model-id` (model ids belong in config). Each finding's `read` is its section of `docs/reference/lint-rules.md`.
 
 ## Formatting
 

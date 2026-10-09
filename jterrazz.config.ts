@@ -33,11 +33,6 @@ export default defineConfig({
                     reason: 'one literal table the generator writes, whose length is the dictionaries’, not code',
                     rules: { 'max-lines': 'off' },
                 },
-                {
-                    files: ['src/factory/**'],
-                    reason: 'createIntelligence is where the providers’ factories are called: the rule guards a consumer’s composition root, and this is the factory it names',
-                    rules: { 'intelligence/model-resolution-in-composition': 'off' },
-                },
             ],
         },
         roots: {

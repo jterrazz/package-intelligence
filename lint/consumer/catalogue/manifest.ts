@@ -30,7 +30,7 @@ export const consumerRows: readonly Row[] = byName<Row>([
         fix: 'call the factory, and resolve the model by name, in a file under `composition/`, and hand the model to what needs it',
         name: 'model-resolution-in-composition',
         sentence:
-            "`createIntelligence(…)`, `createGatewayProvider(…)`, `createOpenRouterProvider(…)`, and `.model('…')` with a literal name in a file importing `@jterrazz/intelligence`, are called only from the composition root, a file under `composition/` — or from a test, which composes its own subject.",
+            "`createIntelligence(…)`, `createGatewayProvider(…)` and `createOpenRouterProvider(…)` imported from `@jterrazz/intelligence`, and `.model('…')` with a literal name in a file importing it, are called only from the composition root, a file under `composition/` — or from a test, which composes its own subject.",
         why: 'Model resolution is the composition root’s work: scattered, a provider or model choice drifts outside the one place meant to own it.',
     },
     {

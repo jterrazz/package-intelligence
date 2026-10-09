@@ -16,17 +16,49 @@ ruleTester().run('model-resolution-in-composition', modelResolutionInComposition
             name: 'a model named by a template with no expression',
         },
         {
-            code: 'const p = createOpenRouterProvider({});',
+            code: "import { createOpenRouterProvider } from '@jterrazz/intelligence';\nconst p = createOpenRouterProvider({});",
             errors: [
                 {
                     column: 10,
-                    line: 1,
+                    line: 2,
                     messageId: 'factoryOutsideComposition',
                     data: { name: 'createOpenRouterProvider' },
                 },
             ],
             filename: OUTSIDE,
-            name: 'createOpenRouterProvider outside the composition root, imported or not',
+            name: 'createOpenRouterProvider outside the composition root',
+        },
+        {
+            code: "import { createIntelligence as compose } from '@jterrazz/intelligence';\nconst i = compose({});",
+            errors: [
+                {
+                    column: 10,
+                    line: 2,
+                    messageId: 'factoryOutsideComposition',
+                    data: { name: 'createIntelligence' },
+                },
+            ],
+            filename: OUTSIDE,
+            name: 'a factory imported under another name',
+        },
+        {
+            code: "import * as intelligence from '@jterrazz/intelligence';\nconst p = intelligence.createGatewayProvider({});",
+            errors: [
+                {
+                    column: 10,
+                    line: 2,
+                    messageId: 'factoryOutsideComposition',
+                    data: { name: 'createGatewayProvider' },
+                },
+            ],
+            filename: OUTSIDE,
+            name: 'a factory read from a namespace import',
+        },
+        {
+            code: "const i = createIntelligence({});\nimport { createIntelligence } from '@jterrazz/intelligence';",
+            errors: [{ column: 10, line: 1, messageId: 'factoryOutsideComposition' }],
+            filename: OUTSIDE,
+            name: 'a factory called above its import',
         },
         {
             code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = createIntelligence({});",
@@ -102,6 +134,41 @@ ruleTester().run('model-resolution-in-composition', modelResolutionInComposition
             code: "import { model } from '@jterrazz/other';\nconst m = client.model('gpt');",
             filename: OUTSIDE,
             name: 'a model call in a file importing another package',
+        },
+        {
+            code: "import { createGatewayProvider } from './gateway.js';\nconst p = createGatewayProvider({});",
+            filename: OUTSIDE,
+            name: 'a function of the same name imported from elsewhere',
+        },
+        {
+            code: 'function createIntelligence(options) { return options; }\nconst i = createIntelligence({});',
+            filename: OUTSIDE,
+            name: 'a local function of the same name',
+        },
+        {
+            code: "import { cleanAiText } from '@jterrazz/intelligence';\nconst t = cleanAiText('x');",
+            filename: OUTSIDE,
+            name: 'another export imported by name',
+        },
+        {
+            code: "import intelligence from '@jterrazz/intelligence';\nconst i = intelligence({});",
+            filename: OUTSIDE,
+            name: 'a default import called',
+        },
+        {
+            code: "import * as intelligence from '@jterrazz/intelligence';\nconst t = intelligence.cleanAiText('x');",
+            filename: OUTSIDE,
+            name: 'another export read from a namespace import',
+        },
+        {
+            code: "import * as intelligence from '@jterrazz/intelligence';\nconst i = other.createIntelligence({});",
+            filename: OUTSIDE,
+            name: 'a factory name read from another object beside a namespace import',
+        },
+        {
+            code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst i = factories[createIntelligence]({});",
+            filename: OUTSIDE,
+            name: 'a computed member named by a factory binding',
         },
         {
             code: 'const i = sdk.createIntelligence({});',
