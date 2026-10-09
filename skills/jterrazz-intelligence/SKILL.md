@@ -5,7 +5,7 @@ description: Thin composition layer over AI SDK v7 — provider factories, cost/
 
 # @jterrazz/intelligence
 
-Part of the @jterrazz ecosystem. A thin composition layer over AI SDK v7 — the public surface is AI SDK's own `LanguageModel` type. Observability goes through OpenTelemetry (the host app registers an OTel Node SDK, e.g. via `@jterrazz/telemetry`).
+Part of the @jterrazz ecosystem. A thin composition layer over AI SDK v7 — the public surface is AI SDK's own model type, `LanguageModelV4`. Observability goes through OpenTelemetry (the host app registers an OTel Node SDK, e.g. via `@jterrazz/telemetry`).
 
 ## Quick start — `createIntelligence`
 
@@ -40,7 +40,7 @@ const model = intelligence.model('summarizer');
 const { text } = await generateText({ model, prompt: 'Summarize this article...' });
 ```
 
-Each agent has a `provider` (key into `providers`) and a `model` (technical model id, passed through as-is). `pricing` is keyed by `"<provider>/<model>"`. Models are built lazily and cached per agent name. Registers `@ai-sdk/otel` telemetry globally on first use (idempotent, best-effort).
+Each agent has a `provider` (key into `providers`) and a `model` (technical model id, passed through as-is). `pricing` is keyed by `"<provider>/<model>"`. Models are built lazily and cached per agent name. Registers `@ai-sdk/otel` telemetry globally on first use, once per process.
 
 ## Providers
 
@@ -63,7 +63,7 @@ const proxy = createGatewayProvider({ baseURL: 'https://proxy.example.com/v1' })
 const model = proxy.model('some-model-id');
 ```
 
-`createGatewayProvider` targets `.chat()` (chat completions), not the Responses API, and every model is wrapped with `extractJsonMiddleware` — strips markdown fences from JSON, a safety net for gateways that wrap JSON output in code fences even when structured output was requested.
+`createGatewayProvider` targets `.chat()` (chat completions), not the Responses API, and every model is wrapped with the schema-instruction middleware — the JSON schema restated in the last user message, for a gateway that drops `response_format` — and `extractJsonMiddleware`, which strips the markdown fence a gateway may wrap JSON in.
 
 ## Middleware
 
@@ -76,15 +76,12 @@ import { createCostMiddleware } from '@jterrazz/intelligence';
 const model = wrapLanguageModel({
     model: provider.model('google/gemini-2.5-flash-lite'),
     middleware: [
-        createCostMiddleware({
-            modelRef: 'openrouter/google/gemini-2.5-flash-lite',
-            pricing: { input: 0.1, output: 0.4 }, // USD/1M tokens, fallback only
-        }),
+        createCostMiddleware({ pricing: { input: 0.1, output: 0.4 } }), // USD/1M tokens, fallback only
     ],
 });
 ```
 
-Resolution order: (1) actual provider cost (`providerMetadata.openrouter.usage.cost`) when > 0, else (2) `pricing` × token usage. Sets `gen_ai.usage.cost` on `trace.getActiveSpan()` (the attribute Langfuse's OTel ingestion prioritizes). Never throws.
+Resolution order: (1) actual provider cost (`providerMetadata.openrouter.usage.cost`) when > 0, else (2) `pricing` × token usage. Sets `gen_ai.usage.cost` on the inference span (the attribute Langfuse's OTel ingestion prioritizes); a stream is costed on its `finish` part.
 
 ### Logging middleware
 
@@ -117,7 +114,7 @@ A model (not middleware — middleware can't swap the underlying model). Retries
 
 Folder-per-agent, prompt isolated from prep logic:
 
-```
+```text
 agents/<name>/<name>.ts          # class: SCHEMA, constructor(model, logger), run()
 agents/<name>/<name>.prompt.ts   # prompt only: Variables + buildPrompt(v) [+ section builders]
 agents/_shared/<name>.prompt.ts  # sections shared across agents
@@ -137,9 +134,9 @@ import { defineConfig } from '@jterrazz/typescript/config';
 export default defineConfig({ kind: 'api', platform: 'node', presets: [intelligence()] });
 ```
 
-The preset hands `@jterrazz/typescript` the plugin and every rule at its shipped severity; the fragment alone stays at `@jterrazz/intelligence/oxlint` for a config that composes its own.
+The preset hands `@jterrazz/typescript` the plugin `@jterrazz/intelligence/oxlint` and every rule at `error` — the toolchain has no warn tier.
 
-Six rules: `p1-prose-in-prompt-files` (error, the flagship — no multi-line prose outside `*.prompt.ts`), `p2-prompt-file-exports` (error, prompt files export only string-builder consts + types), `p3-agent-prompt-sibling` (error, the agent↔prompt import/sibling link), `g1-agent-class-shape` (error, `static readonly SCHEMA` + `run` + `constructor(model, ...)`), `m1-model-resolution-in-composition` (error, `createIntelligence`/provider factories/`.model()` are composition-root-only, under `composition/`), `m2w-no-hardcoded-model-id` (warning, model ids belong in config).
+Six rules, in three families: `prose-in-prompt-files` (the flagship — no multi-line prose outside `*.prompt.ts`) and `prompt-file-exports` (prompt files export only string-builder consts + types); `agent-prompt-sibling` (the agent↔prompt import/sibling link) and `agent-class-shape` (`static readonly SCHEMA` + `run` + `constructor(model, ...)`); `model-resolution-in-composition` (`createIntelligence`/provider factories/`.model()` are composition-root-only, under `composition/`) and `no-hardcoded-model-id` (model ids belong in config). Each finding's `read` is its section of `docs/reference/lint-rules.md`.
 
 ## Formatting
 

@@ -2,7 +2,7 @@
 
 A thin composition layer over [AI SDK v7](https://ai-sdk.dev) — provider factories, cost/fallback/logging middleware, and a config-driven factory that wires them together. Observability goes through OpenTelemetry: the host app registers an OTel Node SDK (e.g. via [`@jterrazz/telemetry`](https://www.npmjs.com/package/@jterrazz/telemetry)), and this package emits AI SDK spans and a `gen_ai.usage.cost` attribute into it.
 
-The public surface is AI SDK's own `LanguageModel` type — every factory here returns a model you can pass straight into `generateText`, `streamText`, `generateObject`, etc.
+The public surface is AI SDK's own model type, `LanguageModelV4` — every factory here returns a model you can pass straight into `generateText`, `streamText`, etc. A repository on the `@jterrazz` toolchain also lists the package's preset, `intelligence()` of `@jterrazz/intelligence/config`, which holds its agents to the convention the package assumes.
 
 ## Installation
 
@@ -50,14 +50,13 @@ Each agent has a `provider` (a key into `providers`) and a `model` (the technica
 
 ## Documentation
 
-The full corpus lives in [`docs/`](docs/):
+The manual lives in [`docs/`](docs/), mapped by [`docs/README.md`](docs/README.md):
 
-- [Architecture](docs/01-architecture.md) — the building blocks, what `createIntelligence` wires, the lint plugin's agent/prompt convention, the exports map.
-- [Developing](docs/02-developing.md) — the toolchain, where a new provider/middleware/rule goes.
-- [Testing](docs/03-testing.md) — the unit, integration and lint-plugin suites.
-- [Operating](docs/04-operating.md) — what publishes this package, and what a merge to `main` does not.
-- [Providers](docs/05-providers.md) — OpenRouter and gateway.
-- [Middleware](docs/06-middleware.md) — agent, cost, logging, schema-instruction.
+- [Architecture](docs/concepts/architecture.md) — the building blocks, what `createIntelligence` wires, the entries, the agent convention.
+- [Providers](docs/reference/providers.md) — OpenRouter and gateway.
+- [Middleware](docs/reference/middleware.md) — agent, cost, logging, schema instruction, and the fallback.
+- [Lint rules](docs/reference/lint-rules.md) — the `intelligence()` preset and its six rules.
+- [Develop](docs/guides/develop.md), [Test](docs/guides/test.md), [Release](docs/guides/release.md) — changing, proving and shipping the package.
 
 Decisions this package alone took are in [`docs/decisions/`](docs/decisions/), numbered in the order they were taken.
 

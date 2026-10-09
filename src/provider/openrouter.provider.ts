@@ -1,6 +1,5 @@
 import type { LanguageModelV4 } from '@ai-sdk/provider';
 import { createOpenRouter } from '@openrouter/ai-sdk-provider';
-import type { LanguageModel } from 'ai';
 
 export type OpenRouterMetadata = {
     /** Application name, sent as the `X-OpenRouter-Title` header for dashboard attribution */
@@ -15,7 +14,7 @@ export type OpenRouterConfig = {
 };
 
 export type OpenRouterProvider = {
-    model: (id: string) => LanguageModel;
+    model: (id: string) => LanguageModelV4;
 };
 
 /** An OpenRouter provider; per-call options go in `providerOptions.openrouter`. */

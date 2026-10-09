@@ -1,19 +1,29 @@
-# @jterrazz/intelligence — the corpus
+# @jterrazz/intelligence — the manual
 
-The manual of this repository: what the package is, how it is changed, what
-proves a change, how it ships, and its two product subjects. The vitrine —
-install, quick start — is the root `README.md`, not this map.
+A thin composition layer over AI SDK v7: provider factories, cost, fallback and logging middleware, a config-driven factory that wires them, the text utilities of `./formatting`, and the `intelligence()` preset that holds a consumer's agents to their convention. What the package is and how a consumer starts is the repository's README; this page lists every page of the manual, by what the reader came to do.
 
-| Chapter                                  | Holds                                                                                                                                  |
-| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| [01-architecture.md](01-architecture.md) | The building blocks and how `createIntelligence` wires them, the model and formatting layers, the lint plugin's shape, the exports map |
-| [02-developing.md](02-developing.md)     | The toolchain, where a new provider/middleware/rule goes, the preserved-terms generator, what a change owes                            |
-| [03-testing.md](03-testing.md)           | The two vitest projects, the goldens the integration specs stand on, the manifest completeness meta-test, the ledger                   |
-| [04-operating.md](04-operating.md)       | What is published, what a GitHub Release triggers, and why a merge to `main` ships nothing                                             |
-| [05-providers.md](05-providers.md)       | The OpenRouter and gateway providers                                                                                                   |
-| [06-middleware.md](06-middleware.md)     | The agent, cost, logging and schema-instruction middleware                                                                             |
+## Guides
 
-The decisions this package alone took stand in [decisions/](decisions/),
-numbered and chronological, the mold `_template.md` beside them. A decision
-spanning several repositories is not one of them — it belongs to the corpus
-that spans them.
+| Page                         | Answers                                                                                       |
+| ---------------------------- | --------------------------------------------------------------------------------------------- |
+| [Develop](guides/develop.md) | Changing the package: the declaration, the gestures, where a new file goes, what it owes      |
+| [Test](guides/test.md)       | Proving a change: the specs, the declared providers, the tarball, the lint rules, the mutants |
+| [Release](guides/release.md) | How the package is published, and who cuts a release                                          |
+
+## Concepts
+
+| Page                                     | Answers                                                                                     |
+| ---------------------------------------- | ------------------------------------------------------------------------------------------- |
+| [Architecture](concepts/architecture.md) | The building blocks, what `createIntelligence` wires, the entries, and the agent convention |
+
+## Reference
+
+| Page                                  | Answers                                                                         |
+| ------------------------------------- | ------------------------------------------------------------------------------- |
+| [Providers](reference/providers.md)   | The OpenRouter and gateway providers: what each sends, and what wraps its model |
+| [Middleware](reference/middleware.md) | The agent, cost, logging and schema-instruction middleware, and the fallback    |
+| [Lint rules](reference/lint-rules.md) | The `intelligence()` preset and every rule it holds a consumer to               |
+
+## Decisions
+
+The records of decisions this package alone took are in [`decisions/`](decisions/), numbered in the order they were taken, the mold `_template.md` beside them. A decision spanning several repositories is recorded by the corpus that spans them.

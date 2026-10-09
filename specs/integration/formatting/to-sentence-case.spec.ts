@@ -1,18 +1,21 @@
-import { expect, test } from 'vitest';
+import { file } from '@jterrazz/test';
+import { describe, expect, test } from 'vitest';
 
-import type { ToSentenceCaseOptions } from '../../../src/formatting.js';
-import { toSentenceCase } from '../../../src/formatting.js';
+import type { ToSentenceCaseOptions } from '../../../src/index.formatting.js';
+import { toSentenceCase } from '../../../src/index.formatting.js';
 import { integration } from '../integration.specification.js';
 
 type Case = { name: string; options?: ToSentenceCaseOptions; title: string };
 
 const TRIVIAL: Case[] = [
+    { name: 'three-word-title', title: 'Building Great Software' },
     { name: 'empty-string', title: '' },
     { name: 'single-word', title: 'Worldbuilding' },
     { name: 'two-word-title', title: 'Building Software' },
 ];
 
 const DETECTION: Case[] = [
+    { name: 'ratio-exactly-at-the-threshold', title: 'Rust Makes Systems programming fun' },
     { name: 'prose-with-one-proper-noun', title: 'Cursor: the compression of mechanical work' },
     { name: 'prose-opening-on-an-acronym', title: 'AI is making us smarter' },
     { name: 'prose-under-the-threshold', title: 'I talked to Google last week' },
@@ -21,7 +24,6 @@ const DETECTION: Case[] = [
 ];
 
 const ACRONYMS: Case[] = [
-    // "api" is a dictionary-fr headword and cspell's acronym list lacks "API".
     {
         name: 'acronym-colliding-with-a-dictionary-word',
         title: 'How To Use The API For HTTP Calls',
@@ -31,6 +33,7 @@ const ACRONYMS: Case[] = [
 ];
 
 const PROPER_NOUNS: Case[] = [
+    { name: 'all-caps-name-known-in-title-case', title: 'We Met AL In Town Today' },
     { name: 'openai-preserved', title: 'The OpenAI Revolution Is Here' },
     { name: 'chatgpt-preserved', title: 'Why ChatGPT Changed Everything' },
     { name: 'brand-as-the-first-word', title: 'Google Released Another Model' },
@@ -43,6 +46,14 @@ const PROPER_NOUNS: Case[] = [
 ];
 
 const FIRST_WORD: Case[] = [
+    { name: 'numbers-outnumbering-the-words', title: 'Best 100 200 300 Tools Ever' },
+    { name: 'lowercase-initial-brands-leading-the-title', title: 'iPhone iPad macOS Are Great' },
+    {
+        name: 'acronym-from-the-dictionaries-as-the-first-word',
+        title: 'ACM Publishes Its Annual Report',
+    },
+    { name: 'mixed-case-term-as-the-first-word', title: 'OAuth Is Confusing For Everyone' },
+    { name: 'numbers-between-the-words', title: 'In 2024 We Shipped 3 New Features' },
     { name: 'untriggered-lowercase-opening', title: 'your next AI skill is Worldbuilding' },
     { name: 'shouting-title', title: 'YOUR NEXT AI SKILL IS WORLDBUILDING' },
     { name: 'pronoun-i-mid-title', title: 'Things I Like About Markdown' },
@@ -59,11 +70,9 @@ const MIXED_CASE: Case[] = [
 ];
 
 const ALL_CAPS: Case[] = [
-    // "acme" is a dictionary-en headword (a pinnacle).
     { name: 'all-caps-known-word', title: 'ACME PRODUCT LAUNCH IS HERE TODAY' },
     { name: 'all-caps-unknown-token', title: 'TODAY BREAKING NEWS ABOUT ZXQW PROTOCOL' },
     { name: 'all-caps-known-word-and-place', title: 'TODAY BREAKING NEWS FROM LONDON CITY' },
-    // "cannes" is the French plural of "canne".
     { name: 'all-caps-french-collision', title: 'BREAKING NEWS FROM CANNES TODAY' },
     {
         name: 'all-caps-french-collision-in-english',
@@ -82,7 +91,6 @@ const PUNCTUATION: Case[] = [
 
 const DICTIONARY: Case[] = [
     { name: 'unrecognized-person-and-place', title: 'Macron Meets Zelensky Over Ukraine Support' },
-    // "macron" is the diacritical mark, a dictionary-en headword.
     {
         name: 'name-colliding-with-a-common-noun',
         title: 'The French President Macron Announced New Measures',
@@ -97,13 +105,11 @@ const DICTIONARY: Case[] = [
 ];
 
 const OPTIONS: Case[] = [
-    // "foo" and "bar" are dictionary-en headwords; "baz" is in neither dictionary.
     {
         name: 'extra-preserved-terms',
         options: { preservedTerms: ['Acme'] },
         title: 'The Acme Foo Bar Baz Is Released',
     },
-    // "ai" is a French verb form, so only the manual list keeps "AI".
     {
         name: 'replace-preserved-drops-the-manual-list',
         options: { preservedTerms: [], replacePreserved: true },
@@ -150,11 +156,13 @@ const CASES: Case[] = [
     ...CORPUS,
 ];
 
-test.each(CASES)('sentence-cases the $name case', async ({ name, options, title }) => {
-    // Given - one row of the table, with the options that row states
-    const result = await integration.call(() => toSentenceCase(title, options));
+describe('to-sentence-case', () => {
+    test.each(CASES)('sentence-cases the $name case', async ({ name, options, title }) => {
+        // Given - one row of the table, with the options that row states
+        const result = await integration.call(() => toSentenceCase(title, options));
 
-    // Then - the golden recorded for that row
-    expect(result.value).toMatch(`${name}.txt`);
-    await expect(result.error).toBeEmpty();
+        // Then - the golden recorded for that row
+        expect(result.value).toMatch(file(`./__expected__/${name}.txt`));
+        expect(result.error.text).toBe('');
+    });
 });

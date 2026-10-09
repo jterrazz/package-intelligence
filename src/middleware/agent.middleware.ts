@@ -13,20 +13,12 @@ export function createAgentMiddleware(options: AgentMiddlewareOptions): Language
     const { agentName } = options;
 
     const nameActiveSpan = (): void => {
-        try {
-            // The AI SDK activates the inference span around the provider call, so it is the active one here.
-            const span = trace.getActiveSpan();
-            if (!span) {
-                return;
-            }
-            span.updateName(agentName);
-            span.setAttribute(AGENT_ATTRIBUTE, agentName);
-        } catch {
-            // best-effort
-        }
+        // outside: the AI SDK activates the inference span around the provider call, so it is the active one here.
+        trace.getActiveSpan()?.updateName(agentName).setAttribute(AGENT_ATTRIBUTE, agentName);
     };
 
     return {
+        // Stryker disable next-line StringLiteral: the AI SDK reads the version of a model, never of a middleware
         specificationVersion: 'v4',
         wrapGenerate: async ({ doGenerate }) => {
             nameActiveSpan();

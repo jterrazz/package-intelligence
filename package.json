@@ -13,27 +13,40 @@
     "sideEffects": false,
     "exports": {
         ".": {
-            "require": "./dist/index.cjs",
-            "import": "./dist/index.js"
+            "import": {
+                "types": "./dist/index.d.ts",
+                "default": "./dist/index.js"
+            },
+            "require": {
+                "types": "./dist/index.d.cts",
+                "default": "./dist/index.cjs"
+            }
         },
         "./config": {
-            "require": "./dist/config.cjs",
-            "import": "./dist/config.js"
+            "types": "./dist/config.d.ts",
+            "default": "./dist/config.js"
         },
         "./formatting": {
-            "require": "./dist/formatting.cjs",
-            "import": "./dist/formatting.js"
+            "import": {
+                "types": "./dist/formatting.d.ts",
+                "default": "./dist/formatting.js"
+            },
+            "require": {
+                "types": "./dist/formatting.d.cts",
+                "default": "./dist/formatting.cjs"
+            }
         },
         "./oxlint": {
-            "require": "./dist/oxlint.cjs",
-            "import": "./dist/oxlint.js"
+            "types": "./dist/oxlint.d.ts",
+            "default": "./dist/oxlint.js"
         }
     },
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
     },
     "scripts": {
-        "build": "tsdown --config tsdown.config.ts",
+        "build": "typescript build",
+        "docs": "npm run build && node .artifacts/dev/chapters.js",
         "generate:terms": "node scripts/generate-preserved-terms.ts && oxfmt src/formatting/preserved-terms.generated.ts",
         "lint": "typescript check",
         "lint:fix": "typescript fix",
@@ -45,6 +58,7 @@
         "@jterrazz/telemetry": "^1.1.0",
         "@openrouter/ai-sdk-provider": "^3.0.0",
         "@opentelemetry/api": "^1.9.1",
+        "@types/json-schema": "^7.0.15",
         "dictionary-en": "^4.0.0",
         "dictionary-fr": "^3.0.0",
         "nspell": "^2.1.5"
@@ -53,18 +67,24 @@
         "@ai-sdk/provider": "^4.0.3",
         "@cspell/dict-companies": "^3.2.12",
         "@cspell/dict-software-terms": "^5.2.4",
-        "@jterrazz/test": "^16.1.0",
-        "@jterrazz/typescript": "^10.3.1",
+        "@jterrazz/test": "file:../package-test",
+        "@jterrazz/typescript": "file:../package-typescript",
+        "@opentelemetry/context-async-hooks": "^2.12.0",
+        "@opentelemetry/sdk-trace-base": "^2.12.0",
         "@types/node": "^26.1.1",
         "@types/nspell": "^2.1.6",
         "ai": "^7.0.28",
-        "tsdown": "^0.23.0",
-        "vitest": "^5.0.1"
+        "vitest": "^5.0.1",
+        "zod": "^4.6.5"
     },
     "peerDependencies": {
+        "@jterrazz/typescript": "file:../package-typescript",
         "ai": ">=7.0.0"
     },
     "peerDependenciesMeta": {
+        "@jterrazz/typescript": {
+            "optional": true
+        },
         "ai": {
             "optional": true
         }

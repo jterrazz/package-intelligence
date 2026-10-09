@@ -41,10 +41,10 @@ function parseWordListCandidates(raw: string): string[] {
         .filter((line) => /[A-Z]/u.test(line));
 }
 
-// A lowercase headword marks a common word: preserving a term that collides with one would capitalize the word too.
+// outside: a lowercase Hunspell headword marks a common word, and preserving a term that collides with one would capitalize the word too.
 function buildCommonWordSet(): Set<string> {
     const raw = readTextFile('dictionary-en/index.dic');
-    // The first line of a Hunspell .dic is the word count, not a headword.
+    // outside: the first line of a Hunspell .dic is the word count, not a headword.
     const lines = raw.split('\n').slice(1);
     const common = new Set<string>();
     for (const line of lines) {
@@ -56,10 +56,8 @@ function buildCommonWordSet(): Set<string> {
     return common;
 }
 
-function main(): void {
-    const commonWords = buildCommonWordSet();
-
-    const sources: Source[] = [
+function readSources(): Source[] {
+    return [
         {
             label: 'computing-acronyms.txt',
             rank: 0,
@@ -82,62 +80,57 @@ function main(): void {
             ),
         },
     ];
+}
 
+type Selection = {
+    candidateCount: number;
+    excluded: { source: string; term: string }[];
+    terms: string[];
+};
+
+function selectTerms(sources: Source[], commonWords: Set<string>): Selection {
     const canonicalByLowercase = new Map<string, string>();
-    const excludedAsAmbiguous: { source: string; term: string }[] = [];
+    const excluded: Selection['excluded'] = [];
     let candidateCount = 0;
-
-    // Most specific source first: it wins a case-insensitive tie.
+    // invariant: the most specific source first, so it wins a case-insensitive tie.
     for (const source of sources.toSorted((a, b) => a.rank - b.rank)) {
         for (const term of source.terms) {
             candidateCount += 1;
             const lower = term.toLowerCase();
             if (commonWords.has(lower)) {
-                excludedAsAmbiguous.push({ source: source.label, term });
-                continue;
-            }
-            if (!canonicalByLowercase.has(lower)) {
+                excluded.push({ source: source.label, term });
+            } else if (!canonicalByLowercase.has(lower)) {
                 canonicalByLowercase.set(lower, term);
             }
         }
     }
+    const terms = [...canonicalByLowercase.values()].toSorted((a, b) => a.localeCompare(b));
+    return { candidateCount, excluded, terms };
+}
 
-    const finalTerms = [...canonicalByLowercase.values()].toSorted((a, b) => a.localeCompare(b));
+function render({ candidateCount, excluded, terms }: Selection, examples: string[]): string {
+    return `// value: written by \`npm run generate:terms\` from @cspell/dict-companies and @cspell/dict-software-terms, less every term dictionary-en holds as a common lowercase word — ${candidateCount} candidates, ${excluded.length} excluded (${examples.join('; ')}), ${terms.length} kept.
 
-    const exampleExclusions = excludedAsAmbiguous.slice(0, 12).map(({ source, term }) => {
-        const lower = term.toLowerCase();
-        return `${term} -> "${lower}" (${source})`;
-    });
-
-    const header = `/**
- * GENERATED FILE — do not edit, run \`npm run generate:terms\`.
- *
- * Source: @cspell/dict-companies + @cspell/dict-software-terms, filtered
- * through the \`dictionary-en\` ambiguity check (see
- * scripts/generate-preserved-terms.ts for the full pipeline).
- *
- * Candidates before ambiguity filter: ${candidateCount}
- * Excluded as ambiguous (lowercase form is a common English word): ${excludedAsAmbiguous.length}
- * Kept: ${finalTerms.length}
- *
- * Examples of ambiguity exclusions:
-${exampleExclusions.map((line) => ` *   ${line}`).join('\n')}
- */
-
+/** The proper nouns and acronyms \`toSentenceCase\` keeps as written. */
 export const GENERATED_PRESERVED_TERMS: readonly string[] = [
-${finalTerms.map((term) => `    ${quote(term)},`).join('\n')}
+${terms.map((term) => `    ${quote(term)},`).join('\n')}
 ];
 `;
+}
 
-    writeFileSync(OUTPUT_PATH, header);
-
+function main(): void {
+    const selection = selectTerms(readSources(), buildCommonWordSet());
+    const examples = selection.excluded
+        .slice(0, 12)
+        .map(({ source, term }) => `${term} -> "${term.toLowerCase()}" (${source})`);
+    writeFileSync(OUTPUT_PATH, render(selection, examples));
     console.log(
-        `Wrote ${finalTerms.length} preserved terms to ${path.relative(ROOT_DIR, OUTPUT_PATH)}`,
+        `Wrote ${selection.terms.length} preserved terms to ${path.relative(ROOT_DIR, OUTPUT_PATH)}`,
     );
-    console.log(`  candidates before ambiguity filter: ${candidateCount}`);
-    console.log(`  excluded as ambiguous: ${excludedAsAmbiguous.length}`);
+    console.log(`  candidates before ambiguity filter: ${selection.candidateCount}`);
+    console.log(`  excluded as ambiguous: ${selection.excluded.length}`);
     console.log('  examples:');
-    for (const line of exampleExclusions) {
+    for (const line of examples) {
         console.log(`    ${line}`);
     }
 }

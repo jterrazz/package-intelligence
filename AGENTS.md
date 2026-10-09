@@ -1,40 +1,31 @@
 # Agent brief — `@jterrazz/intelligence`
 
-A thin composition layer over AI SDK v7: provider factories, cost/fallback/logging middleware, a config-driven factory, and an oxlint plugin mechanizing the agent/prompt convention. This file **routes**; it does not restate what the corpus already says.
+A thin composition layer over AI SDK v7: provider factories, cost/fallback/logging middleware, a config-driven factory, and the `intelligence()` preset mechanizing the agent/prompt convention. This file **routes**; it does not restate what the corpus already says.
 
 ## Where knowledge lives (route here first)
 
 The corpus is `docs/` + `README.md`, mapped by [`docs/README.md`](docs/README.md). Decisions this package alone took are in [`docs/decisions/`](docs/decisions/). Do not duplicate it — link to it.
 
-| Working on…                                         | Read                      |
-| --------------------------------------------------- | ------------------------- |
-| the building blocks, the pipeline, the lint plugin  | `docs/01-architecture.md` |
-| the toolchain, where a new file goes                | `docs/02-developing.md`   |
-| the unit, integration and lint-plugin suites        | `docs/03-testing.md`      |
-| the release, and what a merge to `main` does not do | `docs/04-operating.md`    |
-| OpenRouter and gateway providers                    | `docs/05-providers.md`    |
-| agent, cost, logging, schema-instruction middleware | `docs/06-middleware.md`   |
+| Working on…                                              | Read                            |
+| -------------------------------------------------------- | ------------------------------- |
+| the building blocks, the factory, the entries            | `docs/concepts/architecture.md` |
+| the declaration, the gestures, where a new file goes     | `docs/guides/develop.md`        |
+| the specs, the declared providers, the tarball, mutation | `docs/guides/test.md`           |
+| the release, and who is allowed to cut one               | `docs/guides/release.md`        |
+| OpenRouter and gateway providers                         | `docs/reference/providers.md`   |
+| agent, cost, logging, schema instruction, fallback       | `docs/reference/middleware.md`  |
+| the `intelligence()` preset and its rules                | `docs/reference/lint-rules.md`  |
+
+The manual is cut by its reader's need — `guides/`, `concepts/`, `reference/` — the shape every repository of the ecosystem keeps, and `typescript check` refuses a tree that breaks it (the Docs (layout) pass).
 
 `CLAUDE.md` at the root is a symlink to this file: one brief, two names, no second copy.
 
 One Claude Code skill routes into this corpus: [`skills/jterrazz-intelligence/`](skills/jterrazz-intelligence/SKILL.md).
 
-## Setup
+## Setup and commands
 
-```bash
-npm ci
-npm run build   # tsdown — required before `npm run lint` and the plugin's E2E suite
-```
-
-## Commands
-
-| Task                       | Command                  |
-| -------------------------- | ------------------------ |
-| Run all tests              | `npm test`               |
-| Lint + format + typecheck  | `npm run lint`           |
-| Auto-fix lint issues       | `npm run lint:fix`       |
-| Regenerate preserved terms | `npm run generate:terms` |
+The gestures — `make install` (`npm ci`, never a plain `npm install`, which can rewrite the lockfile), `make build`, `make lint`, `make fix`, `make test`, `make mutation`, `make check` — and what each runs are [Develop § The gestures](docs/guides/develop.md#the-gestures)'s.
 
 ## Standing rule
 
-A change to the agent/prompt convention or an oxlint rule moves in the same commit as the manifest entry, the plugin wiring, the fixture pair and the `docs/01-architecture.md` table row — the six pieces `docs/02-developing.md` lists. A change to the public API also updates the quick start in `README.md` and the export it touched in `docs/01-architecture.md`.
+A rule moves with its catalogue row, its module test, its lint spec and its section of `docs/reference/lint-rules.md` ([Develop § A lint rule](docs/guides/develop.md#a-lint-rule)). A new or changed export reaches `README.md`, the relevant `docs/` page and the `skills/jterrazz-intelligence/` skill in the same change ([Develop § What a change owes](docs/guides/develop.md#what-a-change-owes)).

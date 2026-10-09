@@ -1,42 +1,22 @@
-import { APICallError } from '@ai-sdk/provider';
 import type { LanguageModelV4, LanguageModelV4CallOptions } from '@ai-sdk/provider';
 import type { LoggerPort } from '@jterrazz/telemetry';
-import type { LanguageModel } from 'ai';
+import { APICallError } from 'ai';
 
-const RETRYABLE_MESSAGE_PATTERNS = [
-    /ECONNREFUSED/iu,
-    /ECONNRESET/iu,
-    /ETIMEDOUT/iu,
-    /EAI_AGAIN/iu,
-    /ENOTFOUND/iu,
-    /timed?\s*out/iu,
-    /network/iu,
-    /fetch failed/iu,
-];
-
+// outside: the providers' SDKs raise every call's failure as an `APICallError`, retryable on a 408, 409, 429, 5xx or a network failure.
 function isRetryableError(error: unknown): boolean {
-    if (APICallError.isInstance(error)) {
-        if (typeof error.statusCode === 'number') {
-            return error.statusCode === 429 || error.statusCode >= 500;
-        }
-        return error.isRetryable;
-    }
-
-    const message = error instanceof Error ? error.message : String(error);
-    return RETRYABLE_MESSAGE_PATTERNS.some((pattern) => pattern.test(message));
+    // Stryker disable next-line ConditionalExpression: any other error carries no `isRetryable`, so it reads as not retryable either way
+    return APICallError.isInstance(error) && error.isRetryable;
 }
 
 export type FallbackModelOptions = {
-    primary: LanguageModel;
-    fallback: LanguageModel;
+    primary: LanguageModelV4;
+    fallback: LanguageModelV4;
     logger?: LoggerPort;
 };
 
-/** A model that answers from `fallback` when `primary` fails with a retryable error (429, 5xx, network). */
+/** A model that answers from `fallback` when `primary` fails with a retryable error (408, 409, 429, 5xx, a network failure). */
 export function createFallbackModel(options: FallbackModelOptions): LanguageModelV4 {
-    const { primary, fallback, logger } = options;
-    const primaryModel = primary as LanguageModelV4;
-    const fallbackModel = fallback as LanguageModelV4;
+    const { fallback: fallbackModel, logger, primary: primaryModel } = options;
 
     function logFallback(error: unknown): void {
         logger?.warn('ai.fallback.triggered', {

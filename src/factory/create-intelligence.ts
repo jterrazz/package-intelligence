@@ -2,7 +2,6 @@ import { OpenTelemetry } from '@ai-sdk/otel';
 import type { LanguageModelV4 } from '@ai-sdk/provider';
 import type { LoggerPort } from '@jterrazz/telemetry';
 import { registerTelemetry, wrapLanguageModel } from 'ai';
-import type { LanguageModel } from 'ai';
 
 import { createAgentMiddleware } from '../middleware/agent.middleware.js';
 import { createCostMiddleware } from '../middleware/cost.middleware.js';
@@ -18,7 +17,7 @@ type ProviderConfig =
     | (OpenRouterConfig & { type: 'openrouter' });
 
 type ResolvedProvider = {
-    model: (id: string) => LanguageModel;
+    model: (id: string) => LanguageModelV4;
 };
 
 let telemetryRegistered = false;
@@ -27,27 +26,15 @@ function ensureTelemetryRegistered(): void {
     if (telemetryRegistered) {
         return;
     }
+    // Stryker disable next-line BooleanLiteral: a second registration traces nothing twice; the flag keeps the process's list of integrations from growing with each factory
     telemetryRegistered = true;
-
-    try {
-        registerTelemetry(new OpenTelemetry());
-    } catch {
-        // best-effort
-    }
+    registerTelemetry(new OpenTelemetry());
 }
 
 function createProvider(config: ProviderConfig): ResolvedProvider {
-    switch (config.type) {
-        case 'gateway': {
-            return createGatewayProvider(config);
-        }
-        case 'openrouter': {
-            return createOpenRouterProvider(config);
-        }
-        default: {
-            throw new Error(`Unknown provider type "${String(config)}".`);
-        }
-    }
+    return config.type === 'gateway'
+        ? createGatewayProvider(config)
+        : createOpenRouterProvider(config);
 }
 
 function requireProviderConfig(
@@ -85,77 +72,56 @@ export type IntelligenceConfig = {
 };
 
 export type Intelligence = {
-    model: (agentName: string) => LanguageModel;
+    model: (agentName: string) => LanguageModelV4;
 };
 
-/** Resolves each agent's provider and model into an instrumented `LanguageModel`, cached per agent. */
+type Resolution = Omit<IntelligenceConfig, 'providers'> & {
+    provider: (key: string) => ResolvedProvider;
+};
+
+function buildModel(resolution: Resolution, ref: ModelRef, agentName: string): LanguageModelV4 {
+    const pricing = resolution.pricing?.[`${ref.provider}/${ref.model}`];
+    return wrapLanguageModel({
+        middleware: [
+            createAgentMiddleware({ agentName }),
+            createCostMiddleware(pricing ? { pricing } : {}),
+        ],
+        model: resolution.provider(ref.provider).model(ref.model),
+    });
+}
+
+function buildAgentModel(resolution: Resolution, agentName: string): LanguageModelV4 {
+    const agent = resolution.agents[agentName];
+    if (!agent) {
+        const available = Object.keys(resolution.agents).join(', ') || '(none configured)';
+        throw new Error(`Unknown agent "${agentName}". Available agents: ${available}.`);
+    }
+    const { logger } = resolution;
+    const primary = buildModel(resolution, agent, agentName);
+    const composed = agent.fallback
+        ? createFallbackModel({
+              fallback: buildModel(resolution, agent.fallback, agentName),
+              primary,
+              ...(logger ? { logger } : {}),
+          })
+        : primary;
+    return logger
+        ? wrapLanguageModel({ middleware: [createLoggingMiddleware({ logger })], model: composed })
+        : composed;
+}
+
+/** Resolves each agent's provider and model into an instrumented language model, cached per agent. */
 export function createIntelligence(config: IntelligenceConfig): Intelligence {
     ensureTelemetryRegistered();
-
-    const { agents, logger, pricing, providers } = config;
-
-    const providerCache = new Map<string, ResolvedProvider>();
-    const modelCache = new Map<string, LanguageModel>();
-
-    function resolveProvider(providerKey: string): ResolvedProvider {
-        let provider = providerCache.get(providerKey);
-        if (!provider) {
-            provider = createProvider(requireProviderConfig(providerKey, providers));
-            providerCache.set(providerKey, provider);
-        }
-        return provider;
-    }
-
-    function buildModel(ref: ModelRef, agentName: string): LanguageModel {
-        const provider = resolveProvider(ref.provider);
-        const baseModel = provider.model(ref.model) as LanguageModelV4;
-        const modelPricing = pricing?.[`${ref.provider}/${ref.model}`];
-
-        return wrapLanguageModel({
-            model: baseModel,
-            middleware: [
-                createAgentMiddleware({ agentName }),
-                createCostMiddleware(modelPricing ? { pricing: modelPricing } : {}),
-            ],
-        });
-    }
-
-    function buildAgentModel(agentName: string): LanguageModel {
-        const agentConfig = agents[agentName];
-        if (!agentConfig) {
-            const available = Object.keys(agents).join(', ') || '(none configured)';
-            throw new Error(`Unknown agent "${agentName}". Available agents: ${available}.`);
-        }
-
-        const primary = buildModel(
-            { model: agentConfig.model, provider: agentConfig.provider },
-            agentName,
-        );
-        const composed = agentConfig.fallback
-            ? createFallbackModel({
-                  fallback: buildModel(agentConfig.fallback, agentName),
-                  primary,
-                  ...(logger ? { logger } : {}),
-              })
-            : primary;
-
-        if (!logger) {
-            return composed;
-        }
-
-        return wrapLanguageModel({
-            model: composed as LanguageModelV4,
-            middleware: [createLoggingMiddleware({ logger })],
-        });
-    }
-
+    const models = new Map<string, LanguageModelV4>();
+    const resolution: Resolution = {
+        ...config,
+        provider: (key) => createProvider(requireProviderConfig(key, config.providers)),
+    };
     return {
-        model(agentName: string): LanguageModel {
-            let model = modelCache.get(agentName);
-            if (model === undefined) {
-                model = buildAgentModel(agentName);
-                modelCache.set(agentName, model);
-            }
+        model(agentName) {
+            const model = models.get(agentName) ?? buildAgentModel(resolution, agentName);
+            models.set(agentName, model);
             return model;
         },
     };

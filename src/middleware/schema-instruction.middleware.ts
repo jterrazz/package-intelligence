@@ -16,7 +16,7 @@ function buildInstruction(responseFormat: LanguageModelV4CallOptions['responseFo
     return lines.join('\n');
 }
 
-// The user message, not a system one: gateways fronting CLI agents bury injected system messages under their own persona.
+// outside: the user message, not a system one: gateways fronting CLI agents bury an injected system message under their own persona.
 function appendToLastUserMessage(
     prompt: LanguageModelV4Prompt,
     instruction: string,
@@ -27,11 +27,12 @@ function appendToLastUserMessage(
     }
 
     return prompt.map((message, index) => {
+        // Stryker disable next-line ConditionalExpression: the narrowing TypeScript needs — the message at that index is a user's
         if (index !== lastUserIndex || message.role !== 'user') {
             return message;
         }
 
-        // One text part serializes as a plain string, which proxies and prompt-matching tooling handle more reliably.
+        // outside: one text part serializes as a plain string, which proxies and prompt-matching tooling read more reliably.
         const lastTextIndex = message.content.findLastIndex((part) => part.type === 'text');
         if (lastTextIndex === -1) {
             return {
@@ -43,6 +44,7 @@ function appendToLastUserMessage(
         return {
             ...message,
             content: message.content.map((part, partIndex) => {
+                // Stryker disable next-line ConditionalExpression: the narrowing TypeScript needs — the part at that index is a text
                 if (partIndex !== lastTextIndex || part.type !== 'text') {
                     return part;
                 }
@@ -55,6 +57,7 @@ function appendToLastUserMessage(
 /** Restates a JSON response format's schema in the last user message, for gateways that drop the native field. */
 export function createSchemaInstructionMiddleware(): LanguageModelMiddleware {
     return {
+        // Stryker disable next-line StringLiteral: the AI SDK reads the version of a model, never of a middleware
         specificationVersion: 'v4',
         transformParams: async ({ params }) => {
             const instruction = buildInstruction(params.responseFormat);

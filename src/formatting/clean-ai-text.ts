@@ -13,7 +13,6 @@ const EM_DASH_SEPARATOR_RE = /\s*[—–―‒]\s*/gu;
 const TYPOGRAPHY_REPLACEMENTS: { pattern: RegExp; replacement: string }[] = [
     { pattern: /[\u2018\u2019\u201A]/gu, replacement: "'" },
     { pattern: /[\u201C\u201D\u201E]/gu, replacement: '"' },
-    { pattern: /\u2026/gu, replacement: '...' },
     { pattern: /[\u2022\u25AA-\u25AB\u25B8-\u25B9\u25CF]/gu, replacement: '-' },
 ];
 
@@ -27,10 +26,6 @@ export type CleanAiTextOptions = {
 /** Strips AI artifacts (citation markers, invisible characters) and normalizes typography. */
 export function cleanAiText(text: string, options: CleanAiTextOptions = {}): string {
     const { normalizeEmDashesToCommas = true, collapseSpaces = true } = options;
-
-    if (!text) {
-        return '';
-    }
 
     let result = text;
 

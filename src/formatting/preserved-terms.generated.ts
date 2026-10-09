@@ -1,29 +1,6 @@
-/**
- * GENERATED FILE — do not edit, run `npm run generate:terms`.
- *
- * Source: @cspell/dict-companies + @cspell/dict-software-terms, filtered
- * through the `dictionary-en` ambiguity check (see
- * scripts/generate-preserved-terms.ts for the full pipeline).
- *
- * Candidates before ambiguity filter: 3053
- * Excluded as ambiguous (lowercase form is a common English word): 516
- * Kept: 2512
- *
- * Examples of ambiguity exclusions:
- *   ADMIN -> "admin" (computing-acronyms.txt)
- *   DB -> "db" (computing-acronyms.txt)
- *   DRAM -> "dram" (computing-acronyms.txt)
- *   RAM -> "ram" (computing-acronyms.txt)
- *   REF -> "ref" (computing-acronyms.txt)
- *   UHF -> "uhf" (computing-acronyms.txt)
- *   WAN -> "wan" (computing-acronyms.txt)
- *   ZIP -> "zip" (computing-acronyms.txt)
- *   A -> "a" (companies.txt)
- *   AD -> "ad" (companies.txt)
- *   AT -> "at" (companies.txt)
- *   Adobe -> "adobe" (companies.txt)
- */
+// value: written by `npm run generate:terms` from @cspell/dict-companies and @cspell/dict-software-terms, less every term dictionary-en holds as a common lowercase word — 3053 candidates, 516 excluded (ADMIN -> "admin" (computing-acronyms.txt); DB -> "db" (computing-acronyms.txt); DRAM -> "dram" (computing-acronyms.txt); RAM -> "ram" (computing-acronyms.txt); REF -> "ref" (computing-acronyms.txt); UHF -> "uhf" (computing-acronyms.txt); WAN -> "wan" (computing-acronyms.txt); ZIP -> "zip" (computing-acronyms.txt); A -> "a" (companies.txt); AD -> "ad" (companies.txt); AT -> "at" (companies.txt); Adobe -> "adobe" (companies.txt)), 2512 kept.
 
+/** The proper nouns and acronyms `toSentenceCase` keeps as written. */
 export const GENERATED_PRESERVED_TERMS: readonly string[] = [
     '2GIS',
     '3M',
