@@ -108,7 +108,7 @@ const model = createFallbackModel({
 });
 ```
 
-A model (not middleware — middleware can't swap the underlying model). Retries on the fallback only for retryable errors: 429, 5xx, network errors/timeouts. Non-retryable errors (400s, validation, aborts) propagate unchanged.
+A model (not middleware — middleware can't swap the underlying model). It switches only on an error the AI SDK marks retryable; which errors those are, and that an abort or a timeout is not one, is `docs/reference/middleware.md` § Fallback's.
 
 ## Agent & prompt conventions
 
@@ -140,7 +140,7 @@ Six rules, in three families: `prose-in-prompt-files` (the flagship — no multi
 
 ## Formatting
 
-### cleanAiText / toSentenceCase — text formatting utilities (dependency-free)
+### cleanAiText / toSentenceCase — text formatting utilities
 
 ```typescript
 import { cleanAiText, toSentenceCase } from '@jterrazz/intelligence/formatting';

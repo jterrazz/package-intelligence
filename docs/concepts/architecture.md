@@ -10,7 +10,7 @@ src/
   provider/                        openrouter, gateway              → reference/providers.md
   middleware/                      agent, cost, logging, schema-instruction → reference/middleware.md
   model/fallback-model.ts          the one model wrapper that is no middleware
-  formatting/                      the dependency-free text utilities
+  formatting/                      the text utilities, which never import `ai`
   index.ts, index.formatting.ts    the entries of `.` and `./formatting`
 lint/
   index.config.ts, index.oxlint.ts the entries of `./config` and `./oxlint`

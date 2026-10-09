@@ -10,7 +10,7 @@ How a change to this package is made: the declaration every config follows, the 
 - knip, the build and Stryker are configured by the commands that run them, from the declaration and the manifest;
 - the four entries are read off `package.json#exports` and built from the sources the entry grammar names: `src/index.ts`, `src/index.formatting.ts`, `lint/index.config.ts`, `lint/index.oxlint.ts`.
 
-The declaration names one root beside the spine, `scripts/`, where the preserved-terms generator lives. It holds no other exception, and no debt is recorded: there is no `.jterrazz/` ledger.
+Every exception the package takes to the standard is declared in [`jterrazz.config.ts`](../../jterrazz.config.ts), each with its reason beside it: the roots beside the spine, the dependencies knip cannot see used, and the oxlint overrides. No debt is recorded: there is no `.jterrazz/` ledger. The package holds itself to its own preset, so its rules judge this tree too.
 
 ## The gestures
 
@@ -30,14 +30,14 @@ Build, test and lint output lands under `.artifacts/`, which `.gitignore` ignore
 
 ## Where a new file goes
 
-| Adding…                          | Goes in                                                                                                                                                                |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| a provider                       | `src/provider/<name>.provider.ts`, its kind added to `ProviderConfig` and to the factory's table in `src/factory/create-intelligence.ts`, exported from `src/index.ts` |
-| a middleware                     | `src/middleware/<name>.middleware.ts`, exported from `src/index.ts`                                                                                                    |
-| a text utility                   | `src/formatting/<name>.ts`, exported from `src/index.formatting.ts` — never importing `ai`                                                                             |
-| a lint rule                      | [below](#a-lint-rule)                                                                                                                                                  |
-| a behaviour a consumer relies on | a spec under `specs/integration/<subject>/` ([Test](test.md))                                                                                                          |
-| a module test                    | `<folder>/__tests__/<module>.test.ts`, kept only on the criteria [Test](test.md#what-earns-a-test) names                                                               |
+| Adding…                          | Goes in                                                                                                                                                                                                    |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| a provider                       | `src/provider/<name>.provider.ts`, exported from `src/index.ts`; its config joins the `ProviderConfig` union, and `createProvider` in `src/factory/create-intelligence.ts` gains the branch for its `type` |
+| a middleware                     | `src/middleware/<name>.middleware.ts`, exported from `src/index.ts`                                                                                                                                        |
+| a text utility                   | `src/formatting/<name>.ts`, exported from `src/index.formatting.ts` — never importing `ai`                                                                                                                 |
+| a lint rule                      | [below](#a-lint-rule)                                                                                                                                                                                      |
+| a behaviour a consumer relies on | a spec under `specs/integration/<subject>/` ([Test](test.md))                                                                                                                                              |
+| a module test                    | `<folder>/__tests__/<module>.test.ts`, kept only on the criteria [Test](test.md#what-earns-a-test) names                                                                                                   |
 
 ### A lint rule
 
