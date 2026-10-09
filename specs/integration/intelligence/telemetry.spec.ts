@@ -28,6 +28,9 @@ function streamed(delta: object, usage?: object): { data: object } {
     };
 }
 
+// invariant: the clock stands still, so every duration logged is zero.
+const still = integration.with({ clock: '2026-01-01T09:00:00.000Z' });
+
 type GenerationSpan = { agent: unknown; cost: unknown; model: unknown; name: string };
 
 const exporter = new InMemorySpanExporter();
@@ -202,7 +205,7 @@ describe('telemetry', () => {
     test('a streamed generation is traced, costed and logged like a generated one', async () => {
         // Given - a priced agent on the gateway streaming its answer, its usage on the last chunk, with a logger
         const { logger, records } = recordingLogger();
-        const result = await integration
+        const result = await still
             .intercept(
                 http.post(GATEWAY_COMPLETIONS),
                 http.sse([
@@ -242,7 +245,7 @@ describe('telemetry', () => {
                     level: 'debug',
                     meta: {
                         model: 'primary-model',
-                        durationMs: '{{int}}',
+                        durationMs: 0,
                     },
                 },
             ],
@@ -261,7 +264,7 @@ describe('telemetry', () => {
     test('a logger hears each generation start and complete, with its usage', async () => {
         // Given - an agent on the gateway, with a logger
         const { logger, records } = recordingLogger();
-        const result = await integration
+        const result = await still
             .intercept(http.post(GATEWAY_COMPLETIONS), openai.reply('Hello'))
             .call(async () => {
                 const intelligence = createIntelligence({
@@ -290,7 +293,7 @@ describe('telemetry', () => {
                 level: 'debug',
                 meta: {
                     model: 'primary-model',
-                    durationMs: '{{int}}',
+                    durationMs: 0,
                     finishReason: {
                         unified: 'stop',
                         raw: 'stop',
