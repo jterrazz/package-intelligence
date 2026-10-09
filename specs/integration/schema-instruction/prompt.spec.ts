@@ -139,7 +139,11 @@ describe('prompt', () => {
                 await sent([
                     {
                         content: [
-                            { image: new URL('https://images.test/rain.png'), type: 'image' },
+                            {
+                                data: new URL('https://images.test/rain.png'),
+                                mediaType: 'image/png',
+                                type: 'file',
+                            },
                         ],
                         role: 'user',
                     },
@@ -153,10 +157,9 @@ describe('prompt', () => {
                     role: 'user',
                     content: [
                         {
-                            type: 'file',
-                            file: {
-                                filename: '',
-                                file_data: 'https://images.test/rain.png',
+                            type: 'image_url',
+                            image_url: {
+                                url: 'https://images.test/rain.png',
                             },
                         },
                         {
@@ -177,7 +180,11 @@ describe('prompt', () => {
                     {
                         content: [
                             { text: 'Describe this', type: 'text' },
-                            { image: new URL('https://images.test/rain.png'), type: 'image' },
+                            {
+                                data: new URL('https://images.test/rain.png'),
+                                mediaType: 'image/png',
+                                type: 'file',
+                            },
                             { text: 'in one line', type: 'text' },
                         ],
                         role: 'user',
@@ -196,10 +203,9 @@ describe('prompt', () => {
                             text: 'Describe this',
                         },
                         {
-                            type: 'file',
-                            file: {
-                                filename: '',
-                                file_data: 'https://images.test/rain.png',
+                            type: 'image_url',
+                            image_url: {
+                                url: 'https://images.test/rain.png',
                             },
                         },
                         {
