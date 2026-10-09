@@ -1,6 +1,6 @@
 import { http, openai } from '@jterrazz/test';
 import { generateText } from 'ai';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { createIntelligence } from '../../../src/index.js';
 import { GATEWAY_COMPLETIONS, OPENROUTER_COMPLETIONS, PROVIDERS } from '../__setup__/providers.js';
@@ -66,7 +66,8 @@ describe('resolution', () => {
     });
 
     test('a gateway named without a key is called with no token, whatever the process holds', async () => {
-        // Given - a gateway declared by its address alone, which answers only a call bearing no token
+        // Given - a process holding an OpenAI key, and a gateway declared by its address alone, which answers only a call bearing no token
+        vi.stubEnv('OPENAI_API_KEY', 'sk-process-key');
         const result = await integration
             .intercept({
                 request: http.post(GATEWAY_COMPLETIONS, { headers: { authorization: 'Bearer' } }),
