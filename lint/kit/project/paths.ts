@@ -1,3 +1,4 @@
+import { GROUND_FOLDERS, SETUP_FOLDER, TESTS_FOLDER } from '@jterrazz/typescript/rules';
 import { basename } from 'node:path';
 
 export function segments(path: string): string[] {
@@ -6,7 +7,7 @@ export function segments(path: string): string[] {
 
 const TEST_FILE = /\.(?:test|spec)\.[cm]?tsx?$/u;
 
-const TEST_FOLDERS = new Set(['__fixtures__', 'fixtures', 'specs']);
+const TEST_FOLDERS = new Set([...GROUND_FOLDERS, SETUP_FOLDER, TESTS_FOLDER, 'specs']);
 
 /** A test, a spec, or the ground one stands on: the file is a test's, never the application's. */
 export function isTestMaterial(path: string): boolean {

@@ -108,8 +108,13 @@ ruleTester().run('no-hardcoded-model-id', noHardcodedModelId, {
         },
         {
             code: "const m = 'claude-3-5-sonnet-20241022';",
-            filename: '/repo/tests/fixtures/model-choice.ts',
-            name: 'a model id under fixtures/',
+            filename: '/repo/src/providers/__tests__/__requests__/model-choice.ts',
+            name: 'a model id in the ground of a module test',
+        },
+        {
+            code: "const m = 'claude-3-5-sonnet-20241022';",
+            filename: '/repo/src/agents/__tests__/__setup__/models.ts',
+            name: 'a model id in the setup of a module test',
         },
         {
             code: "const m = 'claude-3-5-sonnet-20241022';",
