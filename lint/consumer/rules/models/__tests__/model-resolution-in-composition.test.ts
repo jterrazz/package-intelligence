@@ -79,7 +79,6 @@ ruleTester().run('model-resolution-in-composition', modelResolutionInComposition
             name: 'a private method named model',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: "import { createIntelligence } from '@jterrazz/intelligence';\nconst m = i.model(`${name}`);",
             filename: OUTSIDE,
             name: 'a model named by a template with an expression',

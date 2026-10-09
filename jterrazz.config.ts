@@ -19,6 +19,11 @@ export default defineConfig({
         oxlint: {
             overrides: [
                 {
+                    files: ['lint/consumer/rules/**/__tests__/**'],
+                    reason: 'a rule test’s case is TypeScript source the rule parses: a placeholder in it belongs to that source’s template, not to a mistyped interpolation',
+                    rules: { 'no-template-curly-in-string': 'off' },
+                },
+                {
                     files: ['scripts/**'],
                     reason: 'the generator is a command run in a terminal: it reports what it wrote on the console',
                     rules: { 'no-console': 'off' },

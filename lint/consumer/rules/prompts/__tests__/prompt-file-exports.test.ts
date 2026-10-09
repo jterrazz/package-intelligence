@@ -79,7 +79,6 @@ ruleTester().run('prompt-file-exports', promptFileExports, {
             name: 'an enum',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export default (v: string) => `Hello ${v}`;',
             errors: [{ column: 0, line: 1, messageId: 'defaultExport' }],
             filename: PROMPT_FILE,
@@ -98,7 +97,6 @@ ruleTester().run('prompt-file-exports', promptFileExports, {
             name: 'a non-function const',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export function buildPrompt(v: string): string { return `Hello ${v}`; }',
             errors: [{ column: 0, line: 1, messageId: 'nonFunctionExport' }],
             filename: PROMPT_FILE,
@@ -111,7 +109,6 @@ ruleTester().run('prompt-file-exports', promptFileExports, {
             name: 'an arrow returning an object',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export const buildPrompt = (v: string) => { if (!v) return []; return `Hello ${v}`; };',
             errors: [{ column: 59, line: 1, messageId: 'nonStringReturn' }],
             filename: PROMPT_FILE,
@@ -120,7 +117,6 @@ ruleTester().run('prompt-file-exports', promptFileExports, {
     ],
     valid: [
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export const build = () => { function pad() { return 1; } const twice = function () { return 2; }; const half = () => { return 3; }; return `${pad()}${twice()}${half()}`; };',
             filename: PROMPT_FILE,
             name: 'a builder whose inner functions return numbers',
@@ -171,13 +167,11 @@ ruleTester().run('prompt-file-exports', promptFileExports, {
             name: 'a file that is no prompt file',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export const buildPrompt = (v: string): string => `Hello ${v}`;',
             filename: PROMPT_FILE,
             name: 'the canonical builder',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: "export const buildSection = (items: string[]): string => { if (items.length === 0) { return ''; } return `Items: ${items.join(', ')}`; };",
             filename: PROMPT_FILE,
             name: 'an early-return builder',
@@ -188,7 +182,6 @@ ruleTester().run('prompt-file-exports', promptFileExports, {
             name: 'a builder delegating to another',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'export interface Variables { word: string; }\nexport type Lang = "EN" | "FR";\nexport const buildPrompt = (v: Variables): string => `Word: ${v.word}`;',
             filename: PROMPT_FILE,
             name: 'types and interfaces',

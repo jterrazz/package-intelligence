@@ -38,7 +38,6 @@ ruleTester().run('prose-in-prompt-files', proseInPromptFiles, {
             name: 'a line of four words',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const prompt = `${a}\nshort\n${b} — and then a whole sentence of prose`;',
             errors: [{ column: 15, line: 1, messageId: 'moveProse' }],
             filename: AGENT_FILE,
@@ -77,7 +76,6 @@ ruleTester().run('prose-in-prompt-files', proseInPromptFiles, {
             name: 'prose in a helper under agents/',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const prompt = `Summarize this article about ${topic}.\nFocus on the key facts and events.\nKeep it neutral and factual.`;',
             errors: [{ column: 15, line: 1, messageId: 'moveProse' }],
             filename: AGENT_FILE,
@@ -136,13 +134,11 @@ ruleTester().run('prose-in-prompt-files', proseInPromptFiles, {
             name: 'prose in a test file under agents/',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const label = `Composing article for ${eventId}`;',
             filename: AGENT_FILE,
             name: 'a single-line literal',
         },
         {
-            // oxlint-disable-next-line no-template-curly-in-string -- literal TS source fixture (the rule under test parses this), not an interpolation typo
             code: 'const json = `{\n  "id": ${id},\n  "ok": true\n}`;',
             filename: AGENT_FILE,
             name: 'multi-line data that is not prose',
