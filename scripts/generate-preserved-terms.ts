@@ -124,15 +124,16 @@ function main(): void {
         .slice(0, 12)
         .map(({ source, term }) => `${term} -> "${term.toLowerCase()}" (${source})`);
     writeFileSync(OUTPUT_PATH, render(selection, examples));
-    console.log(
-        `Wrote ${selection.terms.length} preserved terms to ${path.relative(ROOT_DIR, OUTPUT_PATH)}`,
+    process.stdout.write(
+        [
+            `Wrote ${selection.terms.length} preserved terms to ${path.relative(ROOT_DIR, OUTPUT_PATH)}`,
+            `  candidates before ambiguity filter: ${selection.candidateCount}`,
+            `  excluded as ambiguous: ${selection.excluded.length}`,
+            '  examples:',
+            ...examples.map((line) => `    ${line}`),
+            '',
+        ].join('\n'),
     );
-    console.log(`  candidates before ambiguity filter: ${selection.candidateCount}`);
-    console.log(`  excluded as ambiguous: ${selection.excluded.length}`);
-    console.log('  examples:');
-    for (const line of examples) {
-        console.log(`    ${line}`);
-    }
 }
 
 main();

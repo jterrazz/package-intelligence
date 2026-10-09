@@ -24,11 +24,6 @@ export default defineConfig({
                     rules: { 'no-template-curly-in-string': 'off' },
                 },
                 {
-                    files: ['scripts/**'],
-                    reason: 'the generator is a command run in a terminal: it reports what it wrote on the console',
-                    rules: { 'no-console': 'off' },
-                },
-                {
                     files: ['src/formatting/preserved-terms.generated.ts'],
                     reason: 'one literal table the generator writes, whose length is the dictionaries’, not code',
                     rules: { 'max-lines': 'off' },
