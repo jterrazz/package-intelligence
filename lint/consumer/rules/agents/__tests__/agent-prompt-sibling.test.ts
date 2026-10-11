@@ -7,6 +7,12 @@ const AGENT_FILE = '/repo/src/infrastructure/outbound/agents/article-composer/ar
 ruleTester().run('agent-prompt-sibling', agentPromptSibling, {
     invalid: [
         {
+            code: 'export const helper = () => `Helper.`;',
+            errors: [{ column: 0, line: 1, messageId: 'missingAgentSibling' }],
+            filename: '/repo/src/infrastructure/outbound/agents/__fixtures__/helper.prompt.ts',
+            name: 'a prompt in a double-underscore folder is no shared subject',
+        },
+        {
             code: "export { buildPrompt } from './article-composer.prompt.js';\nexport class ArticleComposer { run() {} }",
             errors: [{ column: 0, line: 1, messageId: 'missingPromptImport' }],
             filename: AGENT_FILE,
@@ -34,8 +40,8 @@ ruleTester().run('agent-prompt-sibling', agentPromptSibling, {
         {
             code: 'export const categoryTaxonomy = (): string => `Taxonomy.`;',
             filename:
-                '/repo/src/infrastructure/outbound/agents/_shared/category-taxonomy.prompt.ts',
-            name: 'a shared prompt file',
+                '/repo/src/infrastructure/outbound/agents/_taxonomy/category-taxonomy.prompt.ts',
+            name: 'a prompt shared under a folder marked for its subject',
         },
         {
             code: 'export const helper = () => 1;',

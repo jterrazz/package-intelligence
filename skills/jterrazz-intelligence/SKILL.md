@@ -117,7 +117,7 @@ Folder-per-agent, prompt isolated from prep logic:
 ```text
 agents/<name>/<name>.ts          # class: SCHEMA, constructor(model, logger), run()
 agents/<name>/<name>.prompt.ts   # prompt only: Variables + buildPrompt(v) [+ section builders]
-agents/_shared/<name>.prompt.ts  # sections shared across agents
+agents/_<subject>/<name>.prompt.ts  # sections shared across agents, in a folder marked for their subject (_taxonomy/)
 ```
 
 Large agents may split their prompt across several `<name>-<section>.prompt.ts` files instead of one.

@@ -3,6 +3,9 @@ import { basename, dirname, join } from 'node:path';
 
 import { segments } from './paths.js';
 
+// invariant: a folder marked `_<subject>/` holds what several agents share; `__tests__/` and the other `__x__` folders are not one.
+const SUBJECT_FOLDER = /^_[a-z][a-z0-9-]*$/u;
+
 export type AgentFile = { name: string };
 
 export type PromptFile = { name: string; shared: boolean; sibling: string };
@@ -38,7 +41,7 @@ export function detectPromptFile(filePath: string): PromptFile | undefined {
     const name = base.slice(0, -'.prompt.ts'.length);
     return {
         name,
-        shared: basename(dirname(filePath)) === '_shared',
+        shared: SUBJECT_FOLDER.test(basename(dirname(filePath))),
         sibling: join(dirname(filePath), `${name}.ts`),
     };
 }

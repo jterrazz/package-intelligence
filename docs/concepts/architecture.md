@@ -52,7 +52,7 @@ The package assumes a consumer lays its agents out one folder each, the prompt a
 ```text
 agents/<name>/<name>.ts          the agent class — SCHEMA, constructor(model, …), run()
 agents/<name>/<name>.prompt.ts   the prompt, and only the prompt
-agents/_shared/<name>.prompt.ts  sections several agents share
+agents/_<subject>/<name>.prompt.ts  sections several agents share, in a folder marked for their subject (`_taxonomy/`)
 composition/                     where the factory is called and each model resolved
 ```
 

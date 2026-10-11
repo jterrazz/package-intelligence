@@ -13,7 +13,7 @@ describe('pairing', () => {
             src/infrastructure/outbound/agents/orphan-prompt/orphan-prompt.prompt.ts:1:1  intelligence(agent-prompt-sibling)
                 found: \`orphan-prompt.prompt.ts\` has no agent \`orphan-prompt.ts\` in its folder
                 why: The two-way link makes the pairing mechanical: an orphaned prompt, or an agent that does not use its prompt, is almost always a mistake.
-                fix: write the agent \`orphan-prompt.ts\` beside its prompt, or move a prompt several agents share under \`_shared/\`
+                fix: write the agent \`orphan-prompt.ts\` beside its prompt, or move a prompt several agents share under a folder marked for its subject, \`_<subject>/\` such as \`_taxonomy/\`
                 read: docs/reference/lint-rules.md#agent-prompt-sibling
             src/infrastructure/outbound/agents/unprompted/unprompted.ts:1:1  intelligence(agent-prompt-sibling)
                 found: the agent file does not import its prompt from "./unprompted.prompt.js"

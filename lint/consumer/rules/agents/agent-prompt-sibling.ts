@@ -21,7 +21,7 @@ export const agentPromptSibling = defineRule(
         docs: row,
         messages: {
             missingAgentSibling: {
-                fix: 'write the agent `{{name}}.ts` beside its prompt, or move a prompt several agents share under `_shared/`',
+                fix: 'write the agent `{{name}}.ts` beside its prompt, or move a prompt several agents share under a folder marked for its subject, `_<subject>/` such as `_taxonomy/`',
                 found: '`{{name}}.prompt.ts` has no agent `{{name}}.ts` in its folder',
             },
             missingPromptImport: {

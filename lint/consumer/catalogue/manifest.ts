@@ -21,7 +21,7 @@ export const consumerRows: readonly Row[] = byName<Row>([
         fix: 'import the prompt from `./<name>.prompt.js` in the agent file, or give the prompt file its agent `<name>.ts` beside it',
         name: 'agent-prompt-sibling',
         sentence:
-            'An agent file (`agents/<name>/<name>.ts`) imports its prompt from `./<name>.prompt.js`; a `<name>.prompt.ts` outside `_shared/` has its agent `<name>.ts` in the same folder.',
+            'An agent file (`agents/<name>/<name>.ts`) imports its prompt from `./<name>.prompt.js`; a `<name>.prompt.ts` outside a `_<subject>/` folder has its agent `<name>.ts` in the same folder.',
         why: 'The two-way link makes the pairing mechanical: an orphaned prompt, or an agent that does not use its prompt, is almost always a mistake.',
     },
     {
