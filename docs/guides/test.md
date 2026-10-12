@@ -57,7 +57,7 @@ No suite reaches a live provider: the stubs state what the gateway and OpenRoute
 
 ## Mutation
 
-`make mutation` runs `typescript mutation`: Stryker mutates the lines a change touched, and the whole suite runs against each mutant. A mutant that a test runs and none detects fails the gate. With nothing uncommitted it measures the last commit; measure a whole branch with `npx typescript mutation --since <commit>`, or every source with `--mutate`, its ranges comma-separated:
+`make mutation` runs `typescript mutation`: Stryker mutates the lines a change touched, and the whole suite runs against each mutant. A mutant that a test runs and none detects fails the gate. With nothing uncommitted on a branch it measures `merge-base..HEAD` (the last commit alone on the default branch) and prints that range in its verdict; `--since <commit>` names another base ([Quality checks § Mutation](https://github.com/jterrazz/package-typescript/blob/main/docs/reference/quality-checks.md#mutation)). Every source is measured with `--mutate`, its ranges comma-separated:
 
 ```bash
 npx typescript mutation --mutate "$(git ls-files src lint/consumer lint/kit lint/index.*.ts | grep -E '\.ts$' | grep -v -e __tests__ -e generated | sed 's/$/:1-400/' | paste -sd, -)"
