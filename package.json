@@ -67,8 +67,8 @@
         "@ai-sdk/provider": "^4.0.3",
         "@cspell/dict-companies": "^3.2.12",
         "@cspell/dict-software-terms": "^5.2.4",
-        "@jterrazz/test": "file:../package-test",
-        "@jterrazz/typescript": "file:../package-typescript",
+        "@jterrazz/test": "file:.artifacts/packages/jterrazz-test-17.0.0.tgz",
+        "@jterrazz/typescript": "file:.artifacts/packages/jterrazz-typescript-11.0.0.tgz",
         "@opentelemetry/context-async-hooks": "^2.12.0",
         "@opentelemetry/sdk-trace-base": "^2.12.0",
         "@types/node": "^26.1.1",
@@ -78,7 +78,7 @@
         "zod": "^4.6.5"
     },
     "peerDependencies": {
-        "@jterrazz/typescript": "file:../package-typescript",
+        "@jterrazz/typescript": "^11.0.0",
         "ai": ">=7.0.0"
     },
     "peerDependenciesMeta": {
