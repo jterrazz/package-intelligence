@@ -13,6 +13,18 @@ ruleTester().run('agent-prompt-sibling', agentPromptSibling, {
             name: 'a prompt in a double-underscore folder is no shared subject',
         },
         {
+            code: 'export const helper = () => `Helper.`;',
+            errors: [{ column: 0, line: 1, messageId: 'missingAgentSibling' }],
+            filename: '/repo/src/infrastructure/outbound/agents/my_taxonomy/helper.prompt.ts',
+            name: 'a folder holding the marker mid-name is no shared subject',
+        },
+        {
+            code: 'export const helper = () => `Helper.`;',
+            errors: [{ column: 0, line: 1, messageId: 'missingAgentSibling' }],
+            filename: '/repo/src/infrastructure/outbound/agents/_taxonomy.old/helper.prompt.ts',
+            name: 'a marked folder followed by foreign characters is no shared subject',
+        },
+        {
             code: "export { buildPrompt } from './article-composer.prompt.js';\nexport class ArticleComposer { run() {} }",
             errors: [{ column: 0, line: 1, messageId: 'missingPromptImport' }],
             filename: AGENT_FILE,
