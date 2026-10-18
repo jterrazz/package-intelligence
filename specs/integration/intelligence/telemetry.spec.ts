@@ -1,4 +1,4 @@
-import { http, openai } from '@jterrazz/test';
+import { http, openai } from '@jterrazz/test/stubs';
 import { context, trace } from '@opentelemetry/api';
 import { AsyncLocalStorageContextManager } from '@opentelemetry/context-async-hooks';
 import {

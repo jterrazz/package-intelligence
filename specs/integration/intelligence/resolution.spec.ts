@@ -1,4 +1,4 @@
-import { http, openai } from '@jterrazz/test';
+import { http, openai } from '@jterrazz/test/stubs';
 import { generateText } from 'ai';
 import { describe, expect, test, vi } from 'vitest';
 
