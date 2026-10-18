@@ -28,12 +28,12 @@ describe('exports', () => {
             src/infrastructure/outbound/agents/some-agent/some-agent.prompt.ts:11:1  intelligence(prompt-file-exports)
                 found: the prompt file exports a class
                 why: A closed export surface keeps a prompt file a pure builder: state, a class or a default export would invite prompt logic to grow side effects.
-                fix: move the class out of the prompt file — an agent class sits in its \`<name>.ts\`
+                fix: move the class out of the prompt file: an agent class sits in its \`<name>.ts\`
                 read: docs/reference/lint-rules.md#prompt-file-exports
             src/infrastructure/outbound/agents/some-agent/some-agent.prompt.ts:13:1  intelligence(prompt-file-exports)
                 found: the prompt file has a default export
                 why: A closed export surface keeps a prompt file a pure builder: state, a class or a default export would invite prompt logic to grow side effects.
-                fix: export the builder by name, \`export const build = (…) => …\`
+                fix: export the builder by name, \`export const build = (...) => ...\`
                 read: docs/reference/lint-rules.md#prompt-file-exports
         `);
     });

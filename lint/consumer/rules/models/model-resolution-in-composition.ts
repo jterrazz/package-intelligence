@@ -77,7 +77,7 @@ export const modelResolutionInComposition = defineRule(
             },
             modelCallOutsideComposition: {
                 fix: 'resolve the model in a file under `composition/`, and hand the model on',
-                found: "`.model('…')` resolves a model outside the composition root",
+                found: "`.model('...')` resolves a model outside the composition root",
             },
         },
         read: readAt(row, CATALOGUE_CHAPTER),

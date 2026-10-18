@@ -61,7 +61,7 @@ export const agentClassShape = defineRule(
         messages: {
             missingConstructorModel: {
                 fix: 'name the first constructor parameter `model`, the language model the composition root hands it',
-                found: 'the agent class’s constructor takes no `model` first',
+                found: "the agent class's constructor takes no `model` first",
             },
             missingRun: {
                 fix: 'give the class its `run` method, the one call its users make',

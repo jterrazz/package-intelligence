@@ -11,7 +11,7 @@ describe('shape', () => {
         // Then - one finding per agent, each with its lesson
         expect(result.report).toMatch(`
             src/infrastructure/outbound/agents/bad-agent/bad-agent.ts:8:17  intelligence(agent-class-shape)
-                found: the agent class’s constructor takes no \`model\` first
+                found: the agent class's constructor takes no \`model\` first
                 why: A fixed shape makes every agent class predictable to read and to wire from the composition root without re-deriving its contract each time.
                 fix: name the first constructor parameter \`model\`, the language model the composition root hands it
                 read: docs/reference/lint-rules.md#agent-class-shape
@@ -21,7 +21,7 @@ describe('shape', () => {
                 fix: export the agent class from its file
                 read: docs/reference/lint-rules.md#agent-class-shape
             src/infrastructure/outbound/agents/no-constructor/no-constructor.ts:3:8  intelligence(agent-class-shape)
-                found: the agent class’s constructor takes no \`model\` first
+                found: the agent class's constructor takes no \`model\` first
                 why: A fixed shape makes every agent class predictable to read and to wire from the composition root without re-deriving its contract each time.
                 fix: name the first constructor parameter \`model\`, the language model the composition root hands it
                 read: docs/reference/lint-rules.md#agent-class-shape

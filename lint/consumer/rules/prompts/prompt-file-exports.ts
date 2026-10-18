@@ -74,11 +74,11 @@ export const promptFileExports = defineRule(
         docs: row,
         messages: {
             classExport: {
-                fix: 'move the class out of the prompt file — an agent class sits in its `<name>.ts`',
+                fix: 'move the class out of the prompt file: an agent class sits in its `<name>.ts`',
                 found: 'the prompt file exports a class',
             },
             defaultExport: {
-                fix: 'export the builder by name, `export const build = (…) => …`',
+                fix: 'export the builder by name, `export const build = (...) => ...`',
                 found: 'the prompt file has a default export',
             },
             nonFunctionExport: {
