@@ -41,7 +41,7 @@ function loadSpellChecker(language: Language): ReturnType<typeof nspell> {
 
 function getSpellChecker(language: Language): ReturnType<typeof nspell> {
     const checker = spellCheckers.get(language) ?? loadSpellChecker(language);
-    // Stryker disable next-line CallExpression: a cache — a checker loaded again answers the same, only slower
+    // Stryker disable next-line CallExpression: a cache: a checker loaded again answers the same, only slower
     spellCheckers.set(language, checker);
     return checker;
 }

@@ -109,7 +109,7 @@ function selectTerms(sources: Source[], commonWords: Set<string>): Selection {
 }
 
 function render({ candidateCount, excluded, terms }: Selection, examples: string[]): string {
-    return `// value: written by \`npm run generate:terms\` from @cspell/dict-companies and @cspell/dict-software-terms, less every term dictionary-en holds as a common lowercase word — ${candidateCount} candidates, ${excluded.length} excluded (${examples.join('; ')}), ${terms.length} kept.
+    return `// value: written by \`npm run generate:terms\` from @cspell/dict-companies and @cspell/dict-software-terms, less every term dictionary-en holds as a common lowercase word: ${candidateCount} candidates, ${excluded.length} excluded (${examples.join('; ')}), ${terms.length} kept.
 
 /** The proper nouns and acronyms \`toSentenceCase\` keeps as written. */
 export const GENERATED_PRESERVED_TERMS: readonly string[] = [

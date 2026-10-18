@@ -4,7 +4,7 @@ import type { LanguageModelMiddleware } from 'ai';
 const AGENT_ATTRIBUTE = 'gen_ai.agent.name';
 
 export type AgentMiddlewareOptions = {
-    /** The agent this model serves — becomes the generation's name in Langfuse */
+    /** The agent this model serves, which becomes the generation's name in Langfuse */
     agentName: string;
 };
 

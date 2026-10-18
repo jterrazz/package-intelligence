@@ -20,12 +20,12 @@ export default defineConfig({
             overrides: [
                 {
                     files: ['lint/consumer/rules/**/__tests__/**'],
-                    reason: 'a rule test’s case is TypeScript source the rule parses: a placeholder in it belongs to that source’s template, not to a mistyped interpolation',
+                    reason: "a rule test's case is TypeScript source the rule parses: a placeholder in it belongs to that source's template, not to a mistyped interpolation",
                     rules: { 'no-template-curly-in-string': 'off' },
                 },
                 {
                     files: ['src/formatting/preserved-terms.generated.ts'],
-                    reason: 'one literal table the generator writes, whose length is the dictionaries’, not code',
+                    reason: "one literal table the generator writes, whose length is the dictionaries', not code",
                     rules: { 'max-lines': 'off' },
                 },
             ],
