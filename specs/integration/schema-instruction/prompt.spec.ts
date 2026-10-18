@@ -46,7 +46,7 @@ describe('prompt', () => {
                 {
                     role: 'user',
                     content:
-                        'Summarize the weather\n\nYou must respond with valid JSON only — no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
+                        'Summarize the weather\n\nYou must respond with valid JSON only: no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
                 },
             ],
         });
@@ -89,7 +89,7 @@ describe('prompt', () => {
                 {
                     role: 'user',
                     content:
-                        'Second question\n\nYou must respond with valid JSON only — no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
+                        'Second question\n\nYou must respond with valid JSON only: no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
                 },
             ],
         });
@@ -126,7 +126,7 @@ describe('prompt', () => {
                 {
                     role: 'user',
                     content:
-                        'You must respond with valid JSON only — no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
+                        'You must respond with valid JSON only: no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
                 },
             ],
         });
@@ -164,7 +164,7 @@ describe('prompt', () => {
                         },
                         {
                             type: 'text',
-                            text: 'You must respond with valid JSON only — no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
+                            text: 'You must respond with valid JSON only: no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
                         },
                     ],
                 },
@@ -210,7 +210,7 @@ describe('prompt', () => {
                         },
                         {
                             type: 'text',
-                            text: 'in one line\n\nYou must respond with valid JSON only — no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
+                            text: 'in one line\n\nYou must respond with valid JSON only: no prose, no markdown code fences.\nThe JSON must strictly conform to this JSON schema:\n{"$schema":"http://json-schema.org/draft-07/schema#","type":"object","properties":{"messages":{"type":"array","items":{}}},"required":["messages"],"additionalProperties":false}',
                         },
                     ],
                 },
@@ -241,7 +241,7 @@ describe('prompt', () => {
                 {
                     role: 'user',
                     content:
-                        'Summarize the weather\n\nYou must respond with valid JSON only — no prose, no markdown code fences.',
+                        'Summarize the weather\n\nYou must respond with valid JSON only: no prose, no markdown code fences.',
                 },
             ],
         });

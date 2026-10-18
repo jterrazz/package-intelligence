@@ -6,7 +6,7 @@ function buildInstruction(responseFormat: LanguageModelV4CallOptions['responseFo
         return '';
     }
 
-    const lines = ['You must respond with valid JSON only — no prose, no markdown code fences.'];
+    const lines = ['You must respond with valid JSON only: no prose, no markdown code fences.'];
     if (responseFormat.schema) {
         lines.push(
             'The JSON must strictly conform to this JSON schema:',
@@ -27,7 +27,7 @@ function appendToLastUserMessage(
     }
 
     return prompt.map((message, index) => {
-        // Stryker disable next-line ConditionalExpression: the narrowing TypeScript needs — the message at that index is a user's
+        // Stryker disable next-line ConditionalExpression: the narrowing TypeScript needs, as the message at that index is a user's
         if (index !== lastUserIndex || message.role !== 'user') {
             return message;
         }
@@ -44,7 +44,7 @@ function appendToLastUserMessage(
         return {
             ...message,
             content: message.content.map((part, partIndex) => {
-                // Stryker disable next-line ConditionalExpression: the narrowing TypeScript needs — the part at that index is a text
+                // Stryker disable next-line ConditionalExpression: the narrowing TypeScript needs, as the part at that index is a text
                 if (partIndex !== lastTextIndex || part.type !== 'text') {
                     return part;
                 }
