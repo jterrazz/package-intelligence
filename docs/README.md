@@ -1,4 +1,4 @@
-# @jterrazz/intelligence — the manual
+# The manual of @jterrazz/intelligence
 
 A thin composition layer over AI SDK v7: provider factories, cost, fallback and logging middleware, a config-driven factory that wires them, the text utilities of `./formatting`, and the `intelligence()` preset that holds a consumer's agents to their convention. What the package is and how a consumer starts is the repository's README; this page lists every page of the manual, by what the reader came to do.
 
