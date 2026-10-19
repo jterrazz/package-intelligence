@@ -1,6 +1,6 @@
 ---
 name: jterrazz-intelligence
-description: Thin composition layer over AI SDK v7: provider factories, cost/fallback/logging middleware, and a config-driven factory. Observability goes through OpenTelemetry. Activates when configuring AI model access, cost tracking, fallback models, or AI SDK middleware.
+description: "Thin composition layer over AI SDK v7: provider factories, cost/fallback/logging middleware, and a config-driven factory. Observability goes through OpenTelemetry. Activates when configuring AI model access, cost tracking, fallback models, or AI SDK middleware."
 ---
 
 # @jterrazz/intelligence
