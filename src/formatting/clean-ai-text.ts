@@ -29,24 +29,24 @@ export function cleanAiText(text: string, options: CleanAiTextOptions = {}): str
 
     let result = text;
 
-    result = result.replace(CR_RE, '\n');
-    result = result.replace(CITATION_RE, '');
+    result = result.replaceAll(CR_RE, '\n');
+    result = result.replaceAll(CITATION_RE, '');
     result = result.normalize('NFKC');
-    result = result.replace(INVISIBLE_CHARS_RE, '');
-    result = result.replace(ASCII_CTRL_RE, '');
+    result = result.replaceAll(INVISIBLE_CHARS_RE, '');
+    result = result.replaceAll(ASCII_CTRL_RE, '');
 
     if (normalizeEmDashesToCommas) {
-        result = result.replace(EM_DASH_SEPARATOR_RE, ', ');
+        result = result.replaceAll(EM_DASH_SEPARATOR_RE, ', ');
     }
 
-    result = result.replace(SPACE_LIKE_RE, ' ');
+    result = result.replaceAll(SPACE_LIKE_RE, ' ');
 
     for (const { pattern, replacement } of TYPOGRAPHY_REPLACEMENTS) {
         result = result.replace(pattern, replacement);
     }
 
     if (collapseSpaces) {
-        result = result.replace(MULTIPLE_SPACES_RE, ' ').trim();
+        result = result.replaceAll(MULTIPLE_SPACES_RE, ' ').trim();
     }
 
     return result;
