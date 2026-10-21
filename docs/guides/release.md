@@ -16,8 +16,9 @@ Nothing that reaches a consumer. `.github/workflows/validate.yaml` runs on every
 
 1. the change merges to `main` and validates green;
 2. the owner bumps `version` in `package.json` (and the lockfile) on `main`;
-3. the owner tags `vX.Y.Z` and creates the GitHub Release;
-4. the workflow builds and publishes the package to npm.
+3. `make rehearse` runs the gate on that commit as the runner will, on Linux ([A rehearsal on Linux](https://github.com/jterrazz/package-typescript/blob/main/docs/reference/commands.md#a-rehearsal-on-linux)), and exits 0;
+4. the owner tags `vX.Y.Z` and creates the GitHub Release;
+5. the workflow builds and publishes the package to npm.
 
 A contributor never bumps the version inside a feature branch: two branches in flight would both claim the same number.
 

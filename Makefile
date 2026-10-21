@@ -1,4 +1,4 @@
-.PHONY: install build lint fix test mutation check
+.PHONY: install build lint fix test mutation check rehearse
 
 node_modules/.install: package-lock.json
 	npm ci
@@ -24,3 +24,7 @@ mutation: build
 	npx typescript mutation
 
 check: lint test mutation
+
+# outside: needs docker and the network; `check` never calls it, and a release runs it on its commit before the tag.
+rehearse: node_modules/.install
+	npx typescript rehearse $(REHEARSE_ARGS)
