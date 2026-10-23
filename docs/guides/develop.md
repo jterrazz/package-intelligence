@@ -19,7 +19,7 @@ Every exception the package takes to the standard is declared in [`jterrazz.conf
 | `make install`           | `npm ci`, once per change of the lockfile                                                                       |
 | `make build`             | `typescript build`: the four entries, into `dist/`                                                              |
 | `make lint`              | `typescript check`, every pass, after a build: its own preset loads from `dist/`, and the Publish pass reads it |
-| `make fix`               | `typescript fix`: the derived files, the formatter, the fixable findings                                        |
+| `make fix`               | `typescript fix`, after a build: the derived files, the formatter, the fixable findings                         |
 | `make test`              | the specs and module tests, after a build: the lint and packaging specs read `dist/` ([Test](test.md))          |
 | `make mutation`          | `typescript mutation`: the zero-survivor verdict over the change ([Test](test.md#mutation))                     |
 | `make check`             | `make lint`, `make test`, then `make mutation`: the gate before a commit                                        |

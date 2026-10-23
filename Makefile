@@ -13,7 +13,8 @@ build: node_modules/.install
 lint: build
 	npm run lint
 
-fix: node_modules/.install
+# invariant: jterrazz.config.ts loads the package's own preset from dist/config.js.
+fix: build
 	npx typescript fix
 
 # invariant: the specs install the tarball npm pack writes from dist/.
