@@ -3,7 +3,7 @@
 What proves a change here is a specification of what a consumer meets: the factory, the providers and the middleware called against declared providers, the rules run by the real oxlint over a tree, and the tarball `npm pack` writes installed in a consumer's project. Module tests are kept for a pure algorithm and for a rule's visitor on snippets.
 
 ```bash
-make test       # builds, then runs every spec and module test
+make test       # builds, then typescript test: the specs and module tests the change reaches, none on a proven tree
 make mutation   # the zero-survivor verdict over the change
 npm run docs    # rewrites the rule catalogue the chapter test compares
 ```
