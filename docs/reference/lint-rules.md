@@ -3,7 +3,7 @@
 The `intelligence()` preset holds a consumer's agent code to [the agent convention](../concepts/architecture.md#the-agent-convention). A repository on the `@jterrazz` toolchain lists it beside its other presets, and `typescript check` runs its rules with the rest of the Oxlint pass:
 
 ```ts
-// jterrazz.config.ts
+// studio.config.ts
 import { intelligence } from '@jterrazz/intelligence/config';
 import { test } from '@jterrazz/test/config';
 import { defineConfig } from '@jterrazz/typescript/config';

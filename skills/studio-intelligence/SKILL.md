@@ -1,5 +1,5 @@
 ---
-name: jterrazz-intelligence
+name: studio-intelligence
 description: 'Thin composition layer over AI SDK v7: provider factories, cost/fallback/logging middleware, and a config-driven factory. Observability goes through OpenTelemetry. Activates when configuring AI model access, cost tracking, fallback models, or AI SDK middleware.'
 ---
 
@@ -127,7 +127,7 @@ Hard rule: **no multi-line natural-language literal outside `*.prompt.ts`.** `ru
 Rationale: the shape reference TypeScript AI codebases converge on, and it gives the contract between a prompt and its variables native typing. Enforced by `@jterrazz/intelligence/oxlint`:
 
 ```typescript
-// jterrazz.config.ts
+// studio.config.ts
 import { intelligence } from '@jterrazz/intelligence/config';
 import { defineConfig } from '@jterrazz/typescript/config';
 

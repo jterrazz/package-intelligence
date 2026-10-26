@@ -8,7 +8,7 @@ export const recommendedRules: Readonly<Record<string, 'error'>> = Object.fromEn
     consumerRows.map(({ name }) => [`intelligence/${name}`, 'error']),
 );
 
-/** The preset a repository lists in `jterrazz.config.ts`, `presets: [intelligence()]`. */
+/** The preset a repository lists in `studio.config.ts`, `presets: [intelligence()]`. */
 export function intelligencePreset(): Preset {
     return definePreset({
         name: 'intelligence',

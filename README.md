@@ -60,4 +60,4 @@ The manual lives in [`docs/`](docs/), mapped by [`docs/README.md`](docs/README.m
 
 Decisions this package alone took are in [`docs/decisions/`](docs/decisions/), numbered in the order they were taken.
 
-For agents: a Claude Code skill, [`skills/jterrazz-intelligence`](skills/jterrazz-intelligence/SKILL.md), routes into this corpus.
+For agents: a Claude Code skill, [`skills/studio-intelligence`](skills/studio-intelligence/SKILL.md), routes into this corpus.

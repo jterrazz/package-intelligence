@@ -13,7 +13,7 @@ build: node_modules/.install
 lint: build
 	npm run lint
 
-# invariant: jterrazz.config.ts loads the package's own preset from dist/config.js.
+# invariant: studio.config.ts loads the package's own preset from dist/config.js.
 fix: build
 	npx typescript fix
 

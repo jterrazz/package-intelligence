@@ -4,13 +4,13 @@ How a change to this package is made: the declaration every config follows, the 
 
 ## The declaration
 
-`@jterrazz/typescript` supplies the whole toolchain (build, type-check, lint, format, unused code, mutation) from one devDependency, and `jterrazz.config.ts` says what this package is: a `library` on `node`, held to `@jterrazz/test`'s preset and to its own, `intelligence()`, loaded from its build by `ownPresets`. Every other config follows from that file:
+`@jterrazz/typescript` supplies the whole toolchain (build, type-check, lint, format, unused code, mutation) from one devDependency, and `studio.config.ts` says what this package is: a `library` on `node`, held to `@jterrazz/test`'s preset and to its own, `intelligence()`, loaded from its build by `ownPresets`. Every other config follows from that file:
 
 - `oxlint.config.ts`, `oxfmt.config.ts`, `tsconfig.json` and `vitest.config.ts` are the one-line derivations `typescript fix` writes and `typescript check` refuses to see edited;
 - knip, the build and Stryker are configured by the commands that run them, from the declaration and the manifest;
 - the four entries are read off `package.json#exports` and built from the sources the entry grammar names: `src/index.ts`, `src/index.formatting.ts`, `lint/index.config.ts`, `lint/index.oxlint.ts`.
 
-Every exception the package takes to the standard is declared in [`jterrazz.config.ts`](../../jterrazz.config.ts), each with its reason beside it: the roots beside the spine, the dependencies knip cannot see used, and the oxlint overrides. No debt is recorded: there is no `.jterrazz/` ledger. The package holds itself to its own preset, so its rules judge this tree too.
+Every exception the package takes to the standard is declared in [`studio.config.ts`](../../studio.config.ts), each with its reason beside it: the roots beside the spine, the dependencies knip cannot see used, and the oxlint overrides. No debt is recorded: there is no `.studio/` ledger. The package holds itself to its own preset, so its rules judge this tree too.
 
 ## The gestures
 
@@ -56,7 +56,7 @@ A rule ships with four pieces, in the folders the lint tree closes ([`@jterrazz/
 
 ## What a change owes
 
-A new or changed export reaches the root `README.md`, the page of this manual that owns it and the `skills/jterrazz-intelligence/` skill in the same change: none of the three is generated, so nothing catches a stale one. A comment states the kind of thing the code cannot say (`invariant:`, `hazard:`, `outside:`, `value:`) or is not written; a public symbol keeps a one-line hover.
+A new or changed export reaches the root `README.md`, the page of this manual that owns it and the `skills/studio-intelligence/` skill in the same change: none of the three is generated, so nothing catches a stale one. A comment states the kind of thing the code cannot say (`invariant:`, `hazard:`, `outside:`, `value:`) or is not written; a public symbol keeps a one-line hover.
 
 - Every export a consumer reaches passes through an entry: no deep import path is public API.
 - An observing middleware never changes what a generation answers: it reads and writes the span or the logger, and hands the call's result on as it came.

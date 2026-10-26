@@ -20,12 +20,12 @@ lint/
 
 Four entries, one package, each built from the source the entry grammar names:
 
-| Entry          | Holds                                                                 | Built as  | Loads                                  |
-| -------------- | --------------------------------------------------------------------- | --------- | -------------------------------------- |
-| `.`            | the factory, the providers, the middleware, the fallback model        | ESM + CJS | `ai`, the provider SDKs, OpenTelemetry |
-| `./formatting` | `cleanAiText`, `toSentenceCase`                                       | ESM + CJS | the Hunspell dictionaries, never `ai`  |
-| `./config`     | `intelligence()`, the preset a consumer lists in `jterrazz.config.ts` | ESM       | `@jterrazz/typescript`                 |
-| `./oxlint`     | the oxlint plugin and `recommendedRules`                              | ESM       | `@jterrazz/typescript/rules`           |
+| Entry          | Holds                                                               | Built as  | Loads                                  |
+| -------------- | ------------------------------------------------------------------- | --------- | -------------------------------------- |
+| `.`            | the factory, the providers, the middleware, the fallback model      | ESM + CJS | `ai`, the provider SDKs, OpenTelemetry |
+| `./formatting` | `cleanAiText`, `toSentenceCase`                                     | ESM + CJS | the Hunspell dictionaries, never `ai`  |
+| `./config`     | `intelligence()`, the preset a consumer lists in `studio.config.ts` | ESM       | `@jterrazz/typescript`                 |
+| `./oxlint`     | the oxlint plugin and `recommendedRules`                            | ESM       | `@jterrazz/typescript/rules`           |
 
 `ai` and `@jterrazz/typescript` are optional peers: a consumer that only cleans text installs neither, and only a repository on the `@jterrazz` toolchain loads the preset, which is why `./config` and `./oxlint`, read by that toolchain's ESM loaders alone, ship no CommonJS build.
 
@@ -56,7 +56,7 @@ agents/_<subject>/<name>.prompt.ts  sections several agents share, in a folder m
 composition/                     where the factory is called and each model resolved
 ```
 
-The class only shapes data (filter, sort, map to flat records) and hands the prompt's builders plain values, never assembled prose; `generateText` stays visible in `run()`. A `*.prompt.ts` holds pure `(data) => string` builders, a main one and the sections it calls. The preset of `./config` makes the convention mechanical: a consumer lists `intelligence()` in its `jterrazz.config.ts`, and the six rules of [Lint rules](../reference/lint-rules.md) judge its tree on every `typescript check`.
+The class only shapes data (filter, sort, map to flat records) and hands the prompt's builders plain values, never assembled prose; `generateText` stays visible in `run()`. A `*.prompt.ts` holds pure `(data) => string` builders, a main one and the sections it calls. The preset of `./config` makes the convention mechanical: a consumer lists `intelligence()` in its `studio.config.ts`, and the six rules of [Lint rules](../reference/lint-rules.md) judge its tree on every `typescript check`.
 
 ## Formatting
 

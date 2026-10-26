@@ -8,7 +8,7 @@ This repository ships one thing: the npm package `@jterrazz/intelligence`, publi
 
 ## What a merge to `main` does
 
-Nothing that reaches a consumer. `.github/workflows/validate.yaml` runs on every push and pull request to `main` and calls the shared `jterrazz-actions` validation workflow: build, lint, test, mutation. A green `main` is a publishable tree, not a published one.
+Nothing that reaches a consumer. `.github/workflows/validate.yaml` runs on every push and pull request to `main` and calls the shared `studio-actions` validation workflow: build, lint, test, mutation. A green `main` is a publishable tree, not a published one.
 
 ## What publishes
 
@@ -24,7 +24,7 @@ A contributor never bumps the version inside a feature branch: two branches in f
 
 ## How a consumer takes it
 
-A consumer installs `@jterrazz/intelligence` beside `ai`, and a repository on the `@jterrazz` toolchain lists `intelligence()` in its `jterrazz.config.ts`. A bump is an ordinary dependency update; a renamed rule, a narrowed type or an entry dropped is a major, recorded in the release notes.
+A consumer installs `@jterrazz/intelligence` beside `ai`, and a repository on the `@jterrazz` toolchain lists `intelligence()` in its `studio.config.ts`. A bump is an ordinary dependency update; a renamed rule, a narrowed type or an entry dropped is a major, recorded in the release notes.
 
 ## Related
 

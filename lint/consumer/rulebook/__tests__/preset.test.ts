@@ -4,7 +4,7 @@ import { intelligencePreset } from '../preset.js';
 
 describe('preset', () => {
     test('the preset hands @jterrazz/typescript the plugin by its published subpath, every rule on at error', () => {
-        // Given - the preset a repository lists in jterrazz.config.ts
+        // Given - the preset a repository lists in studio.config.ts
         const preset = intelligencePreset();
 
         // Then - named for the package, each rule of the catalogue on, none at a warn tier

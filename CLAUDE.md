@@ -20,7 +20,7 @@ The manual is cut by its reader's need (`guides/`, `concepts/`, `reference/`), t
 
 `CLAUDE.md` at the root is a symlink to this file: one brief, two names, no second copy.
 
-One Claude Code skill routes into this corpus: [`skills/jterrazz-intelligence/`](skills/jterrazz-intelligence/SKILL.md).
+One Claude Code skill routes into this corpus: [`skills/studio-intelligence/`](skills/studio-intelligence/SKILL.md).
 
 ## Setup and commands
 
@@ -28,4 +28,4 @@ The gestures (`make install`, which is `npm ci` and never a plain `npm install` 
 
 ## Standing rule
 
-A rule moves with its catalogue row, its module test, its lint spec and its section of `docs/reference/lint-rules.md` ([Develop § A lint rule](docs/guides/develop.md#a-lint-rule)). A new or changed export reaches `README.md`, the relevant `docs/` page and the `skills/jterrazz-intelligence/` skill in the same change ([Develop § What a change owes](docs/guides/develop.md#what-a-change-owes)).
+A rule moves with its catalogue row, its module test, its lint spec and its section of `docs/reference/lint-rules.md` ([Develop § A lint rule](docs/guides/develop.md#a-lint-rule)). A new or changed export reaches `README.md`, the relevant `docs/` page and the `skills/studio-intelligence/` skill in the same change ([Develop § What a change owes](docs/guides/develop.md#what-a-change-owes)).
