@@ -56,20 +56,19 @@
     "dependencies": {
         "@ai-sdk/openai": "^4.0.14",
         "@ai-sdk/otel": "^1.0.31",
+        "@ai-sdk/provider": "^4.0.3",
         "@jterrazz/telemetry": "^1.1.0",
         "@openrouter/ai-sdk-provider": "^3.0.0",
         "@opentelemetry/api": "^1.9.1",
-        "@types/json-schema": "^7.0.15",
         "dictionary-en": "^4.0.0",
         "dictionary-fr": "^3.0.0",
         "nspell": "^2.1.5"
     },
     "devDependencies": {
-        "@ai-sdk/provider": "^4.0.3",
         "@cspell/dict-companies": "^3.2.12",
         "@cspell/dict-software-terms": "^5.2.4",
         "@jterrazz/test": "^19.0.0",
-        "@jterrazz/typescript": "^12.0.1",
+        "@jterrazz/typescript": "^12.1.0",
         "@opentelemetry/context-async-hooks": "^2.12.0",
         "@opentelemetry/sdk-trace-base": "^2.12.0",
         "@types/node": "^26.1.1",
@@ -79,13 +78,9 @@
         "zod": "^4.6.5"
     },
     "peerDependencies": {
-        "@jterrazz/typescript": "^12.0.0",
         "ai": ">=7.0.0"
     },
     "peerDependenciesMeta": {
-        "@jterrazz/typescript": {
-            "optional": true
-        },
         "ai": {
             "optional": true
         }

@@ -27,7 +27,7 @@ Four entries, one package, each built from the source the entry grammar names:
 | `./config`     | `intelligence()`, the preset a consumer lists in `studio.config.ts` | ESM       | `@jterrazz/typescript`                 |
 | `./oxlint`     | the oxlint plugin and `recommendedRules`                            | ESM       | `@jterrazz/typescript/rules`           |
 
-`ai` and `@jterrazz/typescript` are optional peers: a consumer that only cleans text installs neither, and only a repository on the `@jterrazz` toolchain loads the preset, which is why `./config` and `./oxlint`, read by that toolchain's ESM loaders alone, ship no CommonJS build.
+`ai` is an optional peer: a consumer that only cleans text never installs it. `@jterrazz/typescript` is a devDependency the build leaves external ([ADR-040 of `@jterrazz/typescript`](https://github.com/jterrazz/package-typescript/blob/main/docs/decisions/040-a-published-library-leaves-its-devdependencies-to-its-consumer.md)), never a peer: npm counts an installed optional peer of a production dependency as production, which shipped the whole lint toolchain in every consumer's production image. Only a repository on the `@jterrazz` toolchain loads the preset, and it holds the toolchain itself, which is why `./config` and `./oxlint`, read by that toolchain's ESM loaders alone, ship no CommonJS build.
 
 ## What `createIntelligence` wires
 
