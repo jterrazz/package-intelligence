@@ -18,8 +18,6 @@ The corpus is `docs/` + `README.md`, mapped by [`docs/README.md`](docs/README.md
 
 The manual is cut by its reader's need (`guides/`, `concepts/`, `reference/`), the shape every repository of the ecosystem keeps, and `typescript check` refuses a tree that breaks it (the Docs (layout) pass).
 
-`CLAUDE.md` at the root is a symlink to this file: one brief, two names, no second copy.
-
 One Claude Code skill routes into this corpus: [`skills/studio-intelligence/`](skills/studio-intelligence/SKILL.md).
 
 ## Setup and commands
