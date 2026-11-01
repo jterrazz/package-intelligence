@@ -12,7 +12,7 @@ Nothing that reaches a consumer. `.github/workflows/check.yaml` runs on every pu
 
 ## What publishes
 
-`.github/workflows/release.yaml` fires on `release: created` and calls the shared `publish-npm.yaml` workflow with npm provenance (`id-token: write`). Exactly one gesture publishes, and a human makes it: cutting a GitHub Release.
+`.github/workflows/publish.yaml` fires on `release: created` and calls the shared `publish-npm.yaml` workflow with npm provenance (`id-token: write`). Exactly one gesture publishes, and a human makes it: cutting a GitHub Release.
 
 1. the change merges to `main` and validates green;
 2. the owner bumps `version` in `package.json` (and the lockfile) on `main`;
